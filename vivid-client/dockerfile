@@ -17,3 +17,5 @@ FROM nginx:1.19 AS runner
 WORKDIR /var
 RUN rm -rf /usr/share/nginx/html
 COPY --from=compile /app/build /usr/share/nginx/html
+
+EXPOSE 80

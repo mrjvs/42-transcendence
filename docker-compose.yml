@@ -1,0 +1,16 @@
+version: "3.3"
+services:
+  # frontend
+  frontend:
+    build: ./vivid-client
+    container_name: vivid-client
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+# persistent data
+# volumes:
+
+networks:
+  default:
+    name: vivid
