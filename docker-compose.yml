@@ -12,6 +12,8 @@ services:
   backend:
     build: ./vivid-server
     container_name: vivid-server
+    env_file:
+      - ./config/vivid-server.env
     links:
       - database
     depends_on:
