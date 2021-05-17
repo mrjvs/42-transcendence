@@ -18,6 +18,7 @@ function App() {
         >
           Learn hello world
         </a>
+        <p>Test env: {window._env_.VIVID_TEST_ENV}</p>
       </header>
     </div>
   );

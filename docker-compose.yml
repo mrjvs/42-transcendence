@@ -4,6 +4,8 @@ services:
   frontend:
     build: ./vivid-client
     container_name: vivid-client
+    env_file:
+      - ./config/vivid-client.env
     restart: unless-stopped
 
   # server
