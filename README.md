@@ -1,2 +1,2 @@
-# 42-transcendence-
-pong v2
+# Vivid (42-transcendence)
+Because pong is so great
