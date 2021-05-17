@@ -13,4 +13,4 @@ RUN npm run build
 
 # run server
 EXPOSE 3000
-CMD cd dist && node main.js
+CMD export PORT=3000 && cd dist && node main.js
