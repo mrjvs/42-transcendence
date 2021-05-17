@@ -8,6 +8,14 @@ services:
       - "8080:80"
     restart: unless-stopped
 
+  # server
+  backend:
+    build: ./vivid-server
+    container_name: vivid-server
+    ports:
+      - "8081:3000"
+    restart: unless-stopped
+
 # persistent data
 # volumes:
 
