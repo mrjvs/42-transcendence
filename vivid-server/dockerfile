@@ -2,7 +2,7 @@ FROM node:16-alpine
 WORKDIR /app
 
 # install dependecies
-COPY package* .
+COPY package* ./
 RUN npm install
 
 # copy rest
