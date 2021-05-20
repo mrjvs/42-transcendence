@@ -1,0 +1,22 @@
+name: CI Lint
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: node setup
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+      - name: node install dependencies
+        run: npm install
+      - name: node lint
+        run: npm run lint
