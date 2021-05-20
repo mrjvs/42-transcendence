@@ -68,7 +68,7 @@ function NotFound() {
   return (
     <div>
       <h2>Whoops</h2>
-      <p>We couldn't find that page</p>
+      <p>We couldn&lsquo;t find that page</p>
       <Link to="/">Back to home</Link>
     </div>
   );
