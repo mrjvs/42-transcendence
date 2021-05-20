@@ -3,7 +3,7 @@ name: Client Lint
 on: [push, pull_request]
 
 jobs:
-  build:
+  client_linting:
     runs-on: ubuntu-latest
 
     env:

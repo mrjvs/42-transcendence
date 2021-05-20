@@ -3,7 +3,7 @@ name: Server Lint
 on: [push, pull_request]
 
 jobs:
-  build:
+  server_linting:
     runs-on: ubuntu-latest
 
     env:
