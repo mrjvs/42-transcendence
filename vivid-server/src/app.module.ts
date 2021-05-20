@@ -20,7 +20,7 @@ const config = ConfigModule.forRoot({
 			type: 'postgres',
 			host: configService.get('db.host'),
 			port: configService.get('db.port'),
-			user: configService.get('db.user'),
+			username: configService.get('db.user'),
 			password: configService.get('db.password'),
 			database: configService.get('db.database'),
 			autoLoadEntities: true,
