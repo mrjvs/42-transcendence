@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { ChannelService } from './channel.service';
 import { IChannel, ChannelDto } from './models/channel.entity';

@@ -1,4 +1,3 @@
-import { UserEntity } from 'src/users/models/user.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { JoinedChannelEntity } from './joined_channels.entity';
 
