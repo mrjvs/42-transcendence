@@ -3,9 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './users/user.module';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { UserModule } from './users/user.module';
+import { ChannelModule } from './channels/channel.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -13,6 +15,7 @@ const config = ConfigModule.forRoot({
 
 @Module({
   imports: [
+    // config & database
     config,
     TypeOrmModule.forRootAsync({
       imports: [config],
@@ -28,7 +31,10 @@ const config = ConfigModule.forRoot({
       }),
       inject: [ConfigService],
     }),
+
+    // modules
     UserModule,
+    ChannelModule,
   ],
   controllers: [AppController],
   providers: [AppService],
