@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import logo from './logo.svg';
 import './App.css';
 
@@ -15,8 +10,12 @@ function App() {
         <div>
           <nav>
             <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/about">About</Link></li>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/about">About</Link>
+              </li>
             </ul>
           </nav>
           <Switch>
@@ -69,7 +68,7 @@ function NotFound() {
   return (
     <div>
       <h2>Whoops</h2>
-      <p>We couldn't find that page</p>
+      <p>We couldn&lsquo;t find that page</p>
       <Link to="/">Back to home</Link>
     </div>
   );
