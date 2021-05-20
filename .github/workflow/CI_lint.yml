@@ -17,6 +17,6 @@ jobs:
         with:
           node-version: "16.x"
       - name: node install dependencies
-        run: npm install
+        run: npm ci
       - name: node lint
         run: npm run lint
