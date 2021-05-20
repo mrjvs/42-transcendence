@@ -9,7 +9,7 @@ export class ChannelEntity {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @OneToMany(() => JoinedChannelEntity, (channel) => channel.channel_id)
+  @OneToMany(() => JoinedChannelEntity, (channel) => channel.channel)
   joined_users: JoinedChannelEntity[];
 }
 

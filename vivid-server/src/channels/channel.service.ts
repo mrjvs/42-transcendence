@@ -24,7 +24,7 @@ export class ChannelService {
 
   async findChannel(id: string): Promise<IChannel> {
     return await this.ChannelRepository.findOne({
-      relations: ['joined_users'],
+      relations: ['joined_users', 'joined_users.user'],
       where: {
         id,
       },
@@ -34,7 +34,7 @@ export class ChannelService {
   findAll(): Observable<IChannel[]> {
     return from(
       this.ChannelRepository.find({
-        relations: ['joined_users'],
+        relations: ['joined_users', 'joined_users.user'],
       }),
     );
   }

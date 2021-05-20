@@ -17,11 +17,20 @@ export class UserService {
   }
 
   async findUser(id: string): Promise<UserEntity> {
-    return await this.userRepository.findOne(id);
+    return await this.userRepository.findOne({
+      relations: ['joined_channels', 'joined_channels.channel'],
+      where: {
+        id,
+      },
+    });
   }
 
   findAll(): Observable<IUser[]> {
-    return from(this.userRepository.find());
+    return from(
+      this.userRepository.find({
+        relations: ['joined_channels', 'joined_channels.channel'],
+      }),
+    );
   }
 
   deleteUser(id: string) {

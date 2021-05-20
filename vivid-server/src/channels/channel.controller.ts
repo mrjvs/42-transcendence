@@ -33,8 +33,8 @@ export class ChannelController {
     @Body() channel: UserJoinedChannelDto,
   ): Observable<IJoinedChannel> {
     const populatedChannel: IJoinedChannelInput = {
-      ...channel,
-      channel_id: id,
+      user: channel.user_id,
+      channel: id,
     };
     return this.channelService.addUser(populatedChannel);
   }

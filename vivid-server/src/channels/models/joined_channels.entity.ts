@@ -1,28 +1,30 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { IsNotEmpty, IsUUID } from 'class-validator';
 import { ChannelEntity } from './channel.entity';
+import { UserEntity } from 'src/users/models/user.entity';
+import { IUser } from 'src/users/models/user.interface';
 
 @Entity('joined_channels')
 export class JoinedChannelEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'uuid' })
-  user_id: string;
+  @ManyToOne(() => UserEntity, (user) => user.joined_channels)
+  user: string;
 
   @ManyToOne(() => ChannelEntity, (channel) => channel.joined_users)
-  channel_id: string;
+  channel: string;
 }
 
 export class IJoinedChannel {
   id: number;
-  channel_id: string;
-  user_id: string;
+  channel: string;
+  user: string | IUser;
 }
 
 export class IJoinedChannelInput {
-  channel_id: string;
-  user_id: string;
+  channel: string;
+  user: string;
 }
 
 export class UserJoinedChannelDto {
