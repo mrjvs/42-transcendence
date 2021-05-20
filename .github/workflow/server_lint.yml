@@ -1,0 +1,23 @@
+name: Server Lint
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      working-directory: ./vivid-server
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+      - name: Installing dependencies
+        working-directory: ${{env.working-directory}}
+        run: npm ci
+      - name: Linting
+        working-directory: ${{env.working-directory}}
+        run: npm run lint
