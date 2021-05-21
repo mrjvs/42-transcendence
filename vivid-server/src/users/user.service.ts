@@ -28,23 +28,21 @@ export class UserService {
 	deleteUser(id: string) {
 		return this.userRepository.delete(id);
 	}
-}
 
-/**
- * Add new user:
- *		- POST http:localhost:3000/api/v1/users
- * 		  body:
- * 			{
- * 				"id": number
- * 				"name": string
- * 			}
- *
- * Find user by id:
- *		- GET http:localhost:3000/api/v1/users/<id>
- * 
- * Find all users:
- *		- GET http:localhost:3000/api/v1/users
- *
- * Delete user:
- *		- DELETE http:localhost:3000/api/v1/users/<id>
- *  */
+	async findIntraUser(intraId: string): Promise<UserEntity> {
+		return await this.userRepository.findOne({
+			where: {
+				intra_id: intraId,
+			},
+		});
+	}
+	
+	async createUser(intraId: string): Promise<UserEntity> {
+		const user: IUser = {
+			id: 1234,
+			name: "mrjvs",
+			intra_id: intraId,
+		}
+		return await this.userRepository.save(user);
+	}
+}

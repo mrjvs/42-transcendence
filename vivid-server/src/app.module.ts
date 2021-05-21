@@ -7,6 +7,7 @@ import { UserModule } from './users/user.module';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
 
 const config = ConfigModule.forRoot({
 	load: [configuration],
@@ -15,6 +16,7 @@ const config = ConfigModule.forRoot({
 @Module({
   imports: [
     config,
+	AuthModule,
 	TypeOrmModule.forRootAsync({
 		imports:[config],
 		useFactory: async (configService: ConfigService) => ({
@@ -30,7 +32,6 @@ const config = ConfigModule.forRoot({
 		inject: [ConfigService]
 	  }),
 	UserModule,
-	AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

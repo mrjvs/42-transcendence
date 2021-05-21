@@ -12,4 +12,7 @@ export class UserEntity {
 
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
 	createdAt: Date;
+	
+	@Column()
+	intra_id: string;
 }
