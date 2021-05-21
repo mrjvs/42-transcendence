@@ -6,24 +6,21 @@ import { UserService } from 'src/users/user.service';
 export class SessionSerializer extends PassportSerializer {
   constructor(
     @Inject(UserService)
-    private userService: UserService
+    private readonly userService: UserService
   ) {
     super();
   }
 
-  serializeUser(user: any, done: (err: Error, user: any) => void): any {
-    console.log(user);
+  serializeUser(user: any, done: (err: Error, payload: string) => void): any {
     done(null, user.id.toString());
   }
 
-  deserializeUser(id: string, done: (err: Error, payload: string) => void): any {
-    console.log("deserialize", id);
-    this.userService.findUser(id)
-    .then((user:any) => {
+  async deserializeUser(id: string, done: (err: Error, user: any) => void): Promise<any> {
+    try {
+      const user = await this.userService.findUser(id);
       done(null, user);
-    })
-    .catch((err) => {
+    } catch (err) {
       done(err, null);
-    })
+    }
   }
 }

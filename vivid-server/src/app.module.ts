@@ -9,16 +9,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 
-const config = ConfigModule.forRoot({
-	load: [configuration],
-})
-
 @Module({
   imports: [
-    config,
+    ConfigModule.forRoot({
+		load: [configuration],
+	}),
 	AuthModule,
+	PassportModule.register({ session: true }),
 	TypeOrmModule.forRootAsync({
-		imports:[config],
+		imports:[ConfigModule],
 		useFactory: async (configService: ConfigService) => ({
 			type: 'postgres',
 			host: configService.get('db.host'),
@@ -35,5 +34,6 @@ const config = ConfigModule.forRoot({
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [ConfigModule],
 })
 export class AppModule {}

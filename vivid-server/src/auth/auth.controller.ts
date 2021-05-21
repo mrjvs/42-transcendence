@@ -1,10 +1,11 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import { AuthenticatedGuard, IntraAuthGuard } from './guards';
 
 @Controller('auth')
 export class AuthController {
   @Get('/login')
-  @UseGuards(AuthGuard('oauth2'))
+  @UseGuards(IntraAuthGuard)
   login(@Req() req): object {
     return {
       isLoggedIn: !!req.user,
@@ -12,7 +13,8 @@ export class AuthController {
   }
 
   @Get('/me')
-  getUser(@Req() req): object {
+  @UseGuards(AuthenticatedGuard)
+  getUser(@Req() req: Request): object {
     return {
       user: req.user,
     };

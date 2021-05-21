@@ -9,6 +9,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   const configService = app.get(ConfigService);
 
+  // TODO use session connect store from typeORM
   app.use(
     session({
       secret: 'keyboard-cat',
@@ -21,7 +22,6 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.use((req, _, next) => {
-    console.log("request:", req.session);
     next();
   })
 
