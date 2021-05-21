@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { UserModule } from './users/user.module';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 
 const config = ConfigModule.forRoot({
 	load: [configuration],
@@ -28,7 +29,8 @@ const config = ConfigModule.forRoot({
 		}),
 		inject: [ConfigService]
 	  }),
-	UserModule
+	UserModule,
+	AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
