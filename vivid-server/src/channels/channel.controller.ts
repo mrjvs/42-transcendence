@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Delete } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { DeleteResult } from 'typeorm';
 import { ChannelService } from './channel.service';
 import { IChannel, ChannelDto } from './models/channel.entity';
 import {
@@ -37,5 +38,17 @@ export class ChannelController {
       channel_id: id,
     };
     return this.channelService.addUser(populatedChannel);
+  }
+
+  @Delete('/:id/users')
+  exitChannel(
+    @Param('id') id: string,
+    @Body() channel: UserJoinedChannelDto,
+  ): Observable<DeleteResult> {
+    const populatedChannel: IJoinedChannelInput = {
+      ...channel,
+      channel_id: id,
+    };
+    return this.channelService.removeUser(populatedChannel);
   }
 }

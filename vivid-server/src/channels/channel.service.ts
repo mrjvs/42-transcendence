@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
 import { ChannelEntity, IChannel, ChannelDto } from './models/channel.entity';
 import {
@@ -41,5 +41,11 @@ export class ChannelService {
 
   addUser(joinedChannelInput: IJoinedChannelInput): Observable<IJoinedChannel> {
     return from(this.JoinedChannelRepository.save(joinedChannelInput));
+  }
+
+  removeUser(
+    joinedChannelInput: IJoinedChannelInput,
+  ): Observable<DeleteResult> {
+    return from(this.JoinedChannelRepository.delete({ ...joinedChannelInput }));
   }
 }
