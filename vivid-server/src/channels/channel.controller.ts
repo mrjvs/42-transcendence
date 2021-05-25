@@ -29,6 +29,11 @@ export class ChannelController {
     return this.channelService.add(channel);
   }
 
+  @Delete('/:id')
+  deleteChannel(@Param('id') id: string): Observable<DeleteResult> {
+    return this.channelService.remove(id);
+  }
+
   @Post('/:id/users')
   joinChannel(
     @Param('id') id: string,

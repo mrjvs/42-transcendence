@@ -29,6 +29,10 @@ export class ChannelService {
     return from(this.ChannelRepository.save(channelInput));
   }
 
+  remove(channel_id: string): Observable<DeleteResult> {
+    return from(this.ChannelRepository.delete(channel_id));
+  }
+
   async findChannel(id: string): Promise<IChannel> {
     return await this.ChannelRepository.findOne({
       relations: ['joined_users'],
