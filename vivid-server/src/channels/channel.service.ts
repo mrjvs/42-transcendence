@@ -8,6 +8,11 @@ import {
   IJoinedChannel,
   IJoinedChannelInput,
 } from './models/joined_channels.entity';
+import {
+  MessageEntity,
+  IMessage,
+  IMessageInput,
+} from './models/messages.entity';
 
 @Injectable()
 export class ChannelService {
@@ -16,6 +21,8 @@ export class ChannelService {
     private ChannelRepository: Repository<ChannelEntity>,
     @InjectRepository(JoinedChannelEntity)
     private JoinedChannelRepository: Repository<JoinedChannelEntity>,
+    @InjectRepository(MessageEntity)
+    private MessageRepository: Repository<MessageEntity>,
   ) {}
 
   add(channelInput: ChannelDto): Observable<IChannel> {
@@ -47,5 +54,18 @@ export class ChannelService {
     joinedChannelInput: IJoinedChannelInput,
   ): Observable<DeleteResult> {
     return from(this.JoinedChannelRepository.delete({ ...joinedChannelInput }));
+  }
+
+  postMessage(messageInput: IMessageInput): Observable<IMessage> {
+    return from(this.MessageRepository.save(messageInput));
+  }
+
+  getMessages(id: string): Observable<IMessage[]> {
+    return from(
+      this.MessageRepository.createQueryBuilder()
+        .where({ channel: id })
+        .orderBy('created_at', 'ASC')
+        .getMany(),
+    );
   }
 }

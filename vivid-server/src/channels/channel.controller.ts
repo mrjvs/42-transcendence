@@ -8,6 +8,7 @@ import {
   IJoinedChannel,
   IJoinedChannelInput,
 } from './models/joined_channels.entity';
+import { IMessageInput, MessageDto, IMessage } from './models/messages.entity';
 
 @Controller('channels')
 export class ChannelController {
@@ -50,5 +51,22 @@ export class ChannelController {
       channel_id: id,
     };
     return this.channelService.removeUser(populatedChannel);
+  }
+
+  @Post('/:id/messages')
+  postMessage(
+    @Param('id') id: string,
+    @Body() data: MessageDto,
+  ): Observable<IMessage> {
+    const populatedMessage: IMessageInput = {
+      ...data,
+      channel: id,
+    };
+    return this.channelService.postMessage(populatedMessage);
+  }
+
+  @Get('/:id/messages')
+  getMessages(@Param('id') id: string): Observable<IMessage[]> {
+    return this.channelService.getMessages(id);
   }
 }
