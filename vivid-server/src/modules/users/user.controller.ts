@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post, Param } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
-import { IUser } from './models/user.interface';
+import { IUser } from '@/user.interface';
 
 @Controller('users')
 export class UserController {

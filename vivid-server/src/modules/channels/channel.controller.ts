@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Post, Param } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { ChannelService } from './channel.service';
-import { IChannel, ChannelDto } from './models/channel.entity';
+import { IChannel, ChannelDto } from '@/channel.entity';
 import {
   UserJoinedChannelDto,
   IJoinedChannel,
   IJoinedChannelInput,
-} from './models/joined_channels.entity';
+} from '@/joined_channels.entity';
 
 @Controller('channels')
 export class ChannelController {

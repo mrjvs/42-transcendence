@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { IsNotEmpty, IsUUID } from 'class-validator';
 import { ChannelEntity } from './channel.entity';
-import { UserEntity } from 'src/users/models/user.entity';
-import { IUser } from 'src/users/models/user.interface';
+import { UserEntity } from './user.entity';
+import { IUser } from './user.interface';
 
 @Entity('joined_channels')
 export class JoinedChannelEntity {

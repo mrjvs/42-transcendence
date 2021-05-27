@@ -1,4 +1,4 @@
-import { JoinedChannelEntity } from 'src/channels/models/joined_channels.entity';
+import { JoinedChannelEntity } from './joined_channels.entity';
 import {
   Column,
   Entity,
