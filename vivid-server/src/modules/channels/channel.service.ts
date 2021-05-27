@@ -2,17 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
-import { ChannelEntity, IChannel, ChannelDto } from './models/channel.entity';
+import { ChannelEntity, IChannel, ChannelDto } from '@/channel.entity';
 import {
   JoinedChannelEntity,
   IJoinedChannel,
   IJoinedChannelInput,
-} from './models/joined_channels.entity';
-import {
-  MessageEntity,
-  IMessage,
-  IMessageInput,
-} from './models/messages.entity';
+} from '@/joined_channels.entity';
+import { MessageEntity, IMessage, IMessageInput } from '@/messages.entity';
 
 @Injectable()
 export class ChannelService {
