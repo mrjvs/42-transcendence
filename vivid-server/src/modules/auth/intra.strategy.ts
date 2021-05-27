@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-oauth2';
 import { PassportStrategy } from '@nestjs/passport';
-import { HttpService, Inject, Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 

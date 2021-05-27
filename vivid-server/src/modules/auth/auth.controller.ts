@@ -10,7 +10,7 @@ import { UserEntity } from '~/models/user.entity';
 export class AuthController {
   @Get('/login')
   @UseGuards(IntraAuthGuard)
-  login(@Req() req): object {
+  login(@Req() req): any {
     return {
       isLoggedIn: !!req.user,
     };
@@ -18,7 +18,7 @@ export class AuthController {
 
   @Get('/me')
   @UseGuards(AuthenticatedGuard)
-  getUser(@User() user: UserEntity): object {
+  getUser(@User() user: UserEntity): any {
     return {
       user: user,
       name: user.getName(),

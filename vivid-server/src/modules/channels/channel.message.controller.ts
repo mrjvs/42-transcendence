@@ -4,20 +4,18 @@ import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 @Controller('channels/:id/messages')
 @UseGuards(AuthenticatedGuard)
 export class ChannelMessageController {
-  constructor() {}
-
   @Get('/')
-  getMessageHistory(): Object {
+  getMessageHistory(): any {
     return {};
   }
 
   @Post('/')
-  createMessage(): Object {
+  createMessage(): any {
     return {};
   }
 
   @Delete('/:message')
-  addChannelUser(): Object {
+  addChannelUser(): any {
     return {};
   }
 }

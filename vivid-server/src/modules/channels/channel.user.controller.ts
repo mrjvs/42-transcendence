@@ -11,35 +11,33 @@ import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 @Controller('channels/:id/users')
 @UseGuards(AuthenticatedGuard)
 export class ChannelUserController {
-  constructor() {}
-
   @Get('/')
-  getChannelUsers(): Object {
+  getChannelUsers(): any {
     return {};
   }
 
   @Get('/:user')
-  getChannelUser(): Object {
+  getChannelUser(): any {
     return {};
   }
 
   @Post('/:user')
-  addChannelUser(): Object {
+  addChannelUser(): any {
     return {};
   }
 
   @Patch('/:user')
-  updateChannelUser(): Object {
+  updateChannelUser(): any {
     return {};
   }
 
   @Patch('/:user/permissions')
-  updateChannelUserPermisions(): Object {
+  updateChannelUserPermisions(): any {
     return {};
   }
 
   @Delete('/:user')
-  removeChannelUser(): Object {
+  removeChannelUser(): any {
     return {};
   }
 }

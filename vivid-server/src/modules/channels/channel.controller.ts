@@ -22,17 +22,17 @@ export class ChannelController {
   }
 
   @Post('/')
-  createChannel(): Object {
+  createChannel(): any {
     return {};
   }
 
   @Patch('/:id')
-  updateChannel(): Object {
+  updateChannel(): any {
     return {};
   }
 
   @Delete('/:id')
-  removeChannel(): Object {
+  removeChannel(): any {
     return {};
   }
 }
