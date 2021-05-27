@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import logo from './logo.svg';
 import './App.css';
+import { ChannelView } from './views/channel';
 
 function App() {
   return (
@@ -25,6 +25,9 @@ function App() {
             <Route exact path="/">
               <Home />
             </Route>
+            <Route exact path="/channel/:id">
+              <ChannelView />
+            </Route>
             <Route path="*">
               <NotFound />
             </Route>
@@ -35,22 +38,59 @@ function App() {
   );
 }
 
+interface IChannelList {
+  id: string;
+}
+
 function Home() {
+  const [error, setError] = useState(false);
+  const [channelList, setChannelList] = useState<IChannelList[]>([]);
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/v1/channels')
+      .then((res) => res.json())
+      .then((result) => {
+        setLoading(false);
+        setChannelList(result);
+      })
+      .catch(() => {
+        setLoading(false);
+        setError(true);
+      });
+  }, []);
+
+  let channelListRender;
+
+  if (isLoading)
+    channelListRender = (
+      <div>
+        <p>Loading...</p>
+      </div>
+    );
+  else if (error)
+    channelListRender = (
+      <div>
+        <p>Something went wrong, try again later</p>
+      </div>
+    );
+  else
+    channelListRender = (
+      <div>
+        <ul>
+          {channelList.map((v) => (
+            <li key={v.id}>
+              <Link to={`/channel/${v.id}`}>{v.id}</Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+
   return (
-    <header className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
-      <p>
-        Edit <code>src/App.tsx</code> and save to reload.
-      </p>
-      <a
-        className="App-link"
-        href="https://reactjs.org"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Learn hello world
-      </a>
-      <p>Test env: {window._env_.VIVID_TEST_ENV}</p>
+    <header>
+      <h1>Channel list:</h1>
+      {channelListRender}
     </header>
   );
 }

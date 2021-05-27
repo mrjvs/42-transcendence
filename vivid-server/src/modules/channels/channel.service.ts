@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
 import { ChannelEntity, IChannel, ChannelDto } from './models/channel.entity';
 import {
@@ -8,6 +8,11 @@ import {
   IJoinedChannel,
   IJoinedChannelInput,
 } from './models/joined_channels.entity';
+import {
+  MessageEntity,
+  IMessage,
+  IMessageInput,
+} from './models/messages.entity';
 
 @Injectable()
 export class ChannelService {
@@ -16,10 +21,16 @@ export class ChannelService {
     private ChannelRepository: Repository<ChannelEntity>,
     @InjectRepository(JoinedChannelEntity)
     private JoinedChannelRepository: Repository<JoinedChannelEntity>,
+    @InjectRepository(MessageEntity)
+    private MessageRepository: Repository<MessageEntity>,
   ) {}
 
   add(channelInput: ChannelDto): Observable<IChannel> {
     return from(this.ChannelRepository.save(channelInput));
+  }
+
+  remove(channel_id: string): Observable<DeleteResult> {
+    return from(this.ChannelRepository.delete(channel_id));
   }
 
   async findChannel(id: string): Promise<IChannel> {
@@ -41,5 +52,24 @@ export class ChannelService {
 
   addUser(joinedChannelInput: IJoinedChannelInput): Observable<IJoinedChannel> {
     return from(this.JoinedChannelRepository.save(joinedChannelInput));
+  }
+
+  removeUser(
+    joinedChannelInput: IJoinedChannelInput,
+  ): Observable<DeleteResult> {
+    return from(this.JoinedChannelRepository.delete({ ...joinedChannelInput }));
+  }
+
+  postMessage(messageInput: IMessageInput): Observable<IMessage> {
+    return from(this.MessageRepository.save(messageInput));
+  }
+
+  getMessages(id: string): Observable<IMessage[]> {
+    return from(
+      this.MessageRepository.createQueryBuilder()
+        .where({ channel: id })
+        .orderBy('created_at', 'ASC')
+        .getMany(),
+    );
   }
 }
