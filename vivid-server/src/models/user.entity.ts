@@ -23,4 +23,8 @@ export class UserEntity {
 
   @Column()
   intra_id: string;
+
+  getName() {
+    return this.name + '!!!';
+  }
 }

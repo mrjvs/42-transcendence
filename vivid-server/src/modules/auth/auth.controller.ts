@@ -1,9 +1,10 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
+import { User } from '~/middleware/decorators/login.decorator';
 import {
   AuthenticatedGuard,
   IntraAuthGuard,
 } from '~/middleware/guards/auth.guards';
+import { UserEntity } from '~/models/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -17,9 +18,10 @@ export class AuthController {
 
   @Get('/me')
   @UseGuards(AuthenticatedGuard)
-  getUser(@Req() req: Request): object {
+  getUser(@User() user: UserEntity): object {
     return {
-      user: req.user,
+      user: user,
+      name: user.getName(),
     };
   }
 }
