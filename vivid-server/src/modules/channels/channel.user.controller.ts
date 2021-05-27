@@ -1,6 +1,15 @@
-import { Controller, Get, Post, Delete, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 
 @Controller('channels/:id/users')
+@UseGuards(AuthenticatedGuard)
 export class ChannelUserController {
   constructor() {}
 

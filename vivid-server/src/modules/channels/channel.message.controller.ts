@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Delete, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Delete, UseGuards } from '@nestjs/common';
+import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 
 @Controller('channels/:id/messages')
+@UseGuards(AuthenticatedGuard)
 export class ChannelMessageController {
   constructor() {}
 

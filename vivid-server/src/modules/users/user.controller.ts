@@ -1,9 +1,19 @@
-import { Body, Controller, Delete, Get, Post, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
 import { IUser } from '@/user.interface';
+import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 
 @Controller('users')
+@UseGuards(AuthenticatedGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
