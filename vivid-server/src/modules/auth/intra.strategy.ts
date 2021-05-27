@@ -17,7 +17,7 @@ export class IntraStrategy extends PassportStrategy(Strategy) {
       clientID: configService.get('oauth.intra.clientId'),
       clientSecret: configService.get('oauth.intra.clientSecret'),
       callbackURL: 'http://localhost:8080/api/v1/auth/login',
-      scopes: ['public']
+      scopes: ['public'],
     });
   }
 
@@ -27,6 +27,6 @@ export class IntraStrategy extends PassportStrategy(Strategy) {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       .toPromise();
-    return await this.authService.validateUser(data.id)
+    return await this.authService.validateUser(data.id);
   }
 }
