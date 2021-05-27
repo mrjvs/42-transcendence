@@ -1,0 +1,43 @@
+# -- compile --
+FROM node:16-alpine AS compile
+WORKDIR /app
+
+# install dependecies
+COPY package* ./
+RUN npm install
+
+# copy rest
+COPY . .
+
+# compile
+RUN npm run build
+
+# -- run server --
+FROM nginx:1.19 AS runner
+WORKDIR /var
+
+# install node for scripting
+RUN apt-get update -yq \
+   && apt-get install curl gnupg -yq \
+   && curl -sL https://deb.nodesource.com/setup_10.x | bash \
+   && apt-get install nodejs -yq \
+   && apt-get clean -y
+
+# nginx cleanup
+RUN rm -rf /usr/share/nginx/html
+RUN rm -f /etc/nginx/conf.d/default.conf
+
+# site config
+COPY ./docker/site.conf /etc/nginx/conf.d/default.conf
+
+# add built files
+COPY ./docker/generateEnv.js /scripts/generateEnv.js
+COPY --from=compile /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+# 1. run generateEnv.js
+# 2. run nginx
+
+CMD cd /usr/share/nginx/html && node /scripts/generateEnv.js && \
+    nginx -g "daemon off;"

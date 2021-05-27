@@ -1,0 +1,16 @@
+FROM node:16-alpine 
+WORKDIR /app
+
+# install dependecies
+COPY package* ./
+RUN npm install
+
+# copy rest
+COPY . .
+
+# compile
+RUN npm run build
+
+# run server
+EXPOSE 3000
+CMD export PORT=3000 && cd dist && node main.js

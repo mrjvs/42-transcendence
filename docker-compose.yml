@@ -1,0 +1,53 @@
+version: "3.3"
+services:
+  # frontend
+  frontend:
+    build: ./vivid-client
+    container_name: vivid-client
+    env_file:
+      - ./config/vivid-client.env
+    restart: unless-stopped
+
+  # server
+  backend:
+    build: ./vivid-server
+    container_name: vivid-server
+    env_file:
+      - ./config/vivid-server.env
+    links:
+      - database
+    depends_on:
+      - database
+    restart: unless-stopped
+
+  # database
+  database:
+    image: postgres:13.3
+    volumes:
+      - "postgres-data:/var/lib/postgresql/data"
+    env_file:
+      - ./config/postgres.env
+    restart: unless-stopped
+
+  # nginx reverse proxy
+  proxy:
+    image: nginx:1.19
+    volumes:
+      - "./config/nginx-proxy.conf:/etc/nginx/conf.d/default.conf"
+    links:
+      - frontend
+      - backend
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+# persistent data
+volumes:
+  postgres-data:
+
+networks:
+  default:
+    name: vivid
