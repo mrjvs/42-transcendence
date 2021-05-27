@@ -38,5 +38,6 @@ const config = ConfigModule.forRoot({
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [ConfigModule],
 })
 export class AppModule {}
