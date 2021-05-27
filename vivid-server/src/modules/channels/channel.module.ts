@@ -4,6 +4,8 @@ import { ChannelService } from './channel.service';
 import { ChannelEntity } from '@/channel.entity';
 import { JoinedChannelEntity } from '@/joined_channels.entity';
 import { ChannelController } from './channel.controller';
+import { ChannelUserController } from './channel.user.controller';
+import { ChannelMessageController } from './channel.message.controller';
 import { MessageEntity } from '@/messages.entity';
 
 @Module({
@@ -15,6 +17,10 @@ import { MessageEntity } from '@/messages.entity';
     ]),
   ],
   providers: [ChannelService],
-  controllers: [ChannelController],
+  controllers: [
+    ChannelController,
+    ChannelUserController,
+    ChannelMessageController,
+  ],
 })
 export class ChannelModule {}
