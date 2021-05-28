@@ -8,6 +8,7 @@ import configuration from '~/config/configuration';
 import { UserModule } from '$/users/user.module';
 import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
+import { TypeORMSession } from '@/session.entity';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -27,6 +28,7 @@ const config = ConfigModule.forRoot({
         password: configService.get('db.password'),
         database: configService.get('db.database'),
         autoLoadEntities: true,
+        entities: [TypeORMSession],
         synchronize: true,
       }),
       inject: [ConfigService],

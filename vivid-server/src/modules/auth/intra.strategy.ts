@@ -16,7 +16,8 @@ export class IntraStrategy extends PassportStrategy(Strategy) {
       tokenURL: 'https://api.intra.42.fr/oauth/token',
       clientID: configService.get('oauth.intra.clientId'),
       clientSecret: configService.get('oauth.intra.clientSecret'),
-      callbackURL: 'http://localhost:8080/api/v1/auth/login',
+      callbackURL:
+        configService.get('oauth.intra.callbackHost') + '/api/v1/auth/login',
       scopes: ['public'],
     });
   }
