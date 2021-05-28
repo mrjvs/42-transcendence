@@ -24,6 +24,7 @@
     "@nestjs/platform-express": "^7.6.17",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
+    "connect-typeorm": "^1.1.4",
     "express-session": "^1.17.2",
     "passport": "^0.4.1",
     "passport-oauth2": "^1.5.0",
