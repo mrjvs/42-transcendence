@@ -7,4 +7,10 @@ export default () => ({
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DATABASE || 'vivid',
   },
+  oauth: {
+    intra: {
+      clientId: process.env.OAUTH_INTRA_CLIENT_ID,
+      clientSecret: process.env.OAUTH_INTRA_CLIENT_SECRET,
+    },
+  },
 });

@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './users/user.module';
-import configuration from './config/configuration';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import configuration from '~/config/configuration';
+
+import { UserModule } from '$/users/user.module';
+import { ChannelModule } from '$/channels/channel.module';
+import { AuthModule } from '$/auth/auth.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -13,6 +15,7 @@ const config = ConfigModule.forRoot({
 
 @Module({
   imports: [
+    // config & database
     config,
     TypeOrmModule.forRootAsync({
       imports: [config],
@@ -28,9 +31,14 @@ const config = ConfigModule.forRoot({
       }),
       inject: [ConfigService],
     }),
+
+    // modules
     UserModule,
+    ChannelModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [ConfigModule],
 })
 export class AppModule {}
