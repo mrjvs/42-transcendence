@@ -9,6 +9,7 @@ import { UserModule } from '$/users/user.module';
 import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
 import { TypeORMSession } from '@/session.entity';
+import { FriendsModule } from '$/friends/friends.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -38,6 +39,7 @@ const config = ConfigModule.forRoot({
     UserModule,
     ChannelModule,
     AuthModule,
+    FriendsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
