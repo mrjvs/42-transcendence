@@ -17,7 +17,7 @@ export class IntraStrategy extends PassportStrategy(Strategy) {
       clientID: configService.get('oauth.intra.clientId'),
       clientSecret: configService.get('oauth.intra.clientSecret'),
       callbackURL:
-        configService.get('oauth.intra.callbackHost') + '/api/v1/auth/login',
+        configService.get('oauth.intra.callbackHost') + '/api/v1/auth/login/',
       scopes: ['public'],
     });
   }
