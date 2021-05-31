@@ -16,7 +16,7 @@ import { ChannelService, ChannelTypes } from './channel.service';
 import { ChannelDto, IChannel } from '@/channel.entity';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
-import { UserEntity } from '~/models/user.entity';
+import { UserEntity } from '@/user.entity';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { ChannelRoles } from '~/middleware/guards/channel.guards';
 import { DeleteResult } from 'typeorm';

@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { IJoinedChannelInput } from '~/models/joined_channels.entity';
-import { UserEntity } from '~/models/user.entity';
+import { IJoinedChannelInput } from '@/joined_channels.entity';
+import { UserEntity } from '@/user.entity';
 import { ChannelService } from './channel.service';
 
 // TODO do entire file with permissions
