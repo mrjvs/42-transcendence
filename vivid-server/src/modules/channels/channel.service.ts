@@ -10,6 +10,12 @@ import {
 } from '@/joined_channels.entity';
 import { MessageEntity, IMessage, IMessageInput } from '@/messages.entity';
 
+export enum ChannelTypes {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  ALL = 'private',
+}
+
 @Injectable()
 export class ChannelService {
   constructor(
@@ -21,12 +27,30 @@ export class ChannelService {
     private MessageRepository: Repository<MessageEntity>,
   ) {}
 
-  add(channelInput: ChannelDto): Observable<IChannel> {
-    return from(this.ChannelRepository.save(channelInput));
+  async add(channelInput: ChannelDto, userId: string): Promise<IChannel> {
+    const input: IChannel = {
+      has_password: channelInput.hasPassword,
+      is_public: channelInput.isPublic,
+      password: '',
+      title: channelInput.title,
+      owner: userId,
+    };
+    if (input.has_password) input.password = channelInput.password;
+    const saveResult = await this.ChannelRepository.save(input);
+    await this.JoinedChannelRepository.save({
+      channel: saveResult.id,
+      user: saveResult.owner,
+    });
+    return saveResult;
   }
 
-  remove(channel_id: string): Observable<DeleteResult> {
-    return from(this.ChannelRepository.delete(channel_id));
+  async remove(channel_id: string): Promise<DeleteResult> {
+    await this.JoinedChannelRepository.createQueryBuilder()
+      .delete()
+      .where('channel = :id', { id: channel_id })
+      .execute();
+    const result = await this.ChannelRepository.delete(channel_id);
+    return result;
   }
 
   async findChannel(id: string): Promise<IChannel> {
@@ -38,12 +62,13 @@ export class ChannelService {
     });
   }
 
-  findAll(): Observable<IChannel[]> {
-    return from(
-      this.ChannelRepository.find({
-        relations: ['joined_users', 'joined_users.user'],
-      }),
-    );
+  findAllOfType(type: ChannelTypes): Observable<IChannel[]> {
+    const query = {
+      where: {},
+    };
+    if (type === 'public') query.where = { is_public: true };
+    else if (type === 'private') query.where = { is_public: false };
+    return from(this.ChannelRepository.find(query));
   }
 
   addUser(joinedChannelInput: IJoinedChannelInput): Observable<IJoinedChannel> {
