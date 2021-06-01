@@ -41,7 +41,4 @@ export class IMessageInput {
 export class MessageDto {
   @IsNotEmpty()
   content: string;
-
-  @IsNotEmpty()
-  user: string;
 }

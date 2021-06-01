@@ -19,7 +19,7 @@ import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { ChannelRoles } from '~/middleware/guards/channel.guards';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('channels')
 @UseGuards(AuthenticatedGuard)
@@ -47,10 +47,16 @@ export class ChannelController {
     return this.channelService.add(requestBody, user.id);
   }
 
-  // TODO implement changing settings
   @Patch('/:id')
-  updateChannel(): any {
-    return {};
+  @ChannelRoleAuth({
+    channelParam: 'id',
+    role: ChannelRoles.OWNER,
+  })
+  updateChannel(
+    @Body() requestBody: ChannelDto,
+    @Param('id') id: string,
+  ): Promise<UpdateResult> {
+    return this.channelService.update(requestBody, id);
   }
 
   @Delete('/:id')

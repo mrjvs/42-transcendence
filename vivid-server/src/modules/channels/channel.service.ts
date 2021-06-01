@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Observable, from } from 'rxjs';
 import { ChannelEntity, IChannel, ChannelDto } from '@/channel.entity';
 import {
@@ -27,6 +27,7 @@ export class ChannelService {
     private MessageRepository: Repository<MessageEntity>,
   ) {}
 
+  // TODO hash passwords
   async add(channelInput: ChannelDto, userId: string): Promise<IChannel> {
     const input: IChannel = {
       has_password: channelInput.hasPassword,
@@ -42,6 +43,26 @@ export class ChannelService {
       user: saveResult.owner,
     });
     return saveResult;
+  }
+
+  // TODO hash passwords
+  async update(
+    channelInput: ChannelDto,
+    channelId: string,
+  ): Promise<UpdateResult> {
+    const input = {
+      has_password: channelInput.hasPassword,
+      is_public: channelInput.isPublic,
+      password: '',
+      title: channelInput.title,
+    };
+    if (input.has_password) input.password = channelInput.password;
+    const updateResult = await this.ChannelRepository.createQueryBuilder()
+      .update()
+      .set(input)
+      .where('id = :id', { id: channelId })
+      .execute();
+    return updateResult;
   }
 
   async remove(channel_id: string): Promise<DeleteResult> {

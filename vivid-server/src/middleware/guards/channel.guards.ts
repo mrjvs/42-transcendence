@@ -20,21 +20,24 @@ export interface ChannelRole {
   canAdmin?: boolean;
 }
 
-function getUserRolesFromChannel(user, channel) {
+export function getUserRolesFromChannel(user: UserEntity, channel: string) {
   const out = {
     user: false,
     mod: false,
     owner: false,
   };
   if (!user) return out;
-  let channelObject = user.joined_channels.find(
-    (v) => v.channel.id === channel,
+  let channelObject: any = user.joined_channels.find(
+    (v) => (v.channel as any).id === channel,
   );
   if (!channelObject) return out;
   channelObject = channelObject.channel;
   out.user = true;
 
-  if (channelObject.owner === user.id) out.owner = true;
+  if (channelObject.owner === user.id) {
+    out.mod = true;
+    out.owner = true;
+  }
   return out;
 }
 
