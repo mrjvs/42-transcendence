@@ -7,13 +7,11 @@ import {
   Param,
   UseGuards,
   Patch,
-  Put,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
 import { IUser } from '@/user.interface';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { UserUpdateDto } from '~/models/user-update.dto';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -36,10 +34,7 @@ export class UserController {
   }
 
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() name: string ,
-  ): Promise<IUser> {
+  async update(@Param('id') id: string, @Body() name: string): Promise<IUser> {
     await this.userService.update(id, name);
     return await this.userService.findUser(id);
   }
