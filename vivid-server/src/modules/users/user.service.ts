@@ -4,6 +4,7 @@ import { Observable, from } from 'rxjs';
 import { Repository } from 'typeorm';
 import { UserEntity } from '@/user.entity';
 import { IUser } from '@/user.interface';
+import { UserUpdateDto } from '~/models/user-update.dto';
 
 @Injectable()
 export class UserService {
@@ -47,9 +48,13 @@ export class UserService {
 
   async createUser(intraId: string): Promise<UserEntity> {
     const user: IUser = {
-      name: 'mrjvs',
+      name: 'name11',
       intra_id: intraId,
     };
     return await this.userRepository.save(user);
+  }
+
+  async update(id: string, data): Promise<any> {
+    return this.userRepository.update(id, data);
   }
 }
