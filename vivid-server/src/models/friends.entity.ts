@@ -21,5 +21,5 @@ export class FriendsEntity {
   createdAt: Date;
 
   @Column('boolean', { default: false })
-  Accepted: boolean;
+  accepted: boolean;
 }
