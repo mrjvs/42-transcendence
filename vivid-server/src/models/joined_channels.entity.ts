@@ -1,13 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Unique } from 'typeorm';
 import { IsNotEmpty, IsUUID } from 'class-validator';
 import { ChannelEntity } from './channel.entity';
 import { UserEntity } from './user.entity';
 import { IUser } from './user.interface';
 
+@Unique('USER_JOIN', ['user', 'channel'])
 @Entity('joined_channels')
 export class JoinedChannelEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => UserEntity, (user) => user.joined_channels)
   user: string;
@@ -17,7 +18,7 @@ export class JoinedChannelEntity {
 }
 
 export class IJoinedChannel {
-  id: number;
+  id: string;
   channel: string;
   user: string | IUser;
 }
