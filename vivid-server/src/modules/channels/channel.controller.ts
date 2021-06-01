@@ -26,6 +26,8 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
 
+  // TODO get specific channel
+
   @Get('/')
   getChannelList(
     @User() user: UserEntity,
