@@ -31,7 +31,6 @@ export class FriendsController {
     return this.friendsService.findAll();
   }
 
-
   @Post('add/:friend_id')
   async friendRequest(
     @Param('friend_id') friendId: string,
