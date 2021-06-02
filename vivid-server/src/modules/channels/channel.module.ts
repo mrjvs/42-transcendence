@@ -8,6 +8,7 @@ import { ChannelController } from './channel.controller';
 import { ChannelUserController } from './channel.user.controller';
 import { ChannelMessageController } from './channel.message.controller';
 import { MessageEntity } from '@/messages.entity';
+import { ConfigService } from '@nestjs/config';
 
 // TODO return values
 @Module({
@@ -18,7 +19,7 @@ import { MessageEntity } from '@/messages.entity';
       MessageEntity,
     ]),
   ],
-  providers: [ChannelService, ChannelMessageService],
+  providers: [ChannelService, ChannelMessageService, ConfigService],
   controllers: [
     ChannelController,
     ChannelUserController,

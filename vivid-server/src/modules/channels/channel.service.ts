@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Observable, from } from 'rxjs';
@@ -9,6 +14,8 @@ import {
   IJoinedChannelInput,
 } from '@/joined_channels.entity';
 import { MessageEntity, IMessage, IMessageInput } from '@/messages.entity';
+import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 export enum ChannelTypes {
   PUBLIC = 'public',
@@ -25,9 +32,9 @@ export class ChannelService {
     private JoinedChannelRepository: Repository<JoinedChannelEntity>,
     @InjectRepository(MessageEntity)
     private MessageRepository: Repository<MessageEntity>,
+    private configService: ConfigService,
   ) {}
 
-  // TODO hash passwords
   async add(channelInput: ChannelDto, userId: string): Promise<IChannel> {
     const input: IChannel = {
       has_password: channelInput.hasPassword,
@@ -36,7 +43,12 @@ export class ChannelService {
       title: channelInput.title,
       owner: userId,
     };
-    if (input.has_password) input.password = channelInput.password;
+    if (input.has_password) {
+      input.password = await bcrypt.hash(
+        channelInput.password,
+        this.configService.get('saltRounds'),
+      );
+    }
     const saveResult = await this.ChannelRepository.save(input);
     await this.JoinedChannelRepository.save({
       channel: saveResult.id,
@@ -45,7 +57,6 @@ export class ChannelService {
     return saveResult;
   }
 
-  // TODO hash passwords
   async update(
     channelInput: ChannelDto,
     channelId: string,
@@ -56,7 +67,12 @@ export class ChannelService {
       password: '',
       title: channelInput.title,
     };
-    if (input.has_password) input.password = channelInput.password;
+    if (input.has_password) {
+      input.password = await bcrypt.hash(
+        channelInput.password,
+        this.configService.get('saltRounds'),
+      );
+    }
     const updateResult = await this.ChannelRepository.createQueryBuilder()
       .update()
       .set(input)
@@ -92,14 +108,68 @@ export class ChannelService {
     return from(this.ChannelRepository.find(query));
   }
 
-  addUser(joinedChannelInput: IJoinedChannelInput): Observable<IJoinedChannel> {
-    return from(this.JoinedChannelRepository.save(joinedChannelInput));
+  async addUser(
+    joinedChannelInput: IJoinedChannelInput,
+  ): Promise<IJoinedChannel | UpdateResult> {
+    const channel = await this.findChannel(joinedChannelInput.channel);
+    if (!channel) throw new NotFoundException();
+
+    // if password, validate
+    if (
+      channel.has_password &&
+      (!joinedChannelInput.password ||
+        !(await bcrypt.compare(joinedChannelInput.password, channel.password)))
+    )
+      throw new ForbiddenException();
+
+    const alreadyJoined = await this.JoinedChannelRepository.findOne({
+      where: {
+        user: joinedChannelInput.user,
+        channel: joinedChannelInput.channel,
+      },
+    });
+
+    // record already exists
+    if (alreadyJoined) {
+      if (alreadyJoined.is_joined)
+        throw new ConflictException(null, 'User is already joined');
+      const newJoin = await this.JoinedChannelRepository.update(alreadyJoined, {
+        is_joined: true,
+      });
+      return newJoin;
+    }
+
+    // create new join
+    return await this.JoinedChannelRepository.save({
+      channel: joinedChannelInput.channel,
+      user: joinedChannelInput.user,
+    });
   }
 
-  removeUser(
+  async removeUser(
     joinedChannelInput: IJoinedChannelInput,
-  ): Observable<DeleteResult> {
-    return from(this.JoinedChannelRepository.delete({ ...joinedChannelInput }));
+  ): Promise<DeleteResult | UpdateResult> {
+    const channel = await this.findChannel(joinedChannelInput.channel);
+    if (!channel) throw new NotFoundException();
+
+    const alreadyRemoved = await this.JoinedChannelRepository.findOne({
+      where: {
+        user: joinedChannelInput.user,
+        channel: joinedChannelInput.channel,
+      },
+    });
+    if (!alreadyRemoved || !alreadyRemoved.is_joined)
+      throw new ConflictException(null, 'User has already been removed');
+
+    // if has mute or ban, set joined value to false
+    if (alreadyRemoved.is_muted || alreadyRemoved.is_banned) {
+      const result = await this.JoinedChannelRepository.update(alreadyRemoved, {
+        is_joined: false,
+      });
+      return result;
+    }
+
+    return await this.JoinedChannelRepository.delete(alreadyRemoved);
   }
 
   postMessage(messageInput: IMessageInput): Observable<IMessage> {

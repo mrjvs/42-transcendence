@@ -6,11 +6,14 @@ import {
   Patch,
   UseGuards,
   Param,
+  Body,
 } from '@nestjs/common';
-import { User } from '~/middleware/decorators/login.decorator';
+import { UserParam, IUserParam } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { IJoinedChannelInput } from '@/joined_channels.entity';
-import { UserEntity } from '@/user.entity';
+import {
+  IJoinedChannelInput,
+  UserJoinedChannelDto,
+} from '@/joined_channels.entity';
 import { ChannelService } from './channel.service';
 
 // TODO do entire file with permissions
@@ -30,17 +33,18 @@ export class ChannelUserController {
     return {};
   }
 
+  // TODO permissions, only site admins can force join a user
   @Post('/:user')
   addChannelUser(
     @Param('id') channel: string,
-    @Param('user') userId: string,
-    @User() user: UserEntity,
+    @Body() requestBody: UserJoinedChannelDto,
+    @UserParam('user') userParam: IUserParam,
   ): any {
     const input: IJoinedChannelInput = {
       channel,
-      user: userId,
+      user: userParam.id,
+      password: requestBody.password,
     };
-    if (input.user === '@me') input.user = user.id;
     return this.channelService.addUser(input);
   }
 
@@ -54,8 +58,16 @@ export class ChannelUserController {
     return {};
   }
 
+  // TODO permissions, only moderators/owner/siteadmin can remove someone
   @Delete('/:user')
-  removeChannelUser(): any {
-    return {};
+  removeChannelUser(
+    @Param('id') channel: string,
+    @UserParam('user') userParam: IUserParam,
+  ): any {
+    const input: IJoinedChannelInput = {
+      channel,
+      user: userParam.id,
+    };
+    return this.channelService.removeUser(input);
   }
 }

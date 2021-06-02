@@ -17,6 +17,7 @@ export default () => {
   return {
     port,
     useHttps: process.env.USE_HTTPS === 'true',
+    saltRounds: parseInt(process.env.SALT_ROUNDS) || 10,
     db: {
       host: process.env.POSTGRES_HOST || '127.0.0.1',
       port: parseInt(<string>process.env.POSTGRES_PORT) || 5432,
