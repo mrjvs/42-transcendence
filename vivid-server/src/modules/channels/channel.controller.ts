@@ -11,7 +11,7 @@ import {
   Param,
   Body,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { ChannelService, ChannelTypes } from './channel.service';
 import { ChannelDto, IChannel } from '@/channel.entity';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
@@ -26,7 +26,10 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
 
-  // TODO get specific channel
+  @Get('/:id')
+  getChannel(@Param('id') channelId: string): Observable<IChannel> {
+    return from(this.channelService.findChannel(channelId));
+  }
 
   @Get('/')
   getChannelList(

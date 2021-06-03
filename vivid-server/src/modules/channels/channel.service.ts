@@ -67,6 +67,7 @@ export class ChannelService {
       password: '',
       title: channelInput.title,
     };
+
     if (input.has_password) {
       input.password = await bcrypt.hash(
         channelInput.password,
@@ -146,6 +147,50 @@ export class ChannelService {
     });
   }
 
+  async makeUserMod(
+    channel: string,
+    user: string,
+    isMod: boolean = true,
+  ): Promise<UpdateResult> {
+    return await this.JoinedChannelRepository.createQueryBuilder()
+      .update()
+      .where({
+        channel,
+        user,
+        is_joined: true,
+      })
+      .set({ is_mod: isMod })
+      .execute();
+  }
+
+  // TODO catch error in case of no changes
+  async updateUserPunishments(
+    channel: string,
+    user: string,
+    isMuted?: boolean,
+    isBanned?: boolean,
+    muteExpiry?: number,
+    banExpiry?: number,
+  ): Promise<UpdateResult> {
+    let builder: any = this.JoinedChannelRepository.createQueryBuilder()
+      .update()
+      .where({
+        channel,
+        user,
+      });
+    if (isMuted !== null) {
+      let expiry: any = muteExpiry;
+      if (expiry !== null) expiry = new Date(Date.now() + expiry * 1000);
+      builder = builder.set({ is_muted: isMuted, muted_expiry: expiry });
+    }
+    if (isBanned !== null) {
+      let expiry: any = banExpiry;
+      if (expiry !== null) expiry = new Date(Date.now() + expiry * 1000);
+      builder = builder.set({ is_banned: isBanned, ban_expiry: expiry });
+    }
+    return builder.execute();
+  }
+
   async removeUser(
     joinedChannelInput: IJoinedChannelInput,
   ): Promise<DeleteResult | UpdateResult> {
@@ -172,16 +217,25 @@ export class ChannelService {
     return await this.JoinedChannelRepository.delete(alreadyRemoved);
   }
 
-  postMessage(messageInput: IMessageInput): Observable<IMessage> {
-    return from(this.MessageRepository.save(messageInput));
+  listUsers(channelId: string): Observable<JoinedChannelEntity[]> {
+    return from(
+      this.JoinedChannelRepository.find({
+        where: {
+          is_joined: true,
+          channel: channelId,
+        },
+      }),
+    );
   }
 
-  getMessages(id: string): Observable<IMessage[]> {
+  listUser(channelId: string, id: string): Observable<JoinedChannelEntity> {
     return from(
-      this.MessageRepository.createQueryBuilder()
-        .where({ channel: id })
-        .orderBy('created_at', 'ASC')
-        .getMany(),
+      this.JoinedChannelRepository.findOne({
+        where: {
+          user: id,
+          channel: channelId,
+        },
+      }),
     );
   }
 }

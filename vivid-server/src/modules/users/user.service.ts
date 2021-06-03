@@ -47,7 +47,6 @@ export class UserService {
 
   async createUser(intraId: string): Promise<UserEntity> {
     const user: IUser = {
-      name: 'mrjvs',
       intra_id: intraId,
     };
     return await this.userRepository.save(user);

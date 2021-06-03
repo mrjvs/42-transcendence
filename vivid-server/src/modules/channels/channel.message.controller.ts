@@ -25,6 +25,7 @@ export class ChannelMessageController {
   constructor(private messageService: ChannelMessageService) {}
 
   // TODO time based pagination
+  // TODO add ban checks
   @Get('/')
   @ChannelRoleAuth({
     role: ChannelRoles.USER,
@@ -34,6 +35,7 @@ export class ChannelMessageController {
     return this.messageService.getMessages(channelId);
   }
 
+  // TODO add mute/ban checks
   @Post('/')
   @ChannelRoleAuth({
     role: ChannelRoles.USER,

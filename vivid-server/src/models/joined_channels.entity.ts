@@ -5,11 +5,10 @@ import {
   Unique,
   Column,
 } from 'typeorm';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsPositive } from 'class-validator';
 import { ChannelEntity } from './channel.entity';
 import { UserEntity } from './user.entity';
 import { IUser } from './user.interface';
-import { Optional } from '@nestjs/common';
 
 @Unique('USER_JOIN', ['user', 'channel'])
 @Entity('joined_channels')
@@ -60,7 +59,30 @@ export class IJoinedChannelInput {
 }
 
 export class UserJoinedChannelDto {
-  @Optional()
+  @IsOptional()
   @IsNotEmpty()
   password: string;
+}
+
+export class UserPunishmentsDto {
+  @IsOptional()
+  @IsBoolean()
+  isMuted?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isBanned?: boolean;
+
+  @IsOptional()
+  @IsPositive()
+  muteExpiry?: number;
+
+  @IsOptional()
+  @IsPositive()
+  banExpiry?: number;
+}
+
+export class UserPermissionDto {
+  @IsBoolean()
+  isMod: boolean;
 }

@@ -11,6 +11,7 @@ import { MessageEntity } from '@/messages.entity';
 import { ConfigService } from '@nestjs/config';
 
 // TODO return values
+// TODO message events over websocket
 @Module({
   imports: [
     TypeOrmModule.forFeature([
