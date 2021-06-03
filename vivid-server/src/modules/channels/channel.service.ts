@@ -13,7 +13,7 @@ import {
   IJoinedChannel,
   IJoinedChannelInput,
 } from '@/joined_channels.entity';
-import { MessageEntity, IMessage, IMessageInput } from '@/messages.entity';
+import { MessageEntity } from '@/messages.entity';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 
@@ -150,7 +150,7 @@ export class ChannelService {
   async makeUserMod(
     channel: string,
     user: string,
-    isMod: boolean = true,
+    isMod = true,
   ): Promise<UpdateResult> {
     return await this.JoinedChannelRepository.createQueryBuilder()
       .update()

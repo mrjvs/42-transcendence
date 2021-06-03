@@ -59,7 +59,7 @@ export class ChannelRoleGuard implements CanActivate {
     // loop through roles
     const request = context.switchToHttp().getRequest();
     const user: UserEntity = request.user;
-    for (let role of roles) {
+    for (const role of roles) {
       let hasRole = false;
       let channel;
       if (role.canAdmin === undefined) role.canAdmin = false;

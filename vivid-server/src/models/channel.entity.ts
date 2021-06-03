@@ -1,6 +1,5 @@
 import {
   IsNotEmpty,
-  IsOptional,
   Validate,
   ValidationArguments,
   ValidatorConstraint,
