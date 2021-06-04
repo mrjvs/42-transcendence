@@ -86,52 +86,16 @@ export class FriendsController {
   @Delete('unfriend/:friendrequest_id')
   async unfriend(
     @Param('friendrequest_id') friendRequestId: string,
-    @User() user: UserEntity,
-  ) {
-    // checking for friend
-    // let friendship = await this.friendsService.findFriend(user.id, friendId);
-    // Error if friendship isn't found
-    // if (!friendship) {
-    //   req.res.status(404).send('Friendship not found');
-    //   return;
-    // }
-    return this.friendsService.deleteFriendship(user.id, friendRequestId);
+    @User() user: UserEntity) 
+  {
+      return this.friendsService.deleteFriendship(user.id, friendRequestId);
   }
-
-  // // Decline friend request
-  // @Delete('decline/:friend_id')
-  // async declineFriendRequest(
-  //   @Param('friend_id') friendId: string,
-  //   @User() user: UserEntity,
-  //   @Req() req: Request,
-  // ) {
-  //   // checking for friend request
-  //   let friendRequest = await this.friendsService.findFriendRequest(
-  //     user.id,
-  //     friendId,
-  //   );
-  //   // Error if friend request isn't found
-  //   if (!friendRequest) {
-  //     req.res.status(404).send('Friend request not found');
-  //     return;
-  //   }
-  //   return this.friendsService.unfriend(friendRequest);
-  // }
 
   // Get full friendlist
   @Get('friendlist')
   async getFriendlist(
     @User() user: UserEntity)
-    : Promise<UserEntity[]> {
-
-
+  {
     return this.friendsService.getFriendList(user.id);
-    // Get all friend ID's
-    // let friendIds = await this.friendsService.getFriendIds(user.id);
-
-    // Get UserEntities for all friend ID's
-    // return (async () => {
-    //   return Promise.all(friendIds.map((el) => this.userService.findUser(el)));
-    // })();
   }
 }
