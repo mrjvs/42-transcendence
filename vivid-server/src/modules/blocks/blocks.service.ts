@@ -20,7 +20,7 @@ export class BlocksService {
   }
 
   // block user
-  async block(userId: string, blockId: string): Promise<UpdateResult | void> {
+  async block(userId: string, blockId: string): Promise<UpdateResult> {
     return await this.blocksRepository
       .createQueryBuilder()
       .insert()
@@ -31,11 +31,12 @@ export class BlocksService {
       .execute()
       .catch((error) => {
         if (error.code === '23505') throw new BadRequestException();
+        throw error;
       });
   }
 
   // unblock user
-  async unblock(userId: string, blockId: string): Promise<DeleteResult | void> {
+  async unblock(userId: string, blockId: string): Promise<DeleteResult> {
     return await this.blocksRepository
       .createQueryBuilder()
       .delete()
@@ -44,6 +45,7 @@ export class BlocksService {
       .execute()
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
+        throw error;
       });
   }
 

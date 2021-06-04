@@ -12,7 +12,7 @@ import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { BlocksEntity } from '@/blocks.entity';
 import { UserEntity } from '@/user.entity';
-import { UserService } from '../users/user.service';
+import { UserService } from '$/users/user.service';
 import { BlocksService } from './blocks.service';
 import { DeleteResult, UpdateResult } from 'typeorm';
 
@@ -36,7 +36,7 @@ export class BlocksController {
   async blockUser(
     @Param('block_id') userToBlockId: string,
     @User() user: UserEntity,
-  ): Promise<UpdateResult | void> {
+  ): Promise<UpdateResult> {
     // checking if friend is in general user table
     const user_to_block = await this.userService.findUser(userToBlockId);
     if (!user_to_block) throw new NotFoundException();
@@ -52,7 +52,7 @@ export class BlocksController {
   async unblockUser(
     @Param('block_id') blockId: string,
     @User() user: UserEntity,
-  ): Promise<DeleteResult | void> {
+  ): Promise<DeleteResult> {
     return this.blocksService.unblock(user.id, blockId);
   }
 

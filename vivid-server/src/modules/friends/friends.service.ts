@@ -12,7 +12,7 @@ import {
   UpdateResult,
 } from 'typeorm';
 import { FriendsEntity } from '@/friends.entity';
-import { UserEntity } from '~/models/user.entity';
+import { UserEntity } from '@/user.entity';
 
 @Injectable()
 export class FriendsService {
@@ -32,7 +32,13 @@ export class FriendsService {
     user_2: string,
     requested_by: string,
     requested_to: string,
-  ): Promise<InsertResult | void> {
+  ): Promise<InsertResult> {
+    //putting the lower id in first column to be able to check unique combination
+    if (user_2 < user_1) {
+      const tmp = user_1;
+      user_1 = user_2;
+      user_2 = tmp;
+    }
     return this.friendsRepository
       .createQueryBuilder()
       .insert()
@@ -45,6 +51,7 @@ export class FriendsService {
       .execute()
       .catch((error) => {
         if (error.code === '23505') throw new BadRequestException();
+        throw error;
       });
   }
 
@@ -84,7 +91,7 @@ export class FriendsService {
   async acceptFriendRequest(
     userId: string,
     friendRequestId: string,
-  ): Promise<UpdateResult | void> {
+  ): Promise<UpdateResult> {
     return await this.friendsRepository
       .createQueryBuilder()
       .update()
@@ -94,13 +101,14 @@ export class FriendsService {
       .execute()
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
+        throw error;
       });
   }
   // deleting the friendship or decline friendrequest
   async deleteFriendship(
     userId: string,
     friendRequestId: string,
-  ): Promise<DeleteResult | void> {
+  ): Promise<DeleteResult> {
     return await this.friendsRepository
       .createQueryBuilder()
       .delete()
@@ -112,6 +120,7 @@ export class FriendsService {
       .execute()
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
+        throw error;
       });
   }
 }

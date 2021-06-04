@@ -12,7 +12,7 @@ import {
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
-import { UserService } from '../users/user.service';
+import { UserService } from '$/users/user.service';
 import { FriendsService } from './friends.service';
 import { FriendsEntity } from '@/friends.entity';
 import { DeleteResult, UpdateResult } from 'typeorm';
@@ -36,7 +36,7 @@ export class FriendsController {
   async friendRequest(
     @Param('friend_id') friendId: string,
     @User() user: UserEntity,
-  ): Promise<UpdateResult | void> {
+  ): Promise<UpdateResult> {
     // checking if friend is in general user table
     const friend = await this.userService.findUser(friendId);
     if (!friend) throw new NotFoundException();
@@ -44,18 +44,9 @@ export class FriendsController {
     // checking if friend is the logged in user
     if (user.id === friend.id) throw new BadRequestException();
 
-    //checking if friend request has already been made or if they're already friends
-    //putting the lower id in first column to be able to check unique combination
-    if (user.id < friend.id)
-      return this.friendsService.sendFriendRequest(
-        user.id,
-        friend.id,
-        user.id,
-        friend.id,
-      );
     return this.friendsService.sendFriendRequest(
-      friend.id,
       user.id,
+      friend.id,
       user.id,
       friend.id,
     );
@@ -72,7 +63,7 @@ export class FriendsController {
   async acceptRequest(
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
-  ): Promise<UpdateResult | void> {
+  ): Promise<UpdateResult> {
     return this.friendsService.acceptFriendRequest(user.id, friendRequestId);
   }
 
@@ -81,7 +72,7 @@ export class FriendsController {
   async unfriend(
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
-  ): Promise<DeleteResult | void> {
+  ): Promise<DeleteResult> {
     return this.friendsService.deleteFriendship(user.id, friendRequestId);
   }
 
