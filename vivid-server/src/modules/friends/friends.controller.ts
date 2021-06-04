@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -18,14 +20,14 @@ import { FriendsEntity } from '~/models/friends.entity';
 import { Observable } from 'rxjs';
 
 @Controller('friends')
-// @UseGuards(AuthenticatedGuard)
+@UseGuards(AuthenticatedGuard)
 export class FriendsController {
   constructor(
     private friendsService: FriendsService,
     private userService: UserService,
   ) {}
 
-  // @MustbeAdmin()
+  // TODO @MustbeAdmin()
   @Get('all')
   findAll(): Promise<FriendsEntity[]> {
     return this.friendsService.findAll();
@@ -36,32 +38,18 @@ export class FriendsController {
   async friendRequest(
     @Param('friend_id') friendId: string,
     @User() user: UserEntity,
-    @Req() req: Request,
   ) {
-    let friend = await this.userService.findUser(friendId);
-
+    let friend = await this.userService.findUser(friendId); // TODO werkt niet bij invalid userID
     // checking if friend is in general user table
-    if (!friend) {
-      req.res.status(404).send('user not found');
-      return;
-    }
+    if (!friend) throw new NotFoundException();
 
     // checking if friend is the logged in user
-    if (user.id === friend.id) {
-      req.res.status(404).send("can't be friends with ya self mate");
-      return;
-    }
+    if (user.id === friend.id) throw new BadRequestException();
 
     //checking if friend request has already been made or if they're already friends
-    if (
-      this.friendsService.findFriendRequest(user.id, friend.id) ||
-      this.friendsService.findFriendRequest(friend.id, user.id) ||
-      this.friendsService.findFriend(friend.id, user.id)
-    ) {
-      req.res.status(404).send('Friend request is already pending');
-      return;
-    }
-    return this.friendsService.sendFriendRequest(user.id, friend.id);
+    if (user.id < friendId)
+      return this.friendsService.sendFriendRequest(user.id, friend.id, user.id);
+    return this.friendsService.sendFriendRequest(friend.id, user.id, user.id);
   }
 
   // Find all pending friend requests
@@ -84,10 +72,7 @@ export class FriendsController {
     );
 
     // Error if friend request isn't found
-    if (!friendRequest) {
-      req.res.status(404).send("Can't find friendrequest");
-      return;
-    }
+    if (!friendRequest) throw new BadRequestException();
 
     // Accept friend request if found
     return this.friendsService.acceptFriendRequest(friendRequest.id);
@@ -100,13 +85,10 @@ export class FriendsController {
     @User() user: UserEntity,
     @Req() req: Request,
   ) {
-    // checking for friend
+    // Find friend
     let friendship = await this.friendsService.findFriend(user.id, friendId);
     // Error if friendship isn't found
-    if (!friendship) {
-      req.res.status(404).send('Friendship not found');
-      return;
-    }
+    if (!friendship) throw new BadRequestException();
     return this.friendsService.unfriend(friendship);
   }
 
@@ -123,10 +105,7 @@ export class FriendsController {
       friendId,
     );
     // Error if friend request isn't found
-    if (!friendRequest) {
-      req.res.status(404).send('Friend request not found');
-      return;
-    }
+    if (!friendRequest) throw new BadRequestException();
     return this.friendsService.unfriend(friendRequest);
   }
 

@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { from, Observable } from 'rxjs';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { FriendsEntity } from '~/models/friends.entity';
 import { UserEntity } from '~/models/user.entity';
 
@@ -13,20 +13,27 @@ export class FriendsService {
   ) {}
 
   // Admin only, find all FriendsEntity's
-  async findAll(): Promise<FriendsEntity[]> {
-    return await this.friendsRepository.find();
+  findAll(): Promise<FriendsEntity[]> {
+    return this.friendsRepository.find();
   }
 
   // Add FriendEntity to database (=> send friend request)
-  async sendFriendRequest(
-    userId: string,
-    friendId: string,
-  ): Promise<Observable<FriendsEntity>> {
+  sendFriendRequest(
+    user_1: string,
+    user_2: string,
+    requested_by: string,
+  ): Observable<FriendsEntity | void> {
     return from(
-      this.friendsRepository.save({
-        id_request: userId,
-        id_accept: friendId,
-      }),
+      this.friendsRepository
+        .save({
+          user_1,
+          user_2,
+          requested_by,
+        })
+        .catch((error) => {
+          // 23505 is thrown when duplicate key value violates unique constraint (friend request already exists)
+          if (error.code === '23505') throw new BadRequestException();
+        }),
     );
   }
 
@@ -34,7 +41,7 @@ export class FriendsService {
   async findAllFriendRequests(userId: string): Promise<FriendsEntity[]> {
     let requests = await this.friendsRepository.find({
       where: {
-        id_accept: userId,
+        user_2: userId,
         accepted: false,
       },
     });
@@ -45,29 +52,29 @@ export class FriendsService {
     // Get all friendship Entities where user received the request
     let requests = await this.friendsRepository.find({
       where: {
-        id_accept: userId,
+        user_2: userId,
         accepted: true,
       },
     });
 
     // Save only friend ID's
-    let names = requests.map((el) => el.id_request);
+    let names = requests.map((el) => el.user_1);
 
     // Get all friendship Entities where user sent the request
     requests = await this.friendsRepository.find({
       where: {
-        id_request: userId,
+        user_1: userId,
         accepted: true,
       },
     });
 
     // Save only friend ID's and combine with others
-    names.push(...requests.map((el) => el.id_accept));
+    names.push(...requests.map((el) => el.user_2));
     return names;
   }
 
   // Update FriendsEntity to be accepted
-  async acceptFriendRequest(friendRequestId: string) {
+  acceptFriendRequest(friendRequestId: string) {
     return this.friendsRepository.update(friendRequestId, { accepted: true });
   }
 
@@ -78,8 +85,8 @@ export class FriendsService {
   ): Promise<FriendsEntity | undefined> {
     let found = await this.friendsRepository.findOne({
       where: {
-        id_request: userId,
-        id_accept: friendId,
+        user_1: userId,
+        user_2: friendId,
         accepted: false,
       },
     });
@@ -94,8 +101,8 @@ export class FriendsService {
     // Find accepted sent friend requests
     let found = await this.friendsRepository.findOne({
       where: {
-        id_request: userId,
-        id_accept: friendId,
+        user_1: userId,
+        user_2: friendId,
         accepted: true,
       },
     });
@@ -104,8 +111,8 @@ export class FriendsService {
     if (!found) {
       found = await this.friendsRepository.findOne({
         where: {
-          id_request: friendId,
-          id_accept: userId,
+          user_1: friendId,
+          user_2: userId,
           accepted: true,
         },
       });
@@ -114,7 +121,7 @@ export class FriendsService {
   }
 
   // Delete FriendEntity from database (=> unfriend)
-  async unfriend(friendship: FriendsEntity): Promise<FriendsEntity> {
+  unfriend(friendship: FriendsEntity): Promise<FriendsEntity> {
     return this.friendsRepository.remove(friendship);
   }
 }
