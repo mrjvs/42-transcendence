@@ -18,6 +18,7 @@ import { UserService } from '../users/user.service';
 import { FriendsService } from './friends.service';
 import { FriendsEntity } from '@/friends.entity';
 import { Observable } from 'rxjs';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('friends')
 @UseGuards(AuthenticatedGuard)
@@ -38,7 +39,7 @@ export class FriendsController {
   async friendRequest(
     @Param('friend_id') friendId: string,
     @User() user: UserEntity,
-  ) {
+  ): Promise<UpdateResult | void> {
     // checking if friend is in general user table
     let friend = await this.userService.findUser(friendId);
     if (!friend) throw new NotFoundException();
@@ -74,8 +75,8 @@ export class FriendsController {
   async acceptRequest(
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
-  ) {
-    return this.friendsService.acceptFriendRequest(user.id, friendRequestId);
+  ): Promise<UpdateResult | void> {
+    return this.friendsService.acceptFriendRequest("7f0d3384-c858-465c-bf0f-d470ef770d68", friendRequestId);
   }
 
   // Unfriend existing friend
@@ -83,13 +84,13 @@ export class FriendsController {
   async unfriend(
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
-  ) {
+  ): Promise<DeleteResult | void> {
     return this.friendsService.deleteFriendship(user.id, friendRequestId);
   }
 
   // Get full friendlist
   @Get('friendlist')
-  async getFriendlist(@User() user: UserEntity) {
+  async getFriendlist(@User() user: UserEntity): Promise<UserEntity[]> {
     return this.friendsService.getFriendList(user.id);
   }
 }

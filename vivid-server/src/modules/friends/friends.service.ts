@@ -4,8 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getConnection, Repository } from 'typeorm';
+import { DeleteResult, getConnection, InsertResult, Repository, UpdateResult } from 'typeorm';
 import { FriendsEntity } from '@/friends.entity';
+import { UserEntity } from '~/models/user.entity';
 
 @Injectable()
 export class FriendsService {
@@ -25,21 +26,19 @@ export class FriendsService {
     user_2: string,
     requested_by: string,
     requested_to: string,
-  ) {
-    return await this.friendsRepository
+  ): Promise<InsertResult | void> {
+    return this.friendsRepository
       .createQueryBuilder()
       .insert()
-      .values([
-        {
-          user_1: user_1,
-          user_2: user_2,
-          requested_by: requested_by,
-          requested_to: requested_to,
-        },
-      ])
+      .values({
+        user_1: user_1,
+        user_2: user_2,
+        requested_by: requested_by,
+        requested_to: requested_to,
+      })
       .execute()
       .catch((error) => {
-        if ((error.code = '23505')) throw new BadRequestException();
+        if (error.code === '23505') throw new BadRequestException();
       });
   }
 
@@ -54,27 +53,29 @@ export class FriendsService {
   }
 
   // find all friends of the user
-  async getFriendList(userId: string) {
+  async getFriendList(userId: string): Promise<UserEntity[]> {
     return await getConnection()
       .createQueryBuilder()
       .select()
       .from((el) => {
         return el
           .select(
-            `CASE  WHEN user_1 = '${userId}' THEN user_2 
-                   WHEN user_2 = '${userId}' THEN user_1 
-            END`,
+            `CASE  WHEN user_1 = :u THEN user_2 
+        WHEN user_2 = :u THEN user_1 
+        END`,
             'friends',
           )
+          .setParameter('u', userId)
           .from(FriendsEntity, 'f')
-          .where('accepted = :a', { a: true });
+          .where('user_1 = :u OR user_2 = :u', { u: userId })
+          .andWhere('accepted = :a', { a: true });
       }, 'f')
       .leftJoinAndSelect('users', 'users', 'users.id = f.friends::uuid')
       .execute();
   }
 
   // Update FriendsEntity to be accepted
-  async acceptFriendRequest(userId: string, friendRequestId: string) {
+  async acceptFriendRequest(userId: string, friendRequestId: string): Promise<UpdateResult | void> {
     return await this.friendsRepository
       .createQueryBuilder()
       .update()
@@ -83,11 +84,11 @@ export class FriendsService {
       .andWhere('requested_to = :r', { r: userId })
       .execute()
       .catch((error) => {
-        if ((error.code = '22P02')) throw new NotFoundException();
+        if (error.code === '22P02') throw new NotFoundException();
       });
   }
-// deleting the friendship or decline friendrequest
-  async deleteFriendship(userId: string, friendRequestId: string) {
+  // deleting the friendship or decline friendrequest
+  async deleteFriendship(userId: string, friendRequestId: string): Promise<DeleteResult | void> {
     return await this.friendsRepository
       .createQueryBuilder()
       .delete()
@@ -98,7 +99,7 @@ export class FriendsService {
       })
       .execute()
       .catch((error) => {
-        if ((error.code = '22P02')) throw new NotFoundException();
+        if (error.code === '22P02') throw new NotFoundException();
       });
   }
 }

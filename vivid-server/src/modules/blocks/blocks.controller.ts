@@ -14,6 +14,7 @@ import { BlocksEntity } from '@/blocks.entity';
 import { UserEntity } from '@/user.entity';
 import { UserService } from '../users/user.service';
 import { BlocksService } from './blocks.service';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('blocks')
 @UseGuards(AuthenticatedGuard)
@@ -24,7 +25,7 @@ export class BlocksController {
   ) {}
 
   // see all blocks
-  // @MustbeAdmin()
+  // @MustbeAdmin() TODO
   @Get('all')
   findAll(): Promise<BlocksEntity[]> {
     return this.blocksService.findAll();
@@ -35,7 +36,7 @@ export class BlocksController {
   async blockUser(
     @Param('block_id') userToBlockId: string,
     @User() user: UserEntity,
-  ) {
+  ): Promise<UpdateResult | void> {
     // checking if friend is in general user table
     let user_to_block = await this.userService.findUser(userToBlockId);
     if (!user_to_block) throw new NotFoundException();
@@ -50,14 +51,15 @@ export class BlocksController {
   @Delete('unblock/:block_id')
   async unblockUser(
     @Param('block_id') blockId: string,
-    @User() user: UserEntity,
-  ) {
+    @User() user: UserEntity)
+  : Promise<DeleteResult | void> {
     return this.blocksService.unblock(user.id, blockId);
   }
 
   // see all blocks for user
   @Get('blockedlist')
-  async blocked_users(@User() user: UserEntity) {
+  async blocked_users(@User() user: UserEntity)
+  : Promise<BlocksEntity[]> {
     return this.blocksService.getBlocks(user.id);
   }
 }
