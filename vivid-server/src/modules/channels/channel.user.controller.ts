@@ -34,17 +34,23 @@ import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 export class ChannelUserController {
   constructor(private channelService: ChannelService) {}
 
-  // TODO permissions
   @Get('/')
+  @ChannelRoleAuth({
+    role: ChannelRoles.USER,
+    channelParam: 'id',
+  })
   getChannelUsers(@Param('id') channelId: string): any {
     return this.channelService.listUsers(channelId);
   }
 
-  // TODO permissions
   @Get('/:user')
+  @ChannelRoleAuth({
+    role: ChannelRoles.USER,
+    channelParam: 'id',
+  })
   getChannelUser(
     @Param('id') channelId: string,
-    @Param(':user') id: string,
+    @Param('user') id: string,
   ): any {
     return this.channelService.listUser(channelId, id);
   }
