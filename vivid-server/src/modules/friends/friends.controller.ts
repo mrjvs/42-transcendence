@@ -13,10 +13,10 @@ import {
 import { Request } from 'express';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
-import { UserEntity } from '~/models/user.entity';
+import { UserEntity } from '@/user.entity';
 import { UserService } from '../users/user.service';
 import { FriendsService } from './friends.service';
-import { FriendsEntity } from '~/models/friends.entity';
+import { FriendsEntity } from '@/friends.entity';
 import { Observable } from 'rxjs';
 
 @Controller('friends')
@@ -44,10 +44,10 @@ export class FriendsController {
     if (!friend) throw new NotFoundException();
 
     // checking if friend is the logged in user
-    if (user.id === friend.id)
-      throw new BadRequestException();
+    if (user.id === friend.id) throw new BadRequestException();
 
     //checking if friend request has already been made or if they're already friends
+    //putting the lower id in first column to be able to check unique combination
     if (user.id < friend.id)
       return this.friendsService.sendFriendRequest(
         user.id,
@@ -75,27 +75,21 @@ export class FriendsController {
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
   ) {
-    // Accept friend request if found
-    return this.friendsService.acceptFriendRequest(
-      '6ff43c83-2192-408b-9be1-f573422c6766',
-      friendRequestId,
-    );
+    return this.friendsService.acceptFriendRequest(user.id, friendRequestId);
   }
 
   // Unfriend existing friend
   @Delete('unfriend/:friendrequest_id')
   async unfriend(
     @Param('friendrequest_id') friendRequestId: string,
-    @User() user: UserEntity) 
-  {
-      return this.friendsService.deleteFriendship(user.id, friendRequestId);
+    @User() user: UserEntity,
+  ) {
+    return this.friendsService.deleteFriendship(user.id, friendRequestId);
   }
 
   // Get full friendlist
   @Get('friendlist')
-  async getFriendlist(
-    @User() user: UserEntity)
-  {
+  async getFriendlist(@User() user: UserEntity) {
     return this.friendsService.getFriendList(user.id);
   }
 }

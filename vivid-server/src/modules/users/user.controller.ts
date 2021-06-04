@@ -29,12 +29,15 @@ export class UserController {
   }
 
   @Get(':id')
-  async findUser(@Param('id') id: string): Promise<IUser> {
+  async findUser(@Param('id') id: string): Promise<IUser | void> {
     return await this.userService.findUser(id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() name: string): Promise<IUser> {
+  async update(
+    @Param('id') id: string,
+    @Body() name: string,
+  ): Promise<IUser | void> {
     await this.userService.update(id, name);
     return await this.userService.findUser(id);
   }
