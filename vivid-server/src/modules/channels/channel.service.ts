@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -163,7 +164,6 @@ export class ChannelService {
       .execute();
   }
 
-  // TODO catch error in case of no changes
   async updateUserPunishments(
     channel: string,
     user: string,
@@ -178,16 +178,20 @@ export class ChannelService {
         channel,
         user,
       });
+    let hasChanges = false;
     if (isMuted !== null) {
+      hasChanges = true;
       let expiry: any = muteExpiry;
       if (expiry !== null) expiry = new Date(Date.now() + expiry * 1000);
       builder = builder.set({ is_muted: isMuted, muted_expiry: expiry });
     }
     if (isBanned !== null) {
+      hasChanges = true;
       let expiry: any = banExpiry;
       if (expiry !== null) expiry = new Date(Date.now() + expiry * 1000);
       builder = builder.set({ is_banned: isBanned, ban_expiry: expiry });
     }
+    if (!hasChanges) throw new BadRequestException();
     return builder.execute();
   }
 
@@ -195,6 +199,8 @@ export class ChannelService {
     joinedChannelInput: IJoinedChannelInput,
   ): Promise<DeleteResult | UpdateResult> {
     const channel = await this.findChannel(joinedChannelInput.channel);
+    if (channel.owner === joinedChannelInput.user)
+      throw new ForbiddenException(null, 'Cannot remove owner from channel');
     if (!channel) throw new NotFoundException();
 
     const alreadyRemoved = await this.JoinedChannelRepository.findOne({

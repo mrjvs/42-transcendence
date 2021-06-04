@@ -25,22 +25,36 @@ export class ChannelMessageController {
   constructor(private messageService: ChannelMessageService) {}
 
   // TODO time based pagination
-  // TODO add ban checks
   @Get('/')
-  @ChannelRoleAuth({
-    role: ChannelRoles.USER,
-    channelParam: 'id',
-  })
+  @ChannelRoleAuth(
+    {
+      role: ChannelRoles.USER,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.BANNED,
+      channelParam: 'id',
+    },
+  )
   getMessageHistory(@Param('id') channelId: string): any {
     return this.messageService.getMessages(channelId);
   }
 
-  // TODO add mute/ban checks
   @Post('/')
-  @ChannelRoleAuth({
-    role: ChannelRoles.USER,
-    channelParam: 'id',
-  })
+  @ChannelRoleAuth(
+    {
+      role: ChannelRoles.USER,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.BANNED,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.MUTED,
+      channelParam: 'id',
+    },
+  )
   createMessage(
     @Body() messageBody: MessageDto,
     @User() user: UserEntity,

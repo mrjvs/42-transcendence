@@ -39,9 +39,11 @@ export class JoinedChannelEntity {
   is_joined: boolean;
 
   // relations
+  @Column({ type: 'uuid' })
   @ManyToOne(() => UserEntity, (user) => user.joined_channels)
   user: string;
 
+  @Column({ type: 'uuid' })
   @ManyToOne(() => ChannelEntity, (channel) => channel.joined_users)
   channel: string;
 }

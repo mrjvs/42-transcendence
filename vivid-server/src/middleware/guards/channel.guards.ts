@@ -5,19 +5,24 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { ChannelEntity } from '~/models/channel.entity';
+import { JoinedChannelEntity } from '~/models/joined_channels.entity';
 import { UserEntity } from '~/models/user.entity';
 
 export enum ChannelRoles {
   USER,
   MOD,
   OWNER,
+  BANNED,
+  MUTED,
 }
 
 export interface ChannelRole {
   channel?: string;
   channelParam?: string;
-  role: ChannelRoles;
+  role?: ChannelRoles;
   canAdmin?: boolean;
+  notRole?: ChannelRoles;
 }
 
 export function getUserRolesFromChannel(user: UserEntity, channel: string) {
@@ -25,19 +30,26 @@ export function getUserRolesFromChannel(user: UserEntity, channel: string) {
     user: false,
     mod: false,
     owner: false,
+    isBanned: false,
+    isMuted: false,
   };
   if (!user) return out;
-  let channelObject: any = user.joined_channels.find(
+  const joinObject: JoinedChannelEntity | undefined = user.joined_channels.find(
     (v) => (v.channel as any).id === channel,
   );
-  if (!channelObject) return out;
-  channelObject = channelObject.channel;
+  if (!joinObject) return out;
+  const channelObject: ChannelEntity = (joinObject as any).channel;
   out.user = true;
 
   if (channelObject.owner === user.id) {
     out.mod = true;
     out.owner = true;
   }
+
+  if (joinObject.is_mod) out.mod = true;
+  if (joinObject.is_muted) out.isMuted = true;
+  if (joinObject.is_banned) out.isBanned = true;
+
   return out;
 }
 
@@ -73,13 +85,21 @@ export class ChannelRoleGuard implements CanActivate {
       if (role.canAdmin && user.isSiteAdmin()) continue;
 
       // check roles
+      let roleToCheck = role.role;
+      if (role.notRole) roleToCheck = role.notRole;
       const userRoles = getUserRolesFromChannel(user, channel);
-      if (role.role === ChannelRoles.USER && userRoles.user) hasRole = true;
-      else if (role.role === ChannelRoles.MOD && userRoles.mod) hasRole = true;
-      else if (role.role === ChannelRoles.OWNER && userRoles.owner)
+      if (roleToCheck === ChannelRoles.USER && userRoles.user) hasRole = true;
+      else if (roleToCheck === ChannelRoles.MOD && userRoles.mod)
+        hasRole = true;
+      else if (roleToCheck === ChannelRoles.OWNER && userRoles.owner)
+        hasRole = true;
+      else if (roleToCheck === ChannelRoles.BANNED && userRoles.isBanned)
+        hasRole = true;
+      else if (roleToCheck === ChannelRoles.MUTED && userRoles.isMuted)
         hasRole = true;
 
-      if (!hasRole) return false;
+      if (role.notRole && hasRole) return false; // must not have role but does
+      if (!role.notRole && !hasRole) return false; // must have role, but does not
     }
 
     // has passed roles, allow passing through
