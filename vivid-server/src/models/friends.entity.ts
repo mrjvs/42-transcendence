@@ -2,7 +2,6 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  OneToMany,
   CreateDateColumn,
   Unique,
 } from 'typeorm';
@@ -21,6 +20,9 @@ export class FriendsEntity {
 
   @Column()
   requested_by: string;
+
+  @Column()
+  requested_to: string;
 
   @CreateDateColumn()
   createdAt: Date;
