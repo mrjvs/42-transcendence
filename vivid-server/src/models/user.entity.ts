@@ -36,6 +36,7 @@ export class UserEntity {
     return this.site_admin;
   }
 
+  // TODO add guards for account not being setup
   isAccountSetup() {
     return this.name && this.name.length > 0;
   }
