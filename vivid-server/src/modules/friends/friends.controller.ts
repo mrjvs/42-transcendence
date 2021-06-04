@@ -57,8 +57,8 @@ export class FriendsController {
         friend.id,
       );
     return this.friendsService.sendFriendRequest(
-      user.id,
       friend.id,
+      user.id,
       user.id,
       friend.id,
     );
@@ -76,7 +76,10 @@ export class FriendsController {
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
   ): Promise<UpdateResult | void> {
-    return this.friendsService.acceptFriendRequest("7f0d3384-c858-465c-bf0f-d470ef770d68", friendRequestId);
+    return this.friendsService.acceptFriendRequest(
+      '7f0d3384-c858-465c-bf0f-d470ef770d68',
+      friendRequestId,
+    );
   }
 
   // Unfriend existing friend
