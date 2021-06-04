@@ -10,6 +10,7 @@ import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
 import { TypeORMSession } from '@/session.entity';
 import { FriendsModule } from '$/friends/friends.module';
+import { BlocksModule } from '$/blocks/blocks.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -40,6 +41,7 @@ const config = ConfigModule.forRoot({
     ChannelModule,
     AuthModule,
     FriendsModule,
+    BlocksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
