@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Observable, from } from 'rxjs';
 import { Repository } from 'typeorm';
 import { UserEntity } from '@/user.entity';
 import { IUser } from '@/user.interface';
-import { UserUpdateDto } from '~/models/user-update.dto';
 
 @Injectable()
 export class UserService {
@@ -17,13 +16,17 @@ export class UserService {
     return from(this.userRepository.save(user));
   }
 
-  async findUser(id: string): Promise<UserEntity> {
-    return await this.userRepository.findOne({
-      relations: ['joined_channels', 'joined_channels.channel'],
-      where: {
-        id,
-      },
-    });
+  async findUser(id: string): Promise<UserEntity | void> {
+    return await this.userRepository
+      .findOne({
+        relations: ['joined_channels', 'joined_channels.channel'],
+        where: {
+          id,
+        },
+      })
+      .catch((error) => {
+        if ((error.code = '22P02')) throw new NotFoundException();
+      });
   }
 
   findAll(): Observable<IUser[]> {
