@@ -4,7 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, getConnection, InsertResult, Repository, UpdateResult } from 'typeorm';
+import {
+  DeleteResult,
+  getConnection,
+  InsertResult,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { FriendsEntity } from '@/friends.entity';
 import { UserEntity } from '~/models/user.entity';
 
@@ -75,7 +81,10 @@ export class FriendsService {
   }
 
   // Update FriendsEntity to be accepted
-  async acceptFriendRequest(userId: string, friendRequestId: string): Promise<UpdateResult | void> {
+  async acceptFriendRequest(
+    userId: string,
+    friendRequestId: string,
+  ): Promise<UpdateResult | void> {
     return await this.friendsRepository
       .createQueryBuilder()
       .update()
@@ -88,7 +97,10 @@ export class FriendsService {
       });
   }
   // deleting the friendship or decline friendrequest
-  async deleteFriendship(userId: string, friendRequestId: string): Promise<DeleteResult | void> {
+  async deleteFriendship(
+    userId: string,
+    friendRequestId: string,
+  ): Promise<DeleteResult | void> {
     return await this.friendsRepository
       .createQueryBuilder()
       .delete()

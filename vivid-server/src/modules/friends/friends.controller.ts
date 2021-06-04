@@ -7,17 +7,14 @@ import {
   Param,
   Patch,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { UserService } from '../users/user.service';
 import { FriendsService } from './friends.service';
 import { FriendsEntity } from '@/friends.entity';
-import { Observable } from 'rxjs';
 import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('friends')
@@ -41,7 +38,7 @@ export class FriendsController {
     @User() user: UserEntity,
   ): Promise<UpdateResult | void> {
     // checking if friend is in general user table
-    let friend = await this.userService.findUser(friendId);
+    const friend = await this.userService.findUser(friendId);
     if (!friend) throw new NotFoundException();
 
     // checking if friend is the logged in user
@@ -76,10 +73,7 @@ export class FriendsController {
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
   ): Promise<UpdateResult | void> {
-    return this.friendsService.acceptFriendRequest(
-      '7f0d3384-c858-465c-bf0f-d470ef770d68',
-      friendRequestId,
-    );
+    return this.friendsService.acceptFriendRequest(user.id, friendRequestId);
   }
 
   // Unfriend existing friend

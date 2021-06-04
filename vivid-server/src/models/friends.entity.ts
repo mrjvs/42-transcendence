@@ -3,7 +3,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
-  Unique, Check
+  Unique,
+  Check,
 } from 'typeorm';
 
 @Unique(['user_1', 'user_2'])
