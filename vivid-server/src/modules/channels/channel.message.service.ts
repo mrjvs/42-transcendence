@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import { Between, DeleteResult, LessThan, MoreThan, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
 
-import { MessageEntity, IMessage, IMessageInput } from '@/messages.entity';
+import {
+  MessageEntity,
+  IMessage,
+  IMessageInput,
+  PaginationDto,
+} from '@/messages.entity';
 
 @Injectable()
 export class ChannelMessageService {
@@ -16,12 +21,20 @@ export class ChannelMessageService {
     return from(this.MessageRepository.save(messageInput));
   }
 
-  getMessages(id: string): Observable<IMessage[]> {
+  getMessages(
+    id: string,
+    paginationDto: PaginationDto,
+  ): Observable<MessageEntity[]> {
     return from(
-      this.MessageRepository.createQueryBuilder()
-        .where({ channel: id })
-        .orderBy('created_at', 'ASC')
-        .getMany(),
+      this.MessageRepository.find({
+        where: {
+          channel: id,
+          created_at: Between(paginationDto.date1, paginationDto.date2),
+        },
+        order: {
+          created_at: 'ASC',
+        },
+      }),
     );
   }
 

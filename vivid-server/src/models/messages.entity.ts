@@ -42,3 +42,13 @@ export class MessageDto {
   @IsNotEmpty()
   content: string;
 }
+
+export class PaginationDto {
+  @IsOptional()
+  @IsDate()
+  date1: Date;
+
+  @IsOptional()
+  @IsDate()
+  date2: Date;
+}
