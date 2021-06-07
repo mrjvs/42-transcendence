@@ -7,17 +7,15 @@ import {
   Param,
   Patch,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
-import { UserService } from '../users/user.service';
+import { UserService } from '$/users/user.service';
 import { FriendsService } from './friends.service';
 import { FriendsEntity } from '@/friends.entity';
-import { Observable } from 'rxjs';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('friends')
 @UseGuards(AuthenticatedGuard)
@@ -38,23 +36,14 @@ export class FriendsController {
   async friendRequest(
     @Param('friend_id') friendId: string,
     @User() user: UserEntity,
-  ) {
+  ): Promise<UpdateResult> {
     // checking if friend is in general user table
-    let friend = await this.userService.findUser(friendId);
+    const friend = await this.userService.findUser(friendId);
     if (!friend) throw new NotFoundException();
 
     // checking if friend is the logged in user
     if (user.id === friend.id) throw new BadRequestException();
 
-    //checking if friend request has already been made or if they're already friends
-    //putting the lower id in first column to be able to check unique combination
-    if (user.id < friend.id)
-      return this.friendsService.sendFriendRequest(
-        user.id,
-        friend.id,
-        user.id,
-        friend.id,
-      );
     return this.friendsService.sendFriendRequest(
       user.id,
       friend.id,
@@ -74,7 +63,7 @@ export class FriendsController {
   async acceptRequest(
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
-  ) {
+  ): Promise<UpdateResult> {
     return this.friendsService.acceptFriendRequest(user.id, friendRequestId);
   }
 
@@ -83,13 +72,13 @@ export class FriendsController {
   async unfriend(
     @Param('friendrequest_id') friendRequestId: string,
     @User() user: UserEntity,
-  ) {
+  ): Promise<DeleteResult> {
     return this.friendsService.deleteFriendship(user.id, friendRequestId);
   }
 
   // Get full friendlist
   @Get('friendlist')
-  async getFriendlist(@User() user: UserEntity) {
+  async getFriendlist(@User() user: UserEntity): Promise<UserEntity[]> {
     return this.friendsService.getFriendList(user.id);
   }
 }
