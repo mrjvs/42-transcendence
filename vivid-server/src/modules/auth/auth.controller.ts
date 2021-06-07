@@ -4,7 +4,7 @@ import {
   AuthenticatedGuard,
   IntraAuthGuard,
 } from '~/middleware/guards/auth.guards';
-import { UserEntity } from '~/models/user.entity';
+import { UserEntity } from '@/user.entity';
 
 @Controller('auth')
 export class AuthController {

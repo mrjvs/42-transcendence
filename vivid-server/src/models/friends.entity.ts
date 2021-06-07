@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   Unique,
+  Check,
 } from 'typeorm';
 
 @Unique(['user_1', 'user_2'])
+@Check(`"user_1" < "user_2"`)
 @Entity({ name: 'friends' })
 export class FriendsEntity {
   @PrimaryGeneratedColumn('uuid')

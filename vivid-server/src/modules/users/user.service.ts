@@ -25,7 +25,7 @@ export class UserService {
         },
       })
       .catch((error) => {
-        if ((error.code = '22P02')) throw new NotFoundException();
+        if (error.code === '22P02') throw new NotFoundException();
       });
   }
 
