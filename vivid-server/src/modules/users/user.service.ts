@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Observable, from } from 'rxjs';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { UserEntity } from '@/user.entity';
 import { IUser } from '@/user.interface';
 
@@ -59,5 +63,38 @@ export class UserService {
 
   async update(id: string, data): Promise<any> {
     return this.userRepository.update(id, data);
+  }
+
+  async changeUsersAnagram(
+    old_anagram: string,
+    anagram: string,
+  ): Promise<UpdateResult> {
+    return this.userRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        guild_anagram: anagram,
+      })
+      .where('guild_anagram = :guild_anagram', { guild_anagram: old_anagram })
+      .execute()
+      .catch((error) => {
+        if (error.code === '23505') throw new BadRequestException();
+        throw error;
+      });
+  }
+
+  async joinGuild(userId: string, anagram: string): Promise<UpdateResult> {
+    return this.userRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        guild_anagram: anagram,
+      })
+      .where('id = :id', { id: userId })
+      .execute()
+      .catch((error) => {
+        if (error.code === '23505') throw new BadRequestException();
+        throw error;
+      });
   }
 }

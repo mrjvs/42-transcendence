@@ -24,7 +24,13 @@ export class UserEntity {
   @Column()
   intra_id: string;
 
+  @Column('varchar', { default: null })
+  guild_anagram: string;
+
   getName() {
     return this.name + '!!!';
   }
+
+  @Column('boolean', {default: false})
+  admin: boolean;
 }
