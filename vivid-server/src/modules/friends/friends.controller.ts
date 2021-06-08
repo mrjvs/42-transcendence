@@ -25,7 +25,7 @@ export class FriendsController {
     private userService: UserService,
   ) {}
 
-  // @MustbeAdmin()
+  // TODO @MustbeAdmin()
   @Get('all')
   findAll(): Promise<FriendsEntity[]> {
     return this.friendsService.findAll();

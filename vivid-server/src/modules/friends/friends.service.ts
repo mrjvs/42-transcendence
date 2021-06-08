@@ -22,8 +22,8 @@ export class FriendsService {
   ) {}
 
   // Admin only, find all FriendsEntity's
-  async findAll(): Promise<FriendsEntity[]> {
-    return await this.friendsRepository.find();
+  findAll(): Promise<FriendsEntity[]> {
+    return this.friendsRepository.find();
   }
 
   // Add FriendEntity to database (=> send friend request)
@@ -74,8 +74,8 @@ export class FriendsService {
         return el
           .select(
             `CASE  WHEN user_1 = :u THEN user_2 
-        WHEN user_2 = :u THEN user_1 
-        END`,
+        			WHEN user_2 = :u THEN user_1 
+        			END`,
             'friends',
           )
           .setParameter('u', userId)
@@ -104,6 +104,7 @@ export class FriendsService {
         throw error;
       });
   }
+
   // deleting the friendship or decline friendrequest
   async deleteFriendship(
     userId: string,

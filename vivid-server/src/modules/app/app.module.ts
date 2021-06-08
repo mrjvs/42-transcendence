@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import configuration from '~/config/configuration';
 
 import { UserModule } from '$/users/user.module';
+import { WarsModule } from '$/wars/wars.module';
 import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
 import { TypeORMSession } from '@/session.entity';
@@ -44,6 +45,7 @@ const config = ConfigModule.forRoot({
     FriendsModule,
     BlocksModule,
     GuildsModule,
+    WarsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
