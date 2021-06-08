@@ -15,6 +15,12 @@ export class UserEntity {
   @Column()
   name: string;
 
+  @Column({
+    type: 'uuid',
+    nullable: true,
+  })
+  guild_id: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
