@@ -20,6 +20,8 @@ import {
   UserJoinedChannelDto,
   UserPunishmentsDto,
   UserPermissionDto,
+  JoinedChannelEntity,
+  IJoinedChannel,
 } from '@/joined_channels.entity';
 import { ChannelService } from './channel.service';
 import { UserEntity } from '~/models/user.entity';
@@ -28,6 +30,8 @@ import {
   getUserRolesFromChannel,
 } from '~/middleware/guards/channel.guards';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
+import { Observable } from 'rxjs';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('channels/:id/users')
 @UseGuards(AuthenticatedGuard)
@@ -39,7 +43,9 @@ export class ChannelUserController {
     role: ChannelRoles.USER,
     channelParam: 'id',
   })
-  getChannelUsers(@Param('id') channelId: string): any {
+  getChannelUsers(
+    @Param('id') channelId: string,
+  ): Observable<JoinedChannelEntity[]> {
     return this.channelService.listUsers(channelId);
   }
 
@@ -51,7 +57,7 @@ export class ChannelUserController {
   getChannelUser(
     @Param('id') channelId: string,
     @Param('user') id: string,
-  ): any {
+  ): Observable<JoinedChannelEntity> {
     return this.channelService.listUser(channelId, id);
   }
 
@@ -61,7 +67,7 @@ export class ChannelUserController {
     @Body() requestBody: UserJoinedChannelDto,
     @UserParam('user') userParam: IUserParam,
     @User() user: UserEntity,
-  ): any {
+  ): Promise<IJoinedChannel | UpdateResult> {
     // if its not self, must site admin
     if (!userParam.isSelf && !user.isSiteAdmin())
       throw new ForbiddenException();
@@ -83,7 +89,7 @@ export class ChannelUserController {
     @Body() bodyRequests: UserPermissionDto,
     @Param('id') channel: string,
     @Param('user') user: string,
-  ): any {
+  ): Promise<UpdateResult> {
     return this.channelService.makeUserMod(channel, user, bodyRequests.isMod);
   }
 
@@ -93,11 +99,11 @@ export class ChannelUserController {
     canAdmin: true,
     channelParam: 'id',
   })
-  updateChannelUserPermisions(
+  updateChannelUserPermissions(
     @Body() bodyRequests: UserPunishmentsDto,
     @Param('id') channel: string,
     @Param('user') user: string,
-  ): any {
+  ): Promise<UpdateResult> {
     return this.channelService.updateUserPunishments(
       channel,
       user,
@@ -113,7 +119,7 @@ export class ChannelUserController {
     @Param('id') channel: string,
     @UserParam('user') userParam: IUserParam,
     @User() user: UserEntity,
-  ): any {
+  ): Promise<DeleteResult | UpdateResult> {
     const { mod } = getUserRolesFromChannel(user, channel);
     // if its not self, must be mod or site admin
     if (!userParam.isSelf && !(mod || user.isSiteAdmin()))

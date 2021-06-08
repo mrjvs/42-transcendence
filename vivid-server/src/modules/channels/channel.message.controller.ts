@@ -6,6 +6,7 @@ import {
   UseGuards,
   Param,
   Body,
+  Query,
 } from '@nestjs/common';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { User } from '~/middleware/decorators/login.decorator';
@@ -14,17 +15,24 @@ import {
   ChannelRoles,
   getUserRolesFromChannel,
 } from '~/middleware/guards/channel.guards';
-import { IMessageInput, MessageDto } from '@/messages.entity';
+import {
+  IMessage,
+  IMessageInput,
+  MessageDto,
+  MessageEntity,
+  PaginationDto,
+} from '@/messages.entity';
 import { UserEntity } from '@/user.entity';
 import { ChannelMessageService } from './channel.message.service';
 import { DeleteResult } from 'typeorm';
+import { Observable } from 'rxjs';
 
 @Controller('channels/:id/messages')
 @UseGuards(AuthenticatedGuard)
 export class ChannelMessageController {
   constructor(private messageService: ChannelMessageService) {}
 
-  // TODO time based pagination
+  // TODO time based pagination (make it better)
   @Get('/')
   @ChannelRoleAuth(
     {
@@ -36,8 +44,11 @@ export class ChannelMessageController {
       channelParam: 'id',
     },
   )
-  getMessageHistory(@Param('id') channelId: string): any {
-    return this.messageService.getMessages(channelId);
+  getMessageHistory(
+    @Query() paginationDto: PaginationDto,
+    @Param('id') channelId: string,
+  ): Observable<MessageEntity[]> {
+    return this.messageService.getMessages(channelId, paginationDto);
   }
 
   @Post('/')
@@ -59,7 +70,7 @@ export class ChannelMessageController {
     @Body() messageBody: MessageDto,
     @User() user: UserEntity,
     @Param('id') channelId: string,
-  ): any {
+  ): Observable<IMessage> {
     const input: IMessageInput = {
       content: messageBody.content,
       user: user.id,
