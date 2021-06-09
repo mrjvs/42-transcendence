@@ -60,7 +60,7 @@ export class ChannelController {
   updateChannel(
     @Body() requestBody: ChannelDto,
     @Param('id') id: string,
-  ): Promise<UpdateResult> {
+  ): Promise<IChannel> {
     return this.channelService.update(requestBody, id);
   }
 

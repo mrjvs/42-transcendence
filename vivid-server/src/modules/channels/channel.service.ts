@@ -61,7 +61,7 @@ export class ChannelService {
   async update(
     channelInput: ChannelDto,
     channelId: string,
-  ): Promise<UpdateResult> {
+  ): Promise<IChannel> {
     const input = {
       has_password: channelInput.hasPassword,
       is_public: channelInput.isPublic,
@@ -79,7 +79,11 @@ export class ChannelService {
       .update()
       .set(input)
       .where('id = :id', { id: channelId })
-      .execute();
+      .returning("*")
+      .execute()
+      .then((response) => {
+        return <IChannel>response.raw[0];
+      });
     return updateResult;
   }
 
