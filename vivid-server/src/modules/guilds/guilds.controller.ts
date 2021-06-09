@@ -59,7 +59,7 @@ export class GuildsController {
   }
 
   @Patch('deactivate/:anagram')
-  async deleteGuild(
+  async deactivateGuild(
     @Param('anagram') anagram: string,
     @User() user: UserEntity,
   ): Promise<DeleteResult> {

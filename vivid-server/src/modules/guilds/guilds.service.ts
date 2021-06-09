@@ -64,6 +64,7 @@ export class GuildsService {
   }
 
   async guildWin(guildAnagram: string, points: number) {
+    console.log("winner: ", guildAnagram, points)
     return this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -79,11 +80,28 @@ export class GuildsService {
       });
   }
 
-  async guildLose(guildAnagram: string) {
+  async guildTie(guildAnagram: string, points: number) {
     return this.guildsRepository
       .createQueryBuilder()
       .update()
-      .set({ wars_won: () => 'wars_lost + 1' })
+      .set({
+        wars_tied: () => 'wars_tied + 1',
+        total_points: () => `total_points + ${points}`,
+      })
+      .where('anagram = :anagram', { anagram: guildAnagram })
+      .execute()
+      .catch((error) => {
+        if (error.code === '23505') throw new BadRequestException();
+        throw error;
+      });
+  }
+
+  async guildLose(guildAnagram: string) {
+    console.log("loser: ", guildAnagram)
+    return this.guildsRepository
+      .createQueryBuilder()
+      .update()
+      .set({ wars_lost: () => 'wars_lost + 1' })
       .where('anagram = :anagram', { anagram: guildAnagram })
       .execute()
       .catch((error) => {

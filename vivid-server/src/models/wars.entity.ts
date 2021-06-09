@@ -12,16 +12,22 @@ export class WarsEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column() // TODO uuid?
+  @Column()
   guild_1: string;
 
-  @Column() // TODO uuid?
+  @Column()
   guild_2: string;
 
-  // @Column() // TODO uuid?
+  @Column()
+  points_guild_1: number;
+  
+  @Column()
+  points_guild_2: number;
+
+  // @Column()
   // requested_to: string;
 
-  // @Column() // TODO uuid?
+  // @Column()
   // requested_by: string;
 
   @Column()

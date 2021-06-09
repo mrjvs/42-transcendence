@@ -34,6 +34,9 @@ export class GuildsEntity {
   wars_won: number;
 
   @Column('numeric', { default: 0 })
+  wars_tied: number;
+
+  @Column('numeric', { default: 0 })
   wars_lost: number;
 
   @Column('varchar', { default: null })

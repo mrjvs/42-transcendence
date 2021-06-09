@@ -27,7 +27,9 @@ export class WarsController {
 
   // Send War Request
   @Post('add')
-  sendWarRequest(@Body() request: IWars, @User() user: UserEntity) {
+  sendWarRequest(@Body() request: IWars, 
+  @User() user: UserEntity) 
+  {
     // console.log(request);
     return this.warsService.sendWarRequest(user.guild_id, request);
   }
@@ -40,7 +42,14 @@ export class WarsController {
 
   // Decline War Request
   @Delete(':war_id')
-  declineWarRequest(@Param('war_id') warId: string) {
+  declineWarRequest(
+    @Param('war_id') warId: string) 
+  {
     return this.warsService.declineWarRequest(warId);
+  }
+
+  @Get('end')
+  endWar(){
+    return this.warsService.endOfWar("b68ce184-6376-4db1-8519-3d7f4e6a2313");
   }
 }
