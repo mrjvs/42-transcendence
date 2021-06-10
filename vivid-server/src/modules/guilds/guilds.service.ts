@@ -14,7 +14,7 @@ export class GuildsService {
     private guildsRepository: Repository<GuildsEntity>,
   ) {}
 
-  async createGuild(userId: string, nameGuild: string) {
+  async createGuild(userId: string, nameGuild: string): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .insert()
@@ -29,11 +29,14 @@ export class GuildsService {
       });
   }
 
-  async getAll() {
+  async getAll(): Promise<GuildsEntity[]> {
     return this.guildsRepository.createQueryBuilder().select().execute();
   }
 
-  async changeGuildAnagram(userId: string, guildAnagram: string) {
+  async changeGuildAnagram(
+    userId: string,
+    guildAnagram: string,
+  ): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -48,7 +51,10 @@ export class GuildsService {
       });
   }
 
-  async changeGuildName(userId: string, guildName: string) {
+  async changeGuildName(
+    userId: string,
+    guildName: string,
+  ): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -63,8 +69,8 @@ export class GuildsService {
       });
   }
 
-  async guildWin(guildAnagram: string, points: number) {
-    console.log("winner: ", guildAnagram, points)
+  async guildWin(guildAnagram: string, points: number): Promise<UpdateResult> {
+    console.log('winner: ', guildAnagram, points);
     return this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -80,7 +86,7 @@ export class GuildsService {
       });
   }
 
-  async guildTie(guildAnagram: string, points: number) {
+  async guildTie(guildAnagram: string, points: number): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -96,8 +102,8 @@ export class GuildsService {
       });
   }
 
-  async guildLose(guildAnagram: string) {
-    console.log("loser: ", guildAnagram)
+  async guildLose(guildAnagram: string): Promise<UpdateResult> {
+    console.log('loser: ', guildAnagram);
     return this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -110,7 +116,7 @@ export class GuildsService {
       });
   }
 
-  async findGuildAnagram(guildAnagram: string) {
+  async findGuildAnagram(guildAnagram: string): Promise<GuildsEntity> {
     return this.guildsRepository
       .findOne({
         where: {
@@ -123,16 +129,19 @@ export class GuildsService {
       });
   }
 
-  async rankGuilds() {
+  async rankGuilds(): Promise<GuildsEntity[]> {
     return this.guildsRepository
       .createQueryBuilder()
       .select()
-      .where({active: true })
+      .where({ active: true })
       .orderBy({ total_points: 'DESC', wars_won: 'DESC' })
       .execute();
   }
 
-  async changeWarId(guildAnagram: string, warId: string): Promise<UpdateResult> {
+  async changeWarId(
+    guildAnagram: string,
+    warId: string,
+  ): Promise<UpdateResult> {
     return await this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -145,7 +154,7 @@ export class GuildsService {
       });
   }
 
-  async deactivateGuild(guildAnagram: string): Promise<DeleteResult> {
+  async deactivateGuild(guildAnagram: string): Promise<UpdateResult> {
     return await this.guildsRepository
       .createQueryBuilder()
       .update()

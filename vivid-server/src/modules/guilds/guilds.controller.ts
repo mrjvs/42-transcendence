@@ -15,6 +15,7 @@ import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { GuildsEntity } from '~/models/guilds.entity';
 import { UserEntity } from '~/models/user.entity';
 import { UserService } from '../users/user.service';
+import { GuildsModule } from './guilds.module';
 import { GuildsService } from './guilds.service';
 
 @Controller('guilds')
@@ -34,12 +35,14 @@ export class GuildsController {
   async changeGuildAnagram(
     @Param('anagram') anagram: string,
     @User() user: UserEntity,
-  ): Promise<UpdateResult> {
+  ): Promise<UserEntity>{
     if (anagram.length > 5) throw new BadRequestException();
     let old_anagram = user.guild_anagram;
     this.guildsService.changeGuildAnagram(user.id, anagram);
     this.userService.joinGuild(user.id, anagram);
-    return this.userService.changeUsersAnagram(old_anagram, anagram);
+    if (old_anagram !== null)
+      this.userService.changeUsersAnagram(old_anagram, anagram);
+    return user;
   }
 
   @Post('change_name/:name')
@@ -73,7 +76,8 @@ export class GuildsController {
   }
 
   @Get('rank')
-  async rankGuilds() {
+  async rankGuilds() 
+    : Promise<GuildsEntity[]>{
     console.log(await this.guildsService.changeWarId('lego', 'art of war3'));
     return await this.guildsService.rankGuilds();
   }

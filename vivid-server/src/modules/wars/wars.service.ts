@@ -99,7 +99,6 @@ export class WarsService {
     return this.warsRepository.save(request);
   }
 
-
   async acceptWarRequest(warId: string) {
     
     return this.warsRepository
@@ -142,10 +141,6 @@ export class WarsService {
         this.guildsService.guildTie(war.guild_1, war.prize_points / 2);
         this.guildsService.guildTie(war.guild_2, war.prize_points / 2);
       }
-
-
-      console.log(war);
       return ;
     }
-    
   }
