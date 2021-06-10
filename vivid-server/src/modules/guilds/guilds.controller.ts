@@ -12,10 +12,9 @@ import { join } from 'path';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { GuildsEntity } from '~/models/guilds.entity';
-import { UserEntity } from '~/models/user.entity';
-import { UserService } from '../users/user.service';
-import { GuildsModule } from './guilds.module';
+import { GuildsEntity } from '@/guilds.entity';
+import { UserEntity } from '@/user.entity';
+import { UserService } from '$/users/user.service';
 import { GuildsService } from './guilds.service';
 
 @Controller('guilds')

@@ -12,10 +12,9 @@ import {
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { GuildRequestEntity } from '~/models/guild_request.entity';
-import { UserEntity } from '~/models/user.entity';
-import { GuildsService } from '../guilds/guilds.service';
-import { UserService } from '../users/user.service';
+import { GuildRequestEntity } from '@/guild_request.entity';
+import { UserEntity } from '@/user.entity';
+import { UserService } from '$/users/user.service';
 import { GuildRequestService } from './guildrequest.service';
 
 @Controller('guildrequest')

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, InsertResult, Repository, UpdateResult } from 'typeorm';
-import { GuildRequestEntity } from '~/models/guild_request.entity';
+import { GuildRequestEntity } from '@/guild_request.entity';
 
 @Injectable()
 export class GuildRequestService {
