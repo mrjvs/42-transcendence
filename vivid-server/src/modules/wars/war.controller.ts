@@ -8,16 +8,14 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { UserEntity } from '~/models/user.entity';
-import { IWars } from '~/models/wars.interface';
-import { WarsService } from './wars.service';
+import { IWar } from '@/war.interface';
+import { WarService } from './war.service';
 
 @Controller('wars')
 @UseGuards(AuthenticatedGuard)
-export class WarsController {
-  constructor(private warsService: WarsService) {}
+export class WarController {
+  constructor(private warsService: WarService) {}
 
   // @Admin() TODO
   @Get('all')
@@ -27,9 +25,8 @@ export class WarsController {
 
   // Send War Request
   @Post('add')
-  sendWarRequest(@Body() request: IWars, @User() user: UserEntity) {
-    // console.log(request);
-    return this.warsService.sendWarRequest(user.guild_id, request);
+  sendWarRequest(@Body() request: IWar) {
+    return this.warsService.sendWarRequest(request);
   }
 
   // Accept War Request

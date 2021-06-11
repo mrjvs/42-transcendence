@@ -73,7 +73,7 @@ export class FriendsService {
       .from((el) => {
         return el
           .select(
-            `CASE  WHEN user_1 = :u THEN user_2 
+            `CASE WHEN user_1 = :u THEN user_2 
         			WHEN user_2 = :u THEN user_1 
         			END`,
             'friends',
