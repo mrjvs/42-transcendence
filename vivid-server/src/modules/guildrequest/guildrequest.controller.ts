@@ -37,7 +37,7 @@ export class GuildrequestController {
   }
 
   @Post('add/:user_id')
-  async friendRequest(
+  async guildRequest(
     @Param('user_id') invitedId: string,
     @User() user: UserEntity,
   ): Promise<InsertResult> {
@@ -47,17 +47,19 @@ export class GuildrequestController {
 
     // checking if invited user is the logged in user.
     if (user.id === invited.id) throw new BadRequestException();
-
+    console.log("hi");
     // checking if logged in user has an guild which it can invite people in.
-    if (user.guild_anagram === null) throw new BadRequestException();
-
+    // if (user.guild === null) throw new BadRequestException();
+    
     // guild already exist because it couldn't be in the user if it didn't
     // the entity already has a unique combination restricting of user and guild
-
+    
+    console.log("hi");
+    console.log(user);
     return this.guildRequestService.sendGuildRequest(
       invited.id,
       user.id,
-      user.guild_anagram,
+      user.guild,
     );
   }
 
@@ -65,7 +67,7 @@ export class GuildrequestController {
   async acceptRequest(
     @Param('guildRequest_id') guildRequestId: string,
     @User() user: UserEntity,
-  ): Promise<UpdateResult> {
+  ): Promise<UserEntity> {
     await this.guildRequestService.acceptGuildRequest(user.id, guildRequestId);
     let request = await this.guildRequestService.findone(guildRequestId);
     return this.userService.joinGuild(user.id, request.guild_anagram);

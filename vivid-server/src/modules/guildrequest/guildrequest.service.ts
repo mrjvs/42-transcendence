@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, InsertResult, Repository, UpdateResult } from 'typeorm';
 import { GuildRequestEntity } from '@/guild_request.entity';
+import { GuildsEntity } from '@/guilds.entity';
 
 @Injectable()
 export class GuildRequestService {
@@ -35,15 +36,17 @@ export class GuildRequestService {
   async sendGuildRequest(
     _user: string,
     _invited_by: string,
-    _guild_anagram: string,
+    _guild: GuildsEntity,
   ): Promise<InsertResult> {
+    console.log('hi');
+    console.log(_guild);
     return this.guildRequestRepository
       .createQueryBuilder()
       .insert()
       .values({
         user: _user,
         invited_by: _invited_by,
-        guild_anagram: _guild_anagram,
+        guild_anagram: _guild.anagram,
       })
       .execute()
       .catch((error) => {

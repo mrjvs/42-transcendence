@@ -53,8 +53,8 @@ export class UserController {
   async join_guild(
     @User() user: UserEntity,
     @Param('anagram') anagram: string,
-  ): Promise<UpdateResult> {
-    this.guildsService.findGuildAnagram(anagram);
+  ): Promise<UserEntity> {
+    // this.guildsService.findGuildAnagram(anagram);
     return this.userService.joinGuild(user.id, anagram);
   }
 

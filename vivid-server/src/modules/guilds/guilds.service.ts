@@ -6,6 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { GuildsEntity } from '@/guilds.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { UserEntity } from '@/user.entity';
+import { IGuild } from '~/models/user.interface copy';
 
 @Injectable()
 export class GuildsService {
@@ -14,13 +16,17 @@ export class GuildsService {
     private guildsRepository: Repository<GuildsEntity>,
   ) {}
 
-  async createGuild(userId: string, nameGuild: string): Promise<UpdateResult> {
+  async createGuild(
+    user: UserEntity,
+    guild: IGuild,
+  ): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .insert()
       .values({
-        name: nameGuild,
-        owner: userId,
+        name: guild.name,
+        anagram: guild.anagram,
+        owner: user,
       })
       .execute()
       .catch((error) => {
@@ -118,11 +124,7 @@ export class GuildsService {
 
   async findGuildAnagram(guildAnagram: string): Promise<GuildsEntity> {
     return this.guildsRepository
-      .findOne({
-        where: {
-          anagram: guildAnagram,
-        },
-      })
+      .findOne({ anagram: guildAnagram })
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
         throw error;

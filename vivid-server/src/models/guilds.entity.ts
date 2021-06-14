@@ -5,21 +5,27 @@ import {
   Unique,
   Timestamp,
   PrimaryColumn,
+  OneToMany,
+  BaseEntity,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
+import { UserEntity } from './user.entity';
 
 @Unique(['name'])
 @Unique(['owner'])
 @Unique(['anagram'])
 @Entity({ name: 'guilds' })
-export class GuildsEntity {
+export class GuildsEntity extends BaseEntity {
   @PrimaryColumn()
   name: string;
 
   @Column('varchar', { default: null, length: 5 })
   anagram: string;
 
-  @Column()
-  owner: string;
+  @OneToOne(() => UserEntity)
+  @JoinColumn({ name: 'owner' })
+  owner: UserEntity;
 
   @CreateDateColumn()
   created_at: Timestamp;
@@ -41,4 +47,7 @@ export class GuildsEntity {
 
   @Column('varchar', { default: null })
   current_war_id: string;
+
+  @OneToMany(() => UserEntity, (user) => user.guild)
+  users: UserEntity[];
 }

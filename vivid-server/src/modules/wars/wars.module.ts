@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WarsService } from './wars.service';
 import { WarsController } from './wars.controller';
 import { GuildsService } from '../guilds/guilds.service';
-import { GuildsEntity } from '~/models/guilds.entity';
+import { GuildsEntity } from '@/guilds.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([WarsEntity, GuildsEntity])],

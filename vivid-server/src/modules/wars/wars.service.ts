@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Brackets,
@@ -6,9 +10,9 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { GuildsEntity } from '~/models/guilds.entity';
-import { WarsEntity } from '~/models/wars.entity';
-import { IWars } from '~/models/wars.interface';
+import { GuildsEntity } from '@/guilds.entity';
+import { WarsEntity } from '@/wars.entity';
+import { IWars } from '@/wars.interface';
 import { GuildsService } from '../guilds/guilds.service';
 
 @Injectable()
@@ -24,14 +28,13 @@ export class WarsService {
   }
 
   async sendWarRequest(guildId: string, request: IWars) {
+    //   return this.warsRepository
+    //   .createQueryBuilder()
+    //   .insert()
+    //   .values({
 
-  //   return this.warsRepository
-  //   .createQueryBuilder()
-  //   .insert()
-  //   .values({
-
-  //   })
-  // }
+    //   })
+    // }
     // console.log(request);
     // console.log(request.start_date);
     // console.log(new Date(request.start_date).toISOString());
@@ -100,47 +103,43 @@ export class WarsService {
   }
 
   async acceptWarRequest(warId: string) {
-    
     return this.warsRepository
-    .createQueryBuilder()
-    .update()
+      .createQueryBuilder()
+      .update()
       .set({ accepted: true })
       .where({ id: warId })
       .execute();
-    }
-    
-    async declineWarRequest(warId: string) {
-      return this.warsRepository
+  }
+
+  async declineWarRequest(warId: string) {
+    return this.warsRepository
       .createQueryBuilder()
       .delete()
       .where({ id: warId })
       .execute();
-    }
-    
-    async endOfWar(warId: string){
-      let war = await this.warsRepository
+  }
+
+  async endOfWar(warId: string) {
+    let war = await this.warsRepository
       .findOne({
         where: {
-          id: warId
-        }
+          id: warId,
+        },
       })
       .catch((error) => {
         if (error.code === '23505') throw new NotFoundException();
         throw error;
       });
-      if (war.points_guild_1 > war.points_guild_2){
-        this.guildsService.guildWin(war.guild_1, war.prize_points);
-        this.guildsService.guildLose(war.guild_2);
-      }
-      else if (war.points_guild_2 > war.points_guild_1){
-        this.guildsService.guildWin(war.guild_2, war.prize_points);
-        this.guildsService.guildLose(war.guild_1);
-      }
-      else 
-      {
-        this.guildsService.guildTie(war.guild_1, war.prize_points / 2);
-        this.guildsService.guildTie(war.guild_2, war.prize_points / 2);
-      }
-      return ;
+    if (war.points_guild_1 > war.points_guild_2) {
+      this.guildsService.guildWin(war.guild_1, war.prize_points);
+      this.guildsService.guildLose(war.guild_2);
+    } else if (war.points_guild_2 > war.points_guild_1) {
+      this.guildsService.guildWin(war.guild_2, war.prize_points);
+      this.guildsService.guildLose(war.guild_1);
+    } else {
+      this.guildsService.guildTie(war.guild_1, war.prize_points / 2);
+      this.guildsService.guildTie(war.guild_2, war.prize_points / 2);
     }
+    return;
   }
+}
