@@ -11,6 +11,8 @@ import { AuthModule } from '$/auth/auth.module';
 import { TypeORMSession } from '@/session.entity';
 import { FriendsModule } from '$/friends/friends.module';
 import { BlocksModule } from '$/blocks/blocks.module';
+import { GuildsModule } from '$/guilds/guilds.module';
+import { GuildrequestModule } from '$/guildrequest/guildrequest.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -43,6 +45,9 @@ const config = ConfigModule.forRoot({
     FriendsModule,
     BlocksModule,
     WarModule,
+    GuildsModule,
+    WarModule,
+    GuildrequestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

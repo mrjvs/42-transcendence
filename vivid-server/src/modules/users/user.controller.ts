@@ -12,11 +12,18 @@ import { Observable } from 'rxjs';
 import { UserService } from './user.service';
 import { IUser } from '@/user.interface';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
+import { UserEntity } from '~/models/user.entity';
+import { User } from '~/middleware/decorators/login.decorator';
+import { UpdateResult } from 'typeorm';
+import { GuildsService } from '../guilds/guilds.service';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private guildsService: GuildsService,
+  ) {}
 
   @Post()
   add(@Body() user: IUser): Observable<IUser> {
@@ -40,6 +47,15 @@ export class UserController {
   ): Promise<IUser | void> {
     await this.userService.update(id, name);
     return await this.userService.findUser(id);
+  }
+
+  @Post('join_guild/:anagram')
+  async join_guild(
+    @User() user: UserEntity,
+    @Param('anagram') anagram: string,
+  ): Promise<UserEntity> {
+    // this.guildsService.findGuildAnagram(anagram);
+    return this.userService.joinGuild(user.id, anagram);
   }
 
   @Delete(':id')
