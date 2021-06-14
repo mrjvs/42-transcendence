@@ -6,23 +6,23 @@ import { IWar } from '@/war.interface';
 import { WarTimeEntity } from '@/war_time.entity';
 
 @Injectable()
-export class WarService {
+export class WarsService {
   constructor(
     @InjectRepository(WarEntity)
-    private warRepository: Repository<WarEntity>,
+    private warsRepository: Repository<WarEntity>,
     @InjectRepository(WarTimeEntity)
     private warTimeRepository: Repository<WarTimeEntity>,
   ) {}
 
   getAllWars(): Promise<WarEntity[]> {
-    return this.warRepository.find();
+    return this.warsRepository.find();
   }
 
   async sendWarRequest(request: IWar) {
     // TODO check if Guild exist -> need merge with Guilds to be able to do this
 
     // Create war
-    const war = this.warRepository.create(request);
+    const war = this.warsRepository.create(request);
 
     // Create and save War Time timetable and link it to the war
     war.war_time = await this.warTimeRepository
@@ -45,7 +45,7 @@ export class WarService {
     const [war] = await WarEntity.find({ id: warId });
 
     // Check for overlapping wars
-    const overlappingWar = await this.warRepository
+    const overlappingWar = await this.warsRepository
       .createQueryBuilder()
       .select()
       .where('accepted = :a', { a: true })
@@ -65,7 +65,7 @@ export class WarService {
     if (overlappingWar.length !== 0) throw new BadRequestException();
 
     // Save war with overlapping war check to avoid race condition
-    return await this.warRepository
+    return await this.warsRepository
       .createQueryBuilder()
       .update()
       .set({
@@ -75,7 +75,7 @@ export class WarService {
       .andWhere(() => {
         return (
           'NOT EXISTS ( ' +
-          this.warRepository
+          this.warsRepository
             .createQueryBuilder()
             .select()
             .where(`accepted = ${true}`)
@@ -97,7 +97,7 @@ export class WarService {
   }
 
   async declineWarRequest(warId: string) {
-    return this.warRepository
+    return this.warsRepository
       .createQueryBuilder()
       .delete()
       .where({ id: warId })

@@ -9,7 +9,9 @@ import { GuildsService } from '../guilds/guilds.service';
 import { GuildsEntity } from '~/models/guilds.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FriendsEntity, UserEntity, GuildsEntity])],
+  imports: [
+    TypeOrmModule.forFeature([FriendsEntity, UserEntity, GuildsEntity]),
+  ],
   providers: [FriendsService, UserService, GuildsService],
   controllers: [FriendsController],
   exports: [FriendsService],

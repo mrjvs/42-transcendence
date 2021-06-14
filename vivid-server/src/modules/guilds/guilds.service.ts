@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GuildsEntity } from '@/guilds.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserEntity } from '@/user.entity';
-import { IGuild } from '~/models/user.interface copy';
+import { IGuild } from '~/models/guild.interface';
 
 @Injectable()
 export class GuildsService {
@@ -16,10 +16,7 @@ export class GuildsService {
     private guildsRepository: Repository<GuildsEntity>,
   ) {}
 
-  async createGuild(
-    user: UserEntity,
-    guild: IGuild,
-  ): Promise<UpdateResult> {
+  async createGuild(user: UserEntity, guild: IGuild): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .insert()
@@ -28,11 +25,7 @@ export class GuildsService {
         anagram: guild.anagram,
         owner: user,
       })
-      .execute()
-      .catch((error) => {
-        if (error.code === '23505') throw new BadRequestException();
-        throw error;
-      });
+      .execute();
   }
 
   async getAll(): Promise<GuildsEntity[]> {
@@ -76,7 +69,6 @@ export class GuildsService {
   }
 
   async guildWin(guildAnagram: string, points: number): Promise<UpdateResult> {
-    console.log('winner: ', guildAnagram, points);
     return this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -109,7 +101,6 @@ export class GuildsService {
   }
 
   async guildLose(guildAnagram: string): Promise<UpdateResult> {
-    console.log('loser: ', guildAnagram);
     return this.guildsRepository
       .createQueryBuilder()
       .update()
@@ -124,14 +115,14 @@ export class GuildsService {
 
   async findGuildAnagram(guildAnagram: string): Promise<GuildsEntity> {
     return this.guildsRepository
-      .findOne({ anagram: guildAnagram })
+      .findOne({ relations: ['owner'], where: { anagram: guildAnagram } })
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
         throw error;
       });
   }
 
-  async rankGuilds(): Promise<GuildsEntity[]> {
+  async guildsRankList(): Promise<GuildsEntity[]> {
     return this.guildsRepository
       .createQueryBuilder()
       .select()
@@ -156,11 +147,10 @@ export class GuildsService {
       });
   }
 
-  async deactivateGuild(guildAnagram: string): Promise<UpdateResult> {
+  async deleteGuild(guildAnagram: string): Promise<DeleteResult> {
     return await this.guildsRepository
       .createQueryBuilder()
-      .update()
-      .set({ active: false })
+      .delete()
       .where({ anagram: guildAnagram })
       .execute()
       .catch((error) => {
@@ -168,4 +158,5 @@ export class GuildsService {
         throw error;
       });
   }
+  3;
 }

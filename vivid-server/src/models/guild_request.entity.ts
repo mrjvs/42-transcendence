@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 @Unique(['user', 'guild_anagram'])
-@Entity({ name: 'guildRequest' })
+@Entity({ name: 'guild_request' })
 export class GuildRequestEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -22,7 +22,7 @@ export class GuildRequestEntity {
   guild_anagram: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @Column('boolean', { default: false })
   accepted: boolean;

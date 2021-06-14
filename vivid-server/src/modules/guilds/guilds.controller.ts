@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -15,7 +16,7 @@ import { GuildsEntity } from '@/guilds.entity';
 import { UserEntity } from '@/user.entity';
 import { UserService } from '$/users/user.service';
 import { GuildsService } from './guilds.service';
-import { IGuild } from '@/user.interface copy';
+import { IGuild } from '@/guild.interface';
 
 @Controller('guilds')
 @UseGuards(AuthenticatedGuard)
@@ -30,21 +31,17 @@ export class GuildsController {
     return this.guildsService.getAll();
   }
 
-  @Post('change_anagram/:anagram')
+  @Patch('change_anagram/:anagram')
   async changeGuildAnagram(
     @Param('anagram') anagram: string,
     @User() user: UserEntity,
-  ): Promise<UserEntity> {
+  ): Promise<UpdateResult> {
     if (!anagram.match(/^[a-zA-Z1-9\-]{1,5}$/g))
       throw new BadRequestException();
-    // let old_anagram = user.guild_anagram;
-    this.guildsService.changeGuildAnagram(user.id, anagram);
-    // if (old_anagram !== null)
-    // this.userService.changeUsersAnagram(old_anagram, anagram);
-    return user;
+    return this.guildsService.changeGuildAnagram(user.id, anagram);
   }
 
-  @Post('change_name/:name')
+  @Patch('change_name/:name')
   async changeGuildName(
     @Param('name') name: string,
     @User() user: UserEntity,
@@ -61,29 +58,26 @@ export class GuildsController {
     return this.userService.joinGuild(user.id, guild.anagram);
   }
 
-  @Patch('deactivate/:anagram')
-  async deactivateGuild(
+  @Delete('delete/:anagram')
+  async deleteGuild(
     @Param('anagram') anagram: string,
     @User() user: UserEntity,
   ): Promise<DeleteResult> {
-    let guild = await this.guildsService.findGuildAnagram(anagram);
-    if (user.admin || (guild && guild.owner === user)) {
-      // this.userService.changeUsersAnagram(anagram, null); TODO
-      guild.owner = null;
-      //TODO take out the owner.
-      return this.guildsService.deactivateGuild(anagram);
-    }
+    const guild = await this.guildsService.findGuildAnagram(anagram);
+    if (!(user.admin || (guild && guild.owner.id === user.id)))
+      throw new BadRequestException();
+
+    return this.guildsService.deleteGuild(anagram);
   }
 
   @Get('rank')
-  async rankGuilds(): Promise<GuildsEntity[]> {
-    console.log(await this.guildsService.changeWarId('lego', 'art of war3'));
-    return await this.guildsService.rankGuilds();
+  async guildsRankList(): Promise<GuildsEntity[]> {
+    return await this.guildsService.guildsRankList();
   }
 
-  // delete this one
-  @Post('win')
-  async Guildwin() {
-    return this.guildsService.guildWin('other', 50);
-  }
+  // delete this one // TODO - just for testing with guild rankings
+  // @Post('win')
+  // async Guildwin() {
+  //   return this.guildsService.guildWin('jambo', 50);
+  // }
 }

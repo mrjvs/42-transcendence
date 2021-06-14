@@ -1,15 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Observable, from } from 'rxjs';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserEntity } from '@/user.entity';
 import { IUser } from '@/user.interface';
-import { GuildsService } from '../guilds/guilds.service';
-import { GuildsEntity } from '~/models/guilds.entity';
+import { GuildsService } from '$/guilds/guilds.service';
 
 @Injectable()
 export class UserService {
@@ -23,16 +18,22 @@ export class UserService {
     return from(this.userRepository.save(user));
   }
 
-  async findUser(id: string): Promise<UserEntity | void> {
+  async findUser(id: string): Promise<UserEntity> {
     return await this.userRepository
       .findOne({
-        relations: ['joined_channels', 'joined_channels.channel'],
+        relations: [
+          'joined_channels',
+          'joined_channels.channel',
+          'guild',
+          'guild.users',
+        ],
         where: {
           id,
         },
       })
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
+        throw error;
       });
   }
 
@@ -68,60 +69,10 @@ export class UserService {
     return this.userRepository.update(id, data);
   }
 
-  // async changeUsersAnagram(
-  //   old_anagram: string,
-  //   anagram: string,
-  // ): Promise<UpdateResult> {
-  //   return this.userRepository
-  //     .createQueryBuilder()
-  //     .update()
-  //     .set({
-  //       guild_anagram: anagram,
-  //     })
-  //     .where('guild_anagram = :guild_anagram', { guild_anagram: old_anagram })
-  //     .execute()
-  //     .catch((error) => {
-  //       if (error.code === '23505') throw new BadRequestException();
-  //       throw error;
-  //     });
-  // }
-
   async joinGuild(userId: string, anagram: string): Promise<UserEntity> {
-    // console.log(anagram);
-    let user = await this.userRepository.findOne({ id: userId });
-    // console.log(user);
-    let guild = await this.guildsService.findGuildAnagram(anagram);
-    // console.log(guild.anagram);
-    await this.userRepository
-    .createQueryBuilder()
-    .update()
-    .set({
-      guild: guild
-    })
-    .where({
-      id: userId
-    })
-    .execute()
-    .catch((error) => {
-      if (error.code === '22P02') throw new NotFoundException();
-      throw error;
-    });
-    return user;
-
-    // console.log(user.guild);
-    // console.log(user);
-    // return user;
-    // return this.userRepository
-    //   .createQueryBuilder()
-    //   .update()
-    //   .set({
-    //     guild_anagram: anagram,
-    //   })
-    //   .where('id = :id', { id: userId })
-    //   .execute()
-    //   .catch((error) => {
-    //     if (error.code === '23505') throw new BadRequestException();
-    //     throw error;
-    //   });
+    const user = await this.userRepository.findOne({ id: userId });
+    const guild = await this.guildsService.findGuildAnagram(anagram);
+    user.guild = guild;
+    return await this.userRepository.save(user);
   }
 }
