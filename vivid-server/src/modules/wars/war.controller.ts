@@ -40,4 +40,9 @@ export class WarController {
   declineWarRequest(@Param('war_id') warId: string) {
     return this.warsService.declineWarRequest(warId);
   }
+
+  @Get('end')
+  endWar() {
+    return this.warsService.endOfWar('b68ce184-6376-4db1-8519-3d7f4e6a2313');
+  }
 }

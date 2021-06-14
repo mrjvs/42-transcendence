@@ -103,4 +103,28 @@ export class WarService {
       .where({ id: warId })
       .execute();
   }
+
+  async endOfWar(warId: string) {
+    //   let war = await this.warRepository
+    //     .findOne({
+    //       where: {
+    //         id: warId,
+    //       },
+    //     })
+    //     .catch((error) => {
+    //       if (error.code === '23505') throw new NotFoundException();
+    //       throw error;
+    //     });
+    //   if (war.points_guild_1 > war.points_guild_2) {
+    //     this.guildsService.guildWin(war.guild_1, war.prize_points);
+    //     this.guildsService.guildLose(war.guild_2);
+    //   } else if (war.points_guild_2 > war.points_guild_1) {
+    //     this.guildsService.guildWin(war.guild_2, war.prize_points);
+    //     this.guildsService.guildLose(war.guild_1);
+    //   } else {
+    //     this.guildsService.guildTie(war.guild_1, war.prize_points / 2);
+    //     this.guildsService.guildTie(war.guild_2, war.prize_points / 2);
+    //   }
+    //   return;
+  }
 }
