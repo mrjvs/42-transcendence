@@ -20,31 +20,26 @@ export class GuildRequestService {
   }
 
   async findAllGuildRequests(userId: string): Promise<GuildRequestEntity[]> {
-    console.log(userId);
     return await this.guildRequestRepository
       .createQueryBuilder()
       .select()
       .where({ user: userId })
       .andWhere('accepted = :accepted', { accepted: false })
-      .execute()
-      .catch((error) => {
-        if (error.code === '22P02') throw new NotFoundException();
-        throw error;
-      });
+      .execute();
   }
 
   async sendGuildRequest(
-    _user: string,
-    _invited_by: string,
-    _guild: GuildsEntity,
+    user: string,
+    invited_by: string,
+    guild: GuildsEntity,
   ): Promise<InsertResult> {
     return this.guildRequestRepository
       .createQueryBuilder()
       .insert()
       .values({
-        user: _user,
-        invited_by: _invited_by,
-        guild_anagram: _guild.anagram,
+        user: user,
+        invited_by: invited_by,
+        guild_anagram: guild.anagram,
       })
       .execute()
       .catch((error) => {

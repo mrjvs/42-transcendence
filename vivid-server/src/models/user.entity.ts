@@ -7,24 +7,16 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
-  JoinTable,
-  BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
 
 @Entity({ name: 'users' })
-export class UserEntity extends BaseEntity {
+export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   name: string;
-
-  // @Column({
-  //   type: 'uuid',
-  //   nullable: true,
-  // })
-  // guild_id: string;
 
   @CreateDateColumn()
   created_at: Date;
@@ -42,7 +34,9 @@ export class UserEntity extends BaseEntity {
   @Column('boolean', { default: false })
   admin: boolean;
 
-  @ManyToOne(() => GuildsEntity, (guild) => guild.users)
+  @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'guild' })
   guild: GuildsEntity;
 }

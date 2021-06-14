@@ -4,11 +4,11 @@ import {
   CreateDateColumn,
   Unique,
   Timestamp,
-  PrimaryColumn,
   OneToMany,
   BaseEntity,
   OneToOne,
   JoinColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 
@@ -17,7 +17,10 @@ import { UserEntity } from './user.entity';
 @Unique(['anagram'])
 @Entity({ name: 'guilds' })
 export class GuildsEntity extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
   name: string;
 
   @Column('varchar', { default: null, length: 5 })
