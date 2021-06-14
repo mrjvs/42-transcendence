@@ -10,12 +10,12 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IWar } from '@/war.interface';
-import { WarService } from './war.service';
+import { WarsService } from './wars.service';
 
 @Controller('wars')
 @UseGuards(AuthenticatedGuard)
-export class WarController {
-  constructor(private warsService: WarService) {}
+export class WarsController {
+  constructor(private warsService: WarsService) {}
 
   // @Admin() TODO
   @Get('all')

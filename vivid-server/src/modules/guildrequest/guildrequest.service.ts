@@ -38,8 +38,6 @@ export class GuildRequestService {
     _invited_by: string,
     _guild: GuildsEntity,
   ): Promise<InsertResult> {
-    console.log('hi');
-    console.log(_guild);
     return this.guildRequestRepository
       .createQueryBuilder()
       .insert()

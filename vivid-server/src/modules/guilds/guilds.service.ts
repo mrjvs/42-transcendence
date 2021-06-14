@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GuildsEntity } from '@/guilds.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserEntity } from '@/user.entity';
-import { IGuild } from '~/models/user.interface copy';
+import { IGuild } from '~/models/guild.interface';
 
 @Injectable()
 export class GuildsService {
@@ -16,10 +16,7 @@ export class GuildsService {
     private guildsRepository: Repository<GuildsEntity>,
   ) {}
 
-  async createGuild(
-    user: UserEntity,
-    guild: IGuild,
-  ): Promise<UpdateResult> {
+  async createGuild(user: UserEntity, guild: IGuild): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .insert()

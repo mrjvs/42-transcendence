@@ -6,12 +6,14 @@ import {
   OneToMany,
   CreateDateColumn,
   ManyToOne,
-  JoinColumn, JoinTable
+  JoinColumn,
+  JoinTable,
+  BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
 
 @Entity({ name: 'users' })
-export class UserEntity {
+export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -25,7 +27,7 @@ export class UserEntity {
   // guild_id: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @OneToMany(() => JoinedChannelEntity, (channel) => channel.user)
   joined_channels: JoinedChannelEntity[];
@@ -41,6 +43,6 @@ export class UserEntity {
   admin: boolean;
 
   @ManyToOne(() => GuildsEntity, (guild) => guild.users)
-  @JoinTable({ name: 'guild' })
+  @JoinColumn({ name: 'guild' })
   guild: GuildsEntity;
 }

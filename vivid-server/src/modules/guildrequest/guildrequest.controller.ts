@@ -47,20 +47,15 @@ export class GuildrequestController {
 
     // checking if invited user is the logged in user.
     if (user.id === invited.id) throw new BadRequestException();
-    console.log("hi");
     // checking if logged in user has an guild which it can invite people in.
     // if (user.guild === null) throw new BadRequestException();
-    
+
     // guild already exist because it couldn't be in the user if it didn't
     // the entity already has a unique combination restricting of user and guild
-    
-    console.log("hi");
     console.log(user);
-    return this.guildRequestService.sendGuildRequest(
-      invited.id,
-      user.id,
-      user.guild,
-    );
+    console.log(user.guild);
+
+    return;
   }
 
   @Patch('accept/:guildRequest_id')

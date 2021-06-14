@@ -15,7 +15,7 @@ import { GuildsEntity } from '@/guilds.entity';
 import { UserEntity } from '@/user.entity';
 import { UserService } from '$/users/user.service';
 import { GuildsService } from './guilds.service';
-import { IGuild } from '@/user.interface copy';
+import { IGuild } from '@/guild.interface';
 
 @Controller('guilds')
 @UseGuards(AuthenticatedGuard)
