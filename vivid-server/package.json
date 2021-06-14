@@ -25,7 +25,6 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "connect-typeorm": "^1.1.4",
-    "dto-mapping": "^1.1.0",
     "express-session": "^1.17.2",
     "passport": "^0.4.1",
     "passport-oauth2": "^1.5.0",

@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { UserEntity } from '@/user.entity';
 import { UserController } from './user.controller';
 import { GuildsEntity } from '@/guilds.entity';
-import { GuildsService } from '../guilds/guilds.service';
+import { GuildsService } from '$/guilds/guilds.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity, GuildsEntity])],

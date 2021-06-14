@@ -6,7 +6,7 @@ import {
   OneToMany,
   CreateDateColumn,
   ManyToOne,
-  JoinColumn, JoinTable
+  JoinColumn,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
 
@@ -17,12 +17,6 @@ export class UserEntity {
 
   @Column()
   name: string;
-
-  // @Column({
-  //   type: 'uuid',
-  //   nullable: true,
-  // })
-  // guild_id: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -40,7 +34,9 @@ export class UserEntity {
   @Column('boolean', { default: false })
   admin: boolean;
 
-  @ManyToOne(() => GuildsEntity, (guild) => guild.users)
-  @JoinTable({ name: 'guild' })
+  @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'guild' })
   guild: GuildsEntity;
 }

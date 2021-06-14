@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
+import { DeleteResult, InsertResult } from 'typeorm';
 import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { GuildRequestEntity } from '@/guild_request.entity';
@@ -47,15 +47,12 @@ export class GuildrequestController {
 
     // checking if invited user is the logged in user.
     if (user.id === invited.id) throw new BadRequestException();
-    console.log("hi");
-    // checking if logged in user has an guild which it can invite people in.
-    // if (user.guild === null) throw new BadRequestException();
-    
+
+    //getting user with join on guild table
+    user = await this.userService.findUser(user.id);
+
     // guild already exist because it couldn't be in the user if it didn't
     // the entity already has a unique combination restricting of user and guild
-    
-    console.log("hi");
-    console.log(user);
     return this.guildRequestService.sendGuildRequest(
       invited.id,
       user.id,
@@ -63,19 +60,19 @@ export class GuildrequestController {
     );
   }
 
-  @Patch('accept/:guildRequest_id')
+  @Patch('accept/:guild_request_id')
   async acceptRequest(
-    @Param('guildRequest_id') guildRequestId: string,
+    @Param('guild_request_id') guildRequestId: string,
     @User() user: UserEntity,
   ): Promise<UserEntity> {
     await this.guildRequestService.acceptGuildRequest(user.id, guildRequestId);
-    let request = await this.guildRequestService.findone(guildRequestId);
+    const request = await this.guildRequestService.findone(guildRequestId);
     return this.userService.joinGuild(user.id, request.guild_anagram);
   }
 
-  @Delete('decline/:guildRequest_id')
-  async unfriend(
-    @Param('guildRequest_id') guildRequestId: string,
+  @Delete('decline/:guild_request_id')
+  async declineRequest(
+    @Param('guild_request_id') guildRequestId: string,
     @User() user: UserEntity,
   ): Promise<DeleteResult> {
     return this.guildRequestService.deleteGuildRequest(user.id, guildRequestId);

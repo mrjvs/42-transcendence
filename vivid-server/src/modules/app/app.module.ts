@@ -47,7 +47,7 @@ const config = ConfigModule.forRoot({
     BlocksModule,
     GuildsModule,
     WarsModule,
-    GuildrequestModule
+    GuildrequestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

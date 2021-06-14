@@ -20,7 +20,7 @@ export class WarsEntity {
 
   @Column()
   points_guild_1: number;
-  
+
   @Column()
   points_guild_2: number;
 

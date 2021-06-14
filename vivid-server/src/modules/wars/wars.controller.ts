@@ -1,17 +1,12 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
   Param,
   Patch,
-  Post,
   UseGuards,
 } from '@nestjs/common';
-import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { UserEntity } from '@/user.entity';
-import { IWars } from '@/wars.interface';
 import { WarsService } from './wars.service';
 
 @Controller('wars')
@@ -24,15 +19,6 @@ export class WarsController {
   getAllWars() {
     return this.warsService.getAllWars();
   }
-
-  // Send War Request
-  // @Post('add')
-  // sendWarRequest(@Body() request: IWars,
-  // @User() user: UserEntity)
-  // {
-  //   // console.log(request);
-  //   return this.warsService.sendWarRequest(user.guild_id, request);
-  // }
 
   // Accept War Request
   @Patch(':war_id')

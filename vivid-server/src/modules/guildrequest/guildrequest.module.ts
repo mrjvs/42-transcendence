@@ -9,7 +9,9 @@ import { GuildrequestController } from './guildrequest.controller';
 import { GuildRequestService } from './guildrequest.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GuildRequestEntity, GuildsEntity, UserEntity])],
+  imports: [
+    TypeOrmModule.forFeature([GuildRequestEntity, GuildsEntity, UserEntity]),
+  ],
   providers: [GuildsService, GuildRequestService, UserService],
   controllers: [GuildrequestController],
   exports: [GuildRequestService],
