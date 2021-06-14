@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GuildsEntity } from '@/guilds.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserEntity } from '@/user.entity';
-import { IGuild } from '@/user.interface copy';
+import { IGuild } from '~/models/guild.interface';
 
 @Injectable()
 export class GuildsService {
