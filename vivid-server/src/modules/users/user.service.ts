@@ -37,6 +37,31 @@ export class UserService {
       });
   }
 
+  async findUserMatches(id: string): Promise<UserEntity> {
+    return await this.userRepository
+      .findOne({
+        relations: [
+          'joined_channels',
+          'joined_channels.channel',
+          'guild',
+          'guild.users',
+          'matches_req',
+          'matches_req.user_req',
+          'matches_req.user_acpt',
+          'matches_acpt',
+          'matches_acpt.user_req',
+          'matches_acpt.user_acpt',
+        ],
+        where: {
+          id,
+        },
+      })
+      .catch((error) => {
+        if (error.code === '22P02') throw new NotFoundException();
+        throw error;
+      });
+  }
+
   findAll(): Observable<IUser[]> {
     return from(
       this.userRepository.find({
