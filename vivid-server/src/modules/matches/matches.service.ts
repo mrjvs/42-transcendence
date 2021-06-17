@@ -20,11 +20,11 @@ export class MatchesService {
   async insertGame(gamestats: IGame)
     : Promise<UpdateResult> 
   {
-    console.log('stats', gamestats);
+    // console.log('stats', gamestats);
     const user_req = await this.userService.findUser(gamestats.user_id_req); 
     const user_acpt = await this.userService.findUser(gamestats.user_id_acpt); 
-    console.log('user_req', user_req);
-    console.log('user_acpt', user_acpt);
+    // console.log('user_req', user_req);
+    // console.log('user_acpt', user_acpt);
     return await this.matchesRepository
     .createQueryBuilder()
     .insert()
@@ -39,4 +39,6 @@ export class MatchesService {
     })
     .execute()
   }
+
+  
 }

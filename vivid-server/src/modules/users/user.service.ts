@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '@/user.entity';
 import { IUser } from '@/user.interface';
 import { GuildsService } from '$/guilds/guilds.service';
+import { IGame } from '~/models/match.interface';
 
 @Injectable()
 export class UserService {
@@ -99,5 +100,37 @@ export class UserService {
     const guild = await this.guildsService.findGuildAnagram(anagram);
     user.guild = guild;
     return await this.userRepository.save(user);
+  }
+
+  async getWarId(gamestats: IGame){
+    const user_acpt = await this.userRepository
+    .find({
+      relations: [
+        'guild',
+        // 'guild.current_war'
+      ], 
+      where: {
+        id: gamestats.user_id_acpt,
+      },
+    })
+
+    const user_req = await this.userRepository
+    .find({
+      relations: [
+        'guild',
+        // 'guild.current_war'
+      ],
+      where: {
+        id: gamestats.user_id_req,
+      },
+    })
+    // console.log("user_acpt: \n", user_acpt);
+    // console.log("user_req: \n", user_req);
+
+    // let war_user_acpt = user_acpt.guild.current_war.id;
+    // let war_user_req = user_req.guild.current_war.id;
+    // if (war_user_acpt === war_user_req)
+    //   return war_user_acpt;
+    return null;  
   }
 }

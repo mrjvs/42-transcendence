@@ -35,9 +35,10 @@ export class MatchesEntity {
   @Column()
   game_type: string;
 
-  @ManyToOne(() => WarsEntity, (war) => war.)
-
   @Column()
   winner_id: string;
+
+  @Column({default: null})
+  war_id: string;
 
 }

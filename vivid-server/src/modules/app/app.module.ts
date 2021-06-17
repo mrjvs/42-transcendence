@@ -15,6 +15,7 @@ import { BlocksModule } from '$/blocks/blocks.module';
 import { GuildsModule } from '$/guilds/guilds.module';
 import { GuildrequestModule } from '$/guildrequest/guildrequest.module';
 import { MatchesModule } from '../matches/matches.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -25,7 +26,10 @@ const config = ConfigModule.forRoot({
     // config & database
     config,
     TypeOrmModule.forRootAsync({
-      imports: [config],
+      imports: [
+        config, 
+        ScheduleModule.forRoot()
+      ],
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('db.host'),
