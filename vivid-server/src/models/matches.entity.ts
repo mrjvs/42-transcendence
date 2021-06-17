@@ -5,6 +5,7 @@ import {
   CreateDateColumn, ManyToOne, JoinColumn
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { WarsEntity } from './wars.entity';
 
 @Entity({ name: 'matches' })
 export class MatchesEntity {
@@ -33,6 +34,8 @@ export class MatchesEntity {
 
   @Column()
   game_type: string;
+
+  @ManyToOne(() => WarsEntity, (war) => war.)
 
   @Column()
   winner_id: string;
