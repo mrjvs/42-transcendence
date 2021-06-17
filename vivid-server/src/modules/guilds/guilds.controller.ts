@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -27,7 +28,7 @@ export class GuildsController {
   ) {}
 
   @Get()
-  async seeAll() {
+  async seeAll(): Promise<GuildsEntity[]> {
     return this.guildsService.getAll();
   }
 
@@ -63,8 +64,10 @@ export class GuildsController {
     @Param('anagram') anagram: string,
     @User() user: UserEntity,
   ): Promise<DeleteResult> {
-    const guild = await this.guildsService.findGuildAnagram(anagram);
-    if (!(user.admin || (guild && guild.owner.id === user.id)))
+    const guild = await this.guildsService.findGuild(anagram);
+    if (!guild) throw new NotFoundException();
+
+    if (!(user.admin || guild.owner.id === user.id))
       throw new BadRequestException();
 
     return this.guildsService.deleteGuild(anagram);
@@ -74,10 +77,4 @@ export class GuildsController {
   async guildsRankList(): Promise<GuildsEntity[]> {
     return await this.guildsService.guildsRankList();
   }
-
-  // delete this one // TODO - just for testing with guild rankings
-  // @Post('win')
-  // async Guildwin() {
-  //   return this.guildsService.guildWin('jambo', 50);
-  // }
 }

@@ -1,8 +1,8 @@
 import { IWarTime } from './war_time.interface';
 
 export interface IWar {
-  requestingGuild: string;
-  acceptingGuild: string;
+  requesting: string;
+  accepting: string;
   start_date: Date;
   end_date: Date;
   prize_points: number;

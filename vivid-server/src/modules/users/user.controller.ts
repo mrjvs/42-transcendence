@@ -39,10 +39,9 @@ export class UserController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body() name: string,
+    @Body() user: IUser,
   ): Promise<IUser | void> {
-    await this.userService.update(id, name);
-    return await this.userService.findUser(id);
+    return await this.userService.update(id, user);
   }
 
   @Post('join_guild/:anagram')

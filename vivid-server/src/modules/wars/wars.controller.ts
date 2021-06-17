@@ -41,8 +41,15 @@ export class WarsController {
     return this.warsService.declineWarRequest(warId);
   }
 
-  @Get('end')
-  endWar() {
-    return this.warsService.endOfWar('b68ce184-6376-4db1-8519-3d7f4e6a2313');
+  // Start war
+  @Patch('start/:war_id')
+  startWar(@Param('war_id') warId: string) {
+    return this.warsService.startWar(warId);
+  }
+
+  // End war
+  @Patch('end/:war_id')
+  endWar(@Param('war_id') warId: string) {
+    return this.warsService.endWar(warId);
   }
 }
