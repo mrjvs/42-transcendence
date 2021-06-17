@@ -5,9 +5,12 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { GuildsEntity } from './guilds.entity';
 
-@Entity()
+@Entity({ name: 'users' })
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -27,4 +30,13 @@ export class UserEntity {
   getName() {
     return this.name + '!!!';
   }
+
+  @Column('boolean', { default: false })
+  admin: boolean;
+
+  @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'guild' })
+  guild: GuildsEntity;
 }
