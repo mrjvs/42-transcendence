@@ -1,36 +1,153 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { WarsEntity } from '@/wars.entity';
-import { IWars } from '@/wars.interface';
-import { GuildsService } from '../guilds/guilds.service';
+import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { WarEntity } from '@/war.entity';
+import { GuildsEntity } from '@/guilds.entity';
+import { IWar } from '@/war.interface';
+import { WarTimeEntity } from '@/war_time.entity';
+import { GuildsService } from '$/guilds/guilds.service';
 
 @Injectable()
 export class WarsService {
   constructor(
-    @InjectRepository(WarsEntity)
-    private warsRepository: Repository<WarsEntity>,
+    @InjectRepository(WarEntity)
+    private warsRepository: Repository<WarEntity>,
+    @InjectRepository(WarTimeEntity)
+    private warTimeRepository: Repository<WarTimeEntity>,
     private guildsService: GuildsService,
   ) {}
 
-  getAllWars(): Promise<WarsEntity[]> {
+  getAllWars(): Promise<WarEntity[]> {
     return this.warsRepository.find();
   }
 
-  async sendWarRequest(guildId: string, request: IWars) {
-    return this.warsRepository.save(request);
+  private async findWar(warId: string): Promise<WarEntity> {
+    const war = await this.warsRepository.findOne({
+      relations: ['guilds', 'requesting_guild', 'accepting_guild'],
+      where: { id: warId },
+    });
+    return war;
   }
 
-  async acceptWarRequest(warId: string) {
-    return this.warsRepository
+  // Check if all War Times are within the timeframe of the war
+  private validWartimes(war: IWar): boolean {
+    for (const block of war.war_time) {
+      if (block.start_date < war.start_date || block.end_date > war.end_date)
+        return false;
+    }
+    return true;
+  }
+
+  async sendWarRequest(warRequest: IWar): Promise<WarEntity> {
+    // check if guilds exist
+    const acceptingGuild = await this.guildsService.findGuild(
+      warRequest.accepting,
+    );
+    const requestingGuild = await this.guildsService.findGuild(
+      warRequest.requesting,
+    );
+    if (!acceptingGuild || !requestingGuild) throw new NotFoundException();
+
+    // Check if wartimes are valid
+    if (!this.validWartimes(warRequest)) throw new BadRequestException();
+
+    // Create War Time array and save it in database
+    const war_time: WarTimeEntity[] = await this.warTimeRepository
+      .save(warRequest.war_time)
+      .catch((error) => {
+        if (error.code === '23514' || error.code === '23502')
+          throw new BadRequestException();
+        throw error;
+      });
+
+    // Create war
+    const war: WarEntity = this.warsRepository.create(warRequest);
+
+    // Link war with guilds and War Time
+    war.accepting_guild = acceptingGuild;
+    war.requesting_guild = requestingGuild;
+    war.war_time = war_time;
+
+    // Save war in database
+    return war.save().catch((error) => {
+      if (error.code === '23514') throw new BadRequestException();
+      throw error;
+    });
+  }
+
+  private async overlappingWar(war: WarEntity): Promise<boolean> {
+    const overlappingWar = await this.warsRepository
+      .createQueryBuilder()
+      .select()
+      .where('accepted = :a', { a: true })
+      .andWhere('start_date <= :e', { e: war.end_date })
+      .andWhere('end_date >= :s', { s: war.start_date })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('requesting_guild = :g1', {
+            g1: war.requesting_guild.id,
+          })
+            .orWhere('accepting_guild = :g2', {
+              g2: war.requesting_guild.id,
+            })
+            .orWhere('requesting_guild = :g3', {
+              g3: war.accepting_guild.id,
+            })
+            .orWhere('accepting_guild = :g4', {
+              g4: war.accepting_guild.id,
+            });
+        }),
+      )
+      .execute();
+    if (overlappingWar.length !== 0) return true;
+    return false;
+  }
+
+  async acceptWarRequest(warId: string): Promise<UpdateResult> {
+    // Find war
+    const war = await this.findWar(warId);
+    if (!war) throw new NotFoundException();
+
+    // Check for overlapping accepted wars
+    if (await this.overlappingWar(war)) throw new BadRequestException();
+
+    // Save war with extra overlap check to avoid race condition
+    return await this.warsRepository
       .createQueryBuilder()
       .update()
-      .set({ accepted: true })
+      .set({
+        accepted: true,
+      })
       .where({ id: warId })
+      .andWhere(() => {
+        return (
+          'NOT EXISTS ( ' +
+          this.warsRepository
+            .createQueryBuilder()
+            .select()
+            .where(`accepted = ${true}`)
+            .andWhere(`start_date <= '${war.end_date.toISOString()}'`)
+            .andWhere(`end_date >= '${war.start_date.toISOString()}'`)
+            .andWhere(
+              new Brackets((qb) => {
+                qb.where(`requesting_guild = '${war.requesting_guild.id}'`)
+                  .orWhere(`accepting_guild = '${war.requesting_guild.id}'`)
+                  .orWhere(`requesting_guild = '${war.accepting_guild.id}'`)
+                  .orWhere(`accepting_guild = '${war.accepting_guild.id}'`);
+              }),
+            )
+            .getQuery() +
+          ' )'
+        );
+      })
       .execute();
   }
 
-  async declineWarRequest(warId: string) {
+  async declineWarRequest(warId: string): Promise<DeleteResult> {
     return this.warsRepository
       .createQueryBuilder()
       .delete()
@@ -38,27 +155,39 @@ export class WarsService {
       .execute();
   }
 
-  async endOfWar(warId: string) {
-    const war = await this.warsRepository
-      .findOne({
-        where: {
-          id: warId,
-        },
-      })
-      .catch((error) => {
-        if (error.code === '23505') throw new NotFoundException();
-        throw error;
-      });
-    if (war.points_guild_1 > war.points_guild_2) {
-      this.guildsService.guildWin(war.guild_1, war.prize_points);
-      this.guildsService.guildLose(war.guild_2);
-    } else if (war.points_guild_2 > war.points_guild_1) {
-      this.guildsService.guildWin(war.guild_2, war.prize_points);
-      this.guildsService.guildLose(war.guild_1);
-    } else {
-      this.guildsService.guildTie(war.guild_1, war.prize_points / 2);
-      this.guildsService.guildTie(war.guild_2, war.prize_points / 2);
+  async startWar(warId: string): Promise<UpdateResult> {
+    const war = await this.findWar(warId);
+    if (!war) throw new NotFoundException();
+
+    return this.guildsService.startWar(war);
+  }
+
+  async endWar(warId: string): Promise<GuildsEntity[]> {
+    // Find war
+    const war = await this.findWar(warId);
+    if (!war) throw new NotFoundException();
+
+    // TODO Do we need to check if the war has already been ended?
+
+    // If the war was a tie
+    if (war.points_accepting == war.points_requesting)
+      this.guildsService.guildTie(war.guilds, war.prize_points / 2);
+    else {
+      // Set winner & loser
+      let winner: string, loser: string;
+      if (war.points_requesting > war.points_accepting) {
+        winner = war.requesting_guild.anagram;
+        loser = war.accepting_guild.anagram;
+      } else {
+        winner = war.accepting_guild.anagram;
+        loser = war.requesting_guild.anagram;
+      }
+
+      // Resolve points
+      this.guildsService.guildWin(winner, war.prize_points);
+      this.guildsService.guildLose(loser);
     }
-    return;
+    // TODO unupdated guilds are returned, what do we want to return?
+    return war.guilds;
   }
 }

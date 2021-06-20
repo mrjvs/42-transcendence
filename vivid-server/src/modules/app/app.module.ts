@@ -4,9 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import configuration from '~/config/configuration';
-
 import { UserModule } from '$/users/user.module';
-import { WarsModule } from '$/wars/wars.module';
+import { WarsModule } from '~/modules/wars/wars.module';
 import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
 import { TypeORMSession } from '@/session.entity';
@@ -45,6 +44,7 @@ const config = ConfigModule.forRoot({
     AuthModule,
     FriendsModule,
     BlocksModule,
+    WarsModule,
     GuildsModule,
     WarsModule,
     GuildrequestModule,

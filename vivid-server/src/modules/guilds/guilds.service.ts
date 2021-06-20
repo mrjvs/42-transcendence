@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GuildsEntity } from '@/guilds.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserEntity } from '@/user.entity';
-import { IGuild } from '@/user.interface copy';
+import { IGuild } from '@/guild.interface';
+import { WarEntity } from '@/war.entity';
 
 @Injectable()
 export class GuildsService {
@@ -75,51 +76,44 @@ export class GuildsService {
       .set({
         wars_won: () => 'wars_won + 1',
         total_points: () => `total_points + ${points}`,
+        current_war: null,
       })
       .where('anagram = :anagram', { anagram: guildAnagram })
-      .execute()
-      .catch((error) => {
-        if (error.code === '23505') throw new BadRequestException();
-        throw error;
-      });
+      .execute();
   }
 
-  async guildTie(guildAnagram: string, points: number): Promise<UpdateResult> {
+  async guildTie(
+    guilds: GuildsEntity[],
+    points: number,
+  ): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .update()
       .set({
         wars_tied: () => 'wars_tied + 1',
         total_points: () => `total_points + ${points}`,
+        current_war: null,
       })
-      .where('anagram = :anagram', { anagram: guildAnagram })
-      .execute()
-      .catch((error) => {
-        if (error.code === '23505') throw new BadRequestException();
-        throw error;
-      });
+      .where('anagram = :a1', { a1: guilds[0].anagram })
+      .orWhere('anagram = :a2', { a2: guilds[1].anagram })
+      .execute();
   }
 
   async guildLose(guildAnagram: string): Promise<UpdateResult> {
     return this.guildsRepository
       .createQueryBuilder()
       .update()
-      .set({ wars_lost: () => 'wars_lost + 1' })
+      .set({ wars_lost: () => 'wars_lost + 1', current_war: null })
       .where('anagram = :anagram', { anagram: guildAnagram })
-      .execute()
-      .catch((error) => {
-        if (error.code === '23505') throw new NotFoundException();
-        throw error;
-      });
+      .execute();
   }
 
-  async findGuildAnagram(guildAnagram: string): Promise<GuildsEntity> {
-    return this.guildsRepository
-      .findOne({ relations: ['owner'], where: { anagram: guildAnagram } })
-      .catch((error) => {
-        if (error.code === '22P02') throw new NotFoundException();
-        throw error;
-      });
+  async findGuild(guildAnagram: string): Promise<GuildsEntity> {
+    const guild = await this.guildsRepository.findOne({
+      relations: ['owner'],
+      where: { anagram: guildAnagram },
+    });
+    return guild;
   }
 
   async guildsRankList(): Promise<GuildsEntity[]> {
@@ -131,24 +125,8 @@ export class GuildsService {
       .execute();
   }
 
-  async changeWarId(
-    guildAnagram: string,
-    warId: string,
-  ): Promise<UpdateResult> {
-    return await this.guildsRepository
-      .createQueryBuilder()
-      .update()
-      .set({ current_war_id: warId })
-      .where({ anagram: guildAnagram })
-      .execute()
-      .catch((error) => {
-        if (error.code === '22P02') throw new NotFoundException();
-        throw error;
-      });
-  }
-
   async deleteGuild(guildAnagram: string): Promise<DeleteResult> {
-    return await this.guildsRepository
+    return this.guildsRepository
       .createQueryBuilder()
       .delete()
       .where({ anagram: guildAnagram })
@@ -158,5 +136,21 @@ export class GuildsService {
         throw error;
       });
   }
-  3;
+
+  async startWar(war: WarEntity): Promise<UpdateResult> {
+    return this.guildsRepository
+      .createQueryBuilder()
+      .update()
+      .set({ current_war: war })
+      .where(
+        new Brackets((qb) => {
+          qb.where('anagram = :a1', {
+            a1: war.requesting_guild.anagram,
+          }).orWhere('anagram = :a2', {
+            a2: war.accepting_guild.anagram,
+          });
+        }),
+      )
+      .execute();
+  }
 }

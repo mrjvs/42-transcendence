@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
-import { WarsEntity } from '@/wars.entity';
+import { WarEntity } from '@/war.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WarsService } from './wars.service';
 import { WarsController } from './wars.controller';
-import { GuildsService } from '../guilds/guilds.service';
+import { WarTimeEntity } from '@/war_time.entity';
 import { GuildsEntity } from '@/guilds.entity';
+import { GuildsService } from '$/guilds/guilds.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WarsEntity, GuildsEntity])],
+  imports: [TypeOrmModule.forFeature([WarEntity, WarTimeEntity, GuildsEntity])],
   providers: [WarsService, GuildsService],
   controllers: [WarsController],
   exports: [WarsService],
