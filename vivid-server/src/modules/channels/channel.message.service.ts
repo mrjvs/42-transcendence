@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
@@ -42,7 +42,7 @@ export class ChannelMessageService {
     channelId: string,
     messageId: string,
     userId?: string,
-  ): Promise<DeleteResult> {
+  ): Promise<{ id: string }> {
     let builder: any = this.MessageRepository.createQueryBuilder();
     builder = builder
       .delete()
@@ -53,6 +53,8 @@ export class ChannelMessageService {
       builder = builder.where('user = :owner', { owner: userId });
     }
 
-    return await builder.execute();
+    const result: DeleteResult = await builder.execute();
+    if (result.affected !== 1) throw new NotFoundException();
+    return { id: messageId };
   }
 }

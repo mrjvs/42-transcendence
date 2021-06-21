@@ -88,7 +88,7 @@ export class ChannelMessageController {
     @Param('id') channelId: string,
     @Param('message') messageId: string,
     @User() user: UserEntity,
-  ): Promise<DeleteResult> {
+  ): Promise<{ id: string }> {
     const { mod } = getUserRolesFromChannel(user, channelId);
 
     return await this.messageService.deleteMessage(

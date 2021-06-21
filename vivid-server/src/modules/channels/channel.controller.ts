@@ -11,7 +11,6 @@ import {
   Param,
   Body,
 } from '@nestjs/common';
-import { Observable, from } from 'rxjs';
 import { ChannelService, ChannelTypes } from './channel.service';
 import { ChannelDto, IChannel } from '@/channel.entity';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
@@ -19,23 +18,23 @@ import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { ChannelRoles } from '~/middleware/guards/channel.guards';
-import { DeleteResult, UpdateResult } from 'typeorm';
 
+// TODO only show sensitive info if joined (like other users or passwords)
 @Controller('channels')
 @UseGuards(AuthenticatedGuard)
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
 
   @Get('/:id')
-  getChannel(@Param('id') channelId: string): Observable<IChannel> {
-    return from(this.channelService.findChannel(channelId));
+  getChannel(@Param('id') channelId: string): Promise<IChannel> {
+    return this.channelService.findChannel(channelId);
   }
 
   @Get('/')
   getChannelList(
     @User() user: UserEntity,
     @Query('type') type: string,
-  ): Observable<IChannel[]> {
+  ): Promise<IChannel[]> {
     if (!type) type = 'public';
     if (!['public', 'private', 'all'].includes(type))
       throw new BadRequestException('invalidType');
@@ -70,7 +69,7 @@ export class ChannelController {
     role: ChannelRoles.OWNER,
     canAdmin: true,
   })
-  removeChannel(@Param('id') id: string): Promise<DeleteResult> {
+  removeChannel(@Param('id') id: string): Promise<{ id: string }> {
     return this.channelService.remove(id);
   }
 }

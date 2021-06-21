@@ -58,10 +58,7 @@ export class ChannelService {
     return saveResult;
   }
 
-  async update(
-    channelInput: ChannelDto,
-    channelId: string,
-  ): Promise<IChannel> {
+  async update(channelInput: ChannelDto, channelId: string): Promise<IChannel> {
     const input = {
       has_password: channelInput.hasPassword,
       is_public: channelInput.isPublic,
@@ -79,7 +76,7 @@ export class ChannelService {
       .update()
       .set(input)
       .where('id = :id', { id: channelId })
-      .returning("*")
+      .returning('*')
       .execute()
       .then((response) => {
         return <IChannel>response.raw[0];
@@ -87,13 +84,14 @@ export class ChannelService {
     return updateResult;
   }
 
-  async remove(channel_id: string): Promise<DeleteResult> {
+  async remove(channel_id: string): Promise<{ id: string }> {
     await this.JoinedChannelRepository.createQueryBuilder()
       .delete()
       .where('channel = :id', { id: channel_id })
       .execute();
     const result = await this.ChannelRepository.delete(channel_id);
-    return result;
+    if (result.affected !== 1) throw new NotFoundException();
+    return { id: channel_id };
   }
 
   async findChannel(id: string): Promise<IChannel> {
@@ -105,18 +103,18 @@ export class ChannelService {
     });
   }
 
-  findAllOfType(type: ChannelTypes): Observable<IChannel[]> {
+  findAllOfType(type: ChannelTypes): Promise<IChannel[]> {
     const query = {
       where: {},
     };
     if (type === 'public') query.where = { is_public: true };
     else if (type === 'private') query.where = { is_public: false };
-    return from(this.ChannelRepository.find(query));
+    return this.ChannelRepository.find(query);
   }
 
   async addUser(
     joinedChannelInput: IJoinedChannelInput,
-  ): Promise<IJoinedChannel | UpdateResult> {
+  ): Promise<IJoinedChannel> {
     const channel = await this.findChannel(joinedChannelInput.channel);
     if (!channel) throw new NotFoundException();
 
@@ -135,11 +133,12 @@ export class ChannelService {
       },
     });
 
-    // record already exists
+    // record already exists, update
     if (alreadyJoined) {
       if (alreadyJoined.is_joined)
         throw new ConflictException(null, 'User is already joined');
-      const newJoin = await this.JoinedChannelRepository.update(alreadyJoined, {
+      const newJoin = await this.JoinedChannelRepository.save({
+        id: alreadyJoined.id,
         is_joined: true,
       });
       return newJoin;
@@ -156,7 +155,7 @@ export class ChannelService {
     channel: string,
     user: string,
     isMod = true,
-  ): Promise<UpdateResult> {
+  ): Promise<IJoinedChannel> {
     return await this.JoinedChannelRepository.createQueryBuilder()
       .update()
       .where({
@@ -165,7 +164,11 @@ export class ChannelService {
         is_joined: true,
       })
       .set({ is_mod: isMod })
-      .execute();
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return <IJoinedChannel>response.raw[0];
+      });
   }
 
   async updateUserPunishments(
@@ -175,7 +178,7 @@ export class ChannelService {
     isBanned?: boolean,
     muteExpiry?: number,
     banExpiry?: number,
-  ): Promise<UpdateResult> {
+  ): Promise<IJoinedChannel> {
     let builder: any = this.JoinedChannelRepository.createQueryBuilder()
       .update()
       .where({
@@ -196,12 +199,15 @@ export class ChannelService {
       builder = builder.set({ is_banned: isBanned, ban_expiry: expiry });
     }
     if (!hasChanges) throw new BadRequestException();
-    return builder.execute();
+    builder = builder.returning('*');
+    return builder.execute().then((response) => {
+      return <IJoinedChannel>response.raw[0];
+    });
   }
 
   async removeUser(
     joinedChannelInput: IJoinedChannelInput,
-  ): Promise<DeleteResult | UpdateResult> {
+  ): Promise<{ id: string }> {
     const channel = await this.findChannel(joinedChannelInput.channel);
     if (channel.owner === joinedChannelInput.user)
       throw new ForbiddenException(null, 'Cannot remove owner from channel');
@@ -221,31 +227,32 @@ export class ChannelService {
       const result = await this.JoinedChannelRepository.update(alreadyRemoved, {
         is_joined: false,
       });
-      return result;
+      return { id: joinedChannelInput.user };
     }
 
-    return await this.JoinedChannelRepository.delete(alreadyRemoved);
+    await this.JoinedChannelRepository.delete(alreadyRemoved);
+    return { id: joinedChannelInput.user };
   }
 
-  listUsers(channelId: string): Observable<JoinedChannelEntity[]> {
-    return from(
-      this.JoinedChannelRepository.find({
-        where: {
-          is_joined: true,
-          channel: channelId,
-        },
-      }),
-    );
+  async listUsers(channelId: string): Promise<JoinedChannelEntity[]> {
+    if (!(await this.ChannelRepository.findOne(channelId)))
+      throw new NotFoundException();
+    return await this.JoinedChannelRepository.find({
+      where: {
+        is_joined: true,
+        channel: channelId,
+      },
+    });
   }
 
-  listUser(channelId: string, id: string): Observable<JoinedChannelEntity> {
-    return from(
-      this.JoinedChannelRepository.findOne({
-        where: {
-          user: id,
-          channel: channelId,
-        },
-      }),
-    );
+  async listUser(channelId: string, id: string): Promise<JoinedChannelEntity> {
+    const user = await this.JoinedChannelRepository.findOne({
+      where: {
+        user: id,
+        channel: channelId,
+      },
+    });
+    if (!user) throw new NotFoundException();
+    return user;
   }
 }

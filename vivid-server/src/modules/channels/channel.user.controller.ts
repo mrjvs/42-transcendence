@@ -45,7 +45,7 @@ export class ChannelUserController {
   })
   getChannelUsers(
     @Param('id') channelId: string,
-  ): Observable<JoinedChannelEntity[]> {
+  ): Promise<JoinedChannelEntity[]> {
     return this.channelService.listUsers(channelId);
   }
 
@@ -57,7 +57,7 @@ export class ChannelUserController {
   getChannelUser(
     @Param('id') channelId: string,
     @Param('user') id: string,
-  ): Observable<JoinedChannelEntity> {
+  ): Promise<JoinedChannelEntity> {
     return this.channelService.listUser(channelId, id);
   }
 
@@ -67,7 +67,7 @@ export class ChannelUserController {
     @Body() requestBody: UserJoinedChannelDto,
     @UserParam('user') userParam: IUserParam,
     @User() user: UserEntity,
-  ): Promise<IJoinedChannel | UpdateResult> {
+  ): Promise<IJoinedChannel> {
     // if its not self, must site admin
     if (!userParam.isSelf && !user.isSiteAdmin())
       throw new ForbiddenException();
@@ -89,7 +89,7 @@ export class ChannelUserController {
     @Body() bodyRequests: UserPermissionDto,
     @Param('id') channel: string,
     @Param('user') user: string,
-  ): Promise<UpdateResult> {
+  ): Promise<IJoinedChannel> {
     return this.channelService.makeUserMod(channel, user, bodyRequests.isMod);
   }
 
@@ -103,7 +103,7 @@ export class ChannelUserController {
     @Body() bodyRequests: UserPunishmentsDto,
     @Param('id') channel: string,
     @Param('user') user: string,
-  ): Promise<UpdateResult> {
+  ): Promise<IJoinedChannel> {
     return this.channelService.updateUserPunishments(
       channel,
       user,
@@ -119,7 +119,7 @@ export class ChannelUserController {
     @Param('id') channel: string,
     @UserParam('user') userParam: IUserParam,
     @User() user: UserEntity,
-  ): Promise<DeleteResult | UpdateResult> {
+  ): Promise<{ id: string }> {
     const { mod } = getUserRolesFromChannel(user, channel);
     // if its not self, must be mod or site admin
     if (!userParam.isSelf && !(mod || user.isSiteAdmin()))
