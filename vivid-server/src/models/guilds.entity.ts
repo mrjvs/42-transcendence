@@ -9,8 +9,10 @@ import {
   OneToOne,
   JoinColumn,
   PrimaryGeneratedColumn,
+  ManyToOne,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { WarEntity } from './war.entity';
 
 @Unique(['name'])
 @Unique(['owner'])
@@ -23,6 +25,10 @@ export class GuildsEntity extends BaseEntity {
   @Column()
   name: string;
 
+  @OneToMany(
+    () => WarEntity,
+    (war) => war.requesting_guild && war.accepting_guild,
+  )
   @Column('varchar', { default: null, length: 5 })
   anagram: string;
 
@@ -36,20 +42,21 @@ export class GuildsEntity extends BaseEntity {
   @Column('boolean', { default: true })
   active: boolean;
 
-  @Column('numeric', { default: 0 })
+  @Column({ default: 0 })
   total_points: number;
 
-  @Column('numeric', { default: 0 })
+  @Column({ default: 0 })
   wars_won: number;
 
-  @Column('numeric', { default: 0 })
+  @Column({ default: 0 })
   wars_tied: number;
 
-  @Column('numeric', { default: 0 })
+  @Column({ default: 0 })
   wars_lost: number;
 
-  @Column('varchar', { default: null })
-  current_war_id: string;
+  @ManyToOne(() => WarEntity, (war) => war.guilds)
+  @JoinColumn({ name: 'war' })
+  current_war: WarEntity;
 
   @OneToMany(() => UserEntity, (user) => user.guild)
   users: UserEntity[];

@@ -91,13 +91,14 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async update(id: string, data): Promise<any> {
+  async update(id: string, data: IUser): Promise<any> {
     return this.userRepository.update(id, data);
   }
 
   async joinGuild(userId: string, anagram: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({ id: userId });
-    const guild = await this.guildsService.findGuildAnagram(anagram);
+    const guild = await this.guildsService.findGuild(anagram);
+    if (!user || !guild) throw new NotFoundException();
     user.guild = guild;
     return await this.userRepository.save(user);
   }
