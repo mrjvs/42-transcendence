@@ -5,8 +5,11 @@ import {
   Param,
   Patch,
   UseGuards,
+  Post,
+  Body,
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
+import { IWar } from '@/war.interface';
 import { WarsService } from './wars.service';
 
 @Controller('wars')
@@ -18,6 +21,12 @@ export class WarsController {
   @Get('all')
   getAllWars() {
     return this.warsService.getAllWars();
+  }
+
+  // Send War Request
+  @Post('add')
+  sendWarRequest(@Body() request: IWar) {
+    return this.warsService.sendWarRequest(request);
   }
 
   // Accept War Request
@@ -32,8 +41,15 @@ export class WarsController {
     return this.warsService.declineWarRequest(warId);
   }
 
-  @Get('end')
-  endWar() {
-    return this.warsService.endOfWar('b68ce184-6376-4db1-8519-3d7f4e6a2313');
+  // Start war
+  @Patch('start/:war_id')
+  startWar(@Param('war_id') warId: string) {
+    return this.warsService.startWar(warId);
+  }
+
+  // End war
+  @Patch('end/:war_id')
+  endWar(@Param('war_id') warId: string) {
+    return this.warsService.endWar(warId);
   }
 }
