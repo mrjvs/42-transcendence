@@ -70,7 +70,7 @@ export class ChannelMessageController {
     @Body() messageBody: MessageDto,
     @User() user: UserEntity,
     @Param('id') channelId: string,
-  ): Observable<IMessage> {
+  ): Promise<IMessage> {
     const input: IMessageInput = {
       content: messageBody.content,
       user: user.id,

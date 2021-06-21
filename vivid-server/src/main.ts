@@ -10,7 +10,10 @@ import { TypeormStore } from 'connect-typeorm';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: true,
+    cors: {
+      credentials: true,
+      origin: ['http://localhost:3000'], // TODO add to config
+    },
   });
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
@@ -29,7 +32,7 @@ async function bootstrap() {
     session({
       cookie: {
         maxAge: 24 * 7 * 60 * 60 * 1000, // 1 week
-        httpOnly: true,
+        httpOnly: false,
         secure: configService.get('useHttps'),
       },
       secret: configService.get('secrets.session'),

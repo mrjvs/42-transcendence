@@ -48,9 +48,13 @@ function Home() {
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/v1/channels')
+    fetch('http://localhost:8080/api/v1/channels', {
+      credentials: 'include',
+    })
       .then((res) => res.json())
       .then((result) => {
+        if (result.statusCode !== undefined && result.statusCode !== 200)
+          throw new Error('failed fetch');
         setLoading(false);
         setChannelList(result);
       })

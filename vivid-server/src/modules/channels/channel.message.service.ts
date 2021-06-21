@@ -2,23 +2,29 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
-
+// import { parse } from 'cookie';
 import {
   MessageEntity,
   IMessage,
   IMessageInput,
   PaginationDto,
 } from '@/messages.entity';
+// import { UserService } from '$/users/user.service';
+import { Socket } from 'socket.io';
+import { ChannelMessageGateway } from './channel.message.gateway';
 
 @Injectable()
 export class ChannelMessageService {
   constructor(
     @InjectRepository(MessageEntity)
-    private MessageRepository: Repository<MessageEntity>,
+    private MessageRepository: Repository<MessageEntity>, // private readonly userService: UserService,
+    private readonly messageGateway: ChannelMessageGateway,
   ) {}
 
-  postMessage(messageInput: IMessageInput): Observable<IMessage> {
-    return from(this.MessageRepository.save(messageInput));
+  async postMessage(messageInput: IMessageInput): Promise<IMessage> {
+    const result = await this.MessageRepository.save(messageInput);
+    this.messageGateway.sendChannelMessage(result);
+    return result;
   }
 
   getMessages(
@@ -56,5 +62,9 @@ export class ChannelMessageService {
     const result: DeleteResult = await builder.execute();
     if (result.affected !== 1) throw new NotFoundException();
     return { id: messageId };
+  }
+
+  async getUserFromSocket(socket: Socket) {
+    // console.log(socket.handshake);
   }
 }
