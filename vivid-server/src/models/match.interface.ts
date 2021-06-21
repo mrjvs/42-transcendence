@@ -1,4 +1,4 @@
-import { WarsEntity } from "./wars.entity";
+import { WarEntity } from './war.entity';
 
 export interface IGame {
   user_id_req: string;
@@ -8,5 +8,5 @@ export interface IGame {
   add_ons?: string;
   game_type: string;
   winner_id?: string;
-  war_id?: WarsEntity;
+  war_id?: WarEntity;
 }
