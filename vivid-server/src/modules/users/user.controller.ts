@@ -15,6 +15,7 @@ import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
 import { DeleteResult } from 'typeorm';
+import { Cron } from '@nestjs/schedule';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -34,6 +35,11 @@ export class UserController {
   @Get(':id')
   async findUser(@Param('id') id: string): Promise<IUser | void> {
     return await this.userService.findUser(id);
+  }
+
+  @Get('matches/:id')
+  async findUsermatches(@Param('id') id: string): Promise<IUser | void> {
+    return await this.userService.findUserMatches(id);
   }
 
   @Patch(':id')
