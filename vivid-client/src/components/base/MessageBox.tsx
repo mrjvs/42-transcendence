@@ -4,7 +4,7 @@ import './MessageBox.css';
 export function MessageBox(props: {
   placeholder: string;
   disabled: boolean;
-  onSend: () => void;
+  onSend: (text: string) => void;
 }) {
   const [content, setContent] = React.useState('');
 
@@ -14,7 +14,7 @@ export function MessageBox(props: {
 
   function onSubmit(event: any) {
     event.preventDefault();
-    props.onSend();
+    props.onSend(content);
     setContent('');
   }
 

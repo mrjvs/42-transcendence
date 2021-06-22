@@ -33,8 +33,20 @@ export class ChannelMessageService {
 
   getMessages(
     id: string,
-    paginationDto: PaginationDto,
+    paginationDto?: PaginationDto,
   ): Observable<MessageEntity[]> {
+    if (!paginationDto) {
+      return from(
+        this.MessageRepository.find({
+          where: {
+            channel: id,
+          },
+          order: {
+            created_at: 'ASC',
+          },
+        }),
+      );
+    }
     return from(
       this.MessageRepository.find({
         where: {

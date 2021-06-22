@@ -4,7 +4,7 @@ import './Root.css';
 import { Heading } from '../components/styled/Heading';
 import { Button } from '../components/styled/Button';
 import { Icon } from '../components/styled/Icon';
-import { ActionRow } from '../components/styled/ActionRow';
+import { ActionRow } from '../components/styled/sidebar/ActionRow';
 import { SidebarLink } from '../components/styled/sidebar/SidebarLink';
 import { ChannelView } from '../views/ChannelView';
 import { UserContext } from '../hooks/useUser';
@@ -17,12 +17,7 @@ export function RootNavigation() {
       <div className="wrapper">
         <nav className="sideNav">
           <Heading size="big">Vivid</Heading>
-          {/* <ActionRow label="guild" />
-          <Paragraph>You're not in a guild yet</Paragraph>
-          <ActionRow label="channels">new</ActionRow>
-          <Paragraph>You're not in any channels</Paragraph>
-          <ActionRow label="friends">new</ActionRow>
-          <Paragraph>You don't have any friends</Paragraph> */}
+          <ActionRow label="guild" />
           <SidebarLink link="/guilds">
             <Icon type="gear" />
             Guild Settings
@@ -41,7 +36,7 @@ export function RootNavigation() {
           </SidebarLink>
           <ActionRow label="channel">
             <Button badge={1} small={true} onclick={() => alert('ello')}>
-              <Icon type="plus"></Icon>
+              <Icon type="plus" />
               New
             </Button>
           </ActionRow>
@@ -53,12 +48,15 @@ export function RootNavigation() {
         </nav>
         <div className="content">
           <Switch>
-            <Route path="/about"></Route>
-            <Route exact path="/"></Route>
+            <Route exact path="/">
+              <p>home</p>
+            </Route>
             <Route exact path="/channel/:id">
               <ChannelView />
             </Route>
-            <Route path="*"></Route>
+            <Route path="*">
+              <p>Not found</p>
+            </Route>
           </Switch>
         </div>
       </div>

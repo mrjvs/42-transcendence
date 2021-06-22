@@ -44,10 +44,10 @@ export class ChannelMessageController {
     },
   )
   getMessageHistory(
-    @Query() paginationDto: PaginationDto,
+    // @Query() paginationDto: PaginationDto,
     @Param('id') channelId: string,
   ): Observable<MessageEntity[]> {
-    return this.messageService.getMessages(channelId, paginationDto);
+    return this.messageService.getMessages(channelId, null);
   }
 
   @Post('/')
