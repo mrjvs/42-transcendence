@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import React from 'react';
 import { UserContext, useUser } from './hooks/useUser';
 import { RootNavigation } from './navigation/Root';
 
@@ -23,86 +22,6 @@ function App() {
         <RootNavigation />
       </UserProtect>
     </UserContext.Provider>
-  );
-}
-
-interface IChannelList {
-  id: string;
-}
-
-function Home() {
-  const [error, setError] = useState(false);
-  const [channelList, setChannelList] = useState<IChannelList[]>([]);
-  const [isLoading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('http://localhost:8080/api/v1/channels', {
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        if (result.statusCode !== undefined && result.statusCode !== 200)
-          throw new Error('failed fetch');
-        setLoading(false);
-        setChannelList(result);
-      })
-      .catch(() => {
-        setLoading(false);
-        setError(true);
-      });
-  }, []);
-
-  let channelListRender;
-
-  if (isLoading)
-    channelListRender = (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
-  else if (error)
-    channelListRender = (
-      <div>
-        <p>Something went wrong, try again later</p>
-      </div>
-    );
-  else
-    channelListRender = (
-      <div>
-        <ul>
-          {channelList.map((v) => (
-            <li key={v.id}>
-              <Link to={`/channel/${v.id}`}>{v.id}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-
-  return (
-    <header>
-      <h1>Channel list:</h1>
-      {channelListRender}
-    </header>
-  );
-}
-
-function About() {
-  return (
-    <div>
-      <h2>About</h2>
-      <p>Sample text</p>
-    </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <div>
-      <h2>Whoops</h2>
-      <p>We couldn&lsquo;t find that page</p>
-      <Link to="/">Back to home</Link>
-    </div>
   );
 }
 
