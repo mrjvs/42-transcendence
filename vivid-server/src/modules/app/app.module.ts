@@ -8,6 +8,7 @@ import configuration from '~/config/configuration';
 import { UserModule } from '$/users/user.module';
 import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
+import { EventModule } from '$/websocket/event.module';
 import { TypeORMSession } from '@/session.entity';
 
 const config = ConfigModule.forRoot({
@@ -38,6 +39,7 @@ const config = ConfigModule.forRoot({
     UserModule,
     ChannelModule,
     AuthModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [AppService],

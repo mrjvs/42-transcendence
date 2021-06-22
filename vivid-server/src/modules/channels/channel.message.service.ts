@@ -8,8 +8,7 @@ import {
   IMessageInput,
   PaginationDto,
 } from '@/messages.entity';
-import { UserService } from '$/users/user.service';
-import { ChannelMessageGateway } from './channel.message.gateway';
+import { EventGateway } from '~/modules/websocket/event.gateway';
 import { ChannelService } from './channel.service';
 
 @Injectable()
@@ -17,8 +16,7 @@ export class ChannelMessageService {
   constructor(
     @InjectRepository(MessageEntity)
     private MessageRepository: Repository<MessageEntity>,
-    private readonly userService: UserService,
-    private readonly messageGateway: ChannelMessageGateway,
+    private readonly eventGateway: EventGateway,
     private readonly channelService: ChannelService,
   ) {}
 
@@ -29,7 +27,7 @@ export class ChannelMessageService {
     );
     if (!channel) throw new NotFoundException();
     const result = await this.MessageRepository.save(messageInput);
-    this.messageGateway.sendChannelMessage(result, channel.joined_users);
+    this.eventGateway.sendChannelMessage(result, channel.joined_users);
     return result;
   }
 

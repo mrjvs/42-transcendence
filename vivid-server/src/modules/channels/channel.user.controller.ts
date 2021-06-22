@@ -30,8 +30,6 @@ import {
   getUserRolesFromChannel,
 } from '~/middleware/guards/channel.guards';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
-import { Observable } from 'rxjs';
-import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('channels/:id/users')
 @UseGuards(AuthenticatedGuard)

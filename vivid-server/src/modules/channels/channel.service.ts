@@ -18,7 +18,6 @@ import {
   IJoinedChannel,
   IJoinedChannelInput,
 } from '@/joined_channels.entity';
-import { MessageEntity } from '@/messages.entity';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 
@@ -96,10 +95,7 @@ export class ChannelService {
     return { id: channel_id };
   }
 
-  async findChannel(
-    id: string,
-    resolveUsers: boolean = true,
-  ): Promise<IChannel> {
+  async findChannel(id: string, resolveUsers = true): Promise<IChannel> {
     const relations = ['joined_users'];
     if (resolveUsers) relations.push('joined_users.user');
     return await this.ChannelRepository.findOne({
@@ -231,7 +227,7 @@ export class ChannelService {
 
     // if has mute or ban, set joined value to false
     if (alreadyRemoved.is_muted || alreadyRemoved.is_banned) {
-      const result = await this.JoinedChannelRepository.update(alreadyRemoved, {
+      await this.JoinedChannelRepository.update(alreadyRemoved, {
         is_joined: false,
       });
       return { id: joinedChannelInput.user };

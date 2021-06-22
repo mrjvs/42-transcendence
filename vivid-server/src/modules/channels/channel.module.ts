@@ -9,10 +9,9 @@ import { ChannelUserController } from './channel.user.controller';
 import { ChannelMessageController } from './channel.message.controller';
 import { MessageEntity } from '@/messages.entity';
 import { ConfigService } from '@nestjs/config';
-import { ChannelMessageGateway } from './channel.message.gateway';
 import { UserModule } from '$/users/user.module';
+import { EventModule } from '../websocket/event.module';
 
-// TODO message events over websocket
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -21,13 +20,9 @@ import { UserModule } from '$/users/user.module';
       MessageEntity,
     ]),
     UserModule,
+    EventModule,
   ],
-  providers: [
-    ChannelService,
-    ChannelMessageService,
-    ChannelMessageGateway,
-    ConfigService,
-  ],
+  providers: [ChannelService, ChannelMessageService, ConfigService],
   controllers: [
     ChannelController,
     ChannelUserController,

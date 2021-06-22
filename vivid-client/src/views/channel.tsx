@@ -51,6 +51,7 @@ function InputBox(props: {
   React.useEffect(() => {
     const client = socketIOClient('http://localhost:8080', {
       withCredentials: true,
+      path: '/api/v1/events',
     });
 
     client.on('connect', () => {

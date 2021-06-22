@@ -5,8 +5,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '@/user.entity';
 import { IUser } from '@/user.interface';
 import { parse } from 'cookie';
-import { getSessionStore } from '../auth/auth-session';
-import { resolve } from 'path';
+import { getSessionStore } from '$/auth/auth-session';
 
 @Injectable()
 export class UserService {

@@ -8,8 +8,8 @@ import { IMessage } from '~/models/messages.entity';
 import { UserService } from '$/users/user.service';
 import { IJoinedChannel } from '~/models/joined_channels.entity';
 
-@WebSocketGateway()
-export class ChannelMessageGateway implements OnGatewayConnection {
+@WebSocketGateway({ path: '/api/v1/events' })
+export class EventGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
@@ -25,7 +25,7 @@ export class ChannelMessageGateway implements OnGatewayConnection {
       a[v.user as string] = true;
       return a;
     }, {});
-    for (let socketId in sockets) {
+    for (const socketId in sockets) {
       const client = sockets[socketId];
       if (!client.auth) continue; // skip user if not authed
       if (!mappedJoins[client.auth]) continue; // skip if user not in channel
