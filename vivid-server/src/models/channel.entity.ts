@@ -6,7 +6,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { JoinedChannelEntity } from './joined_channels.entity';
+import { IJoinedChannel, JoinedChannelEntity } from './joined_channels.entity';
 
 @Entity('channels')
 export class ChannelEntity {
@@ -36,6 +36,15 @@ export class ChannelEntity {
 }
 
 export class IChannel {
+  is_public?: boolean;
+  has_password?: boolean;
+  password?: string;
+  title: string;
+  owner: string;
+  joined_users?: IJoinedChannel[];
+}
+
+export class IChannelInput {
   is_public?: boolean;
   has_password?: boolean;
   password?: string;

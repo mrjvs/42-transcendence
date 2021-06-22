@@ -49,13 +49,8 @@ function InputBox(props: {
   }
 
   React.useEffect(() => {
-    const client = socketIOClient('http://127.0.0.1:8080', {
-      query: {
-        token: document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('vivid.login='))
-          ?.split('=')[1],
-      },
+    const client = socketIOClient('http://localhost:8080', {
+      withCredentials: true,
     });
 
     client.on('connect', () => {

@@ -2,28 +2,34 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
-// import { parse } from 'cookie';
 import {
   MessageEntity,
   IMessage,
   IMessageInput,
   PaginationDto,
 } from '@/messages.entity';
-// import { UserService } from '$/users/user.service';
-import { Socket } from 'socket.io';
+import { UserService } from '$/users/user.service';
 import { ChannelMessageGateway } from './channel.message.gateway';
+import { ChannelService } from './channel.service';
 
 @Injectable()
 export class ChannelMessageService {
   constructor(
     @InjectRepository(MessageEntity)
-    private MessageRepository: Repository<MessageEntity>, // private readonly userService: UserService,
+    private MessageRepository: Repository<MessageEntity>,
+    private readonly userService: UserService,
     private readonly messageGateway: ChannelMessageGateway,
+    private readonly channelService: ChannelService,
   ) {}
 
   async postMessage(messageInput: IMessageInput): Promise<IMessage> {
+    const channel = await this.channelService.findChannel(
+      messageInput.channel,
+      false,
+    );
+    if (!channel) throw new NotFoundException();
     const result = await this.MessageRepository.save(messageInput);
-    this.messageGateway.sendChannelMessage(result);
+    this.messageGateway.sendChannelMessage(result, channel.joined_users);
     return result;
   }
 
@@ -62,9 +68,5 @@ export class ChannelMessageService {
     const result: DeleteResult = await builder.execute();
     if (result.affected !== 1) throw new NotFoundException();
     return { id: messageId };
-  }
-
-  async getUserFromSocket(socket: Socket) {
-    // console.log(socket.handshake);
   }
 }

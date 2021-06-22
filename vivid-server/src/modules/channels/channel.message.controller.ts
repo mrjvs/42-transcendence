@@ -24,7 +24,6 @@ import {
 } from '@/messages.entity';
 import { UserEntity } from '@/user.entity';
 import { ChannelMessageService } from './channel.message.service';
-import { DeleteResult } from 'typeorm';
 import { Observable } from 'rxjs';
 
 @Controller('channels/:id/messages')

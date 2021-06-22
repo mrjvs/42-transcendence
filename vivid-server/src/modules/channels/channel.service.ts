@@ -6,9 +6,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { Observable, from } from 'rxjs';
-import { ChannelEntity, IChannel, ChannelDto } from '@/channel.entity';
+import { Repository } from 'typeorm';
+import {
+  ChannelEntity,
+  IChannel,
+  ChannelDto,
+  IChannelInput,
+} from '@/channel.entity';
 import {
   JoinedChannelEntity,
   IJoinedChannel,
@@ -31,13 +35,11 @@ export class ChannelService {
     private ChannelRepository: Repository<ChannelEntity>,
     @InjectRepository(JoinedChannelEntity)
     private JoinedChannelRepository: Repository<JoinedChannelEntity>,
-    @InjectRepository(MessageEntity)
-    private MessageRepository: Repository<MessageEntity>,
     private configService: ConfigService,
   ) {}
 
   async add(channelInput: ChannelDto, userId: string): Promise<IChannel> {
-    const input: IChannel = {
+    const input: IChannelInput = {
       has_password: channelInput.hasPassword,
       is_public: channelInput.isPublic,
       password: '',
@@ -94,9 +96,14 @@ export class ChannelService {
     return { id: channel_id };
   }
 
-  async findChannel(id: string): Promise<IChannel> {
+  async findChannel(
+    id: string,
+    resolveUsers: boolean = true,
+  ): Promise<IChannel> {
+    const relations = ['joined_users'];
+    if (resolveUsers) relations.push('joined_users.user');
     return await this.ChannelRepository.findOne({
-      relations: ['joined_users', 'joined_users.user'],
+      relations,
       where: {
         id,
       },

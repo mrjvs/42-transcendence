@@ -10,6 +10,7 @@ import { ChannelMessageController } from './channel.message.controller';
 import { MessageEntity } from '@/messages.entity';
 import { ConfigService } from '@nestjs/config';
 import { ChannelMessageGateway } from './channel.message.gateway';
+import { UserModule } from '$/users/user.module';
 
 // TODO message events over websocket
 @Module({
@@ -19,11 +20,12 @@ import { ChannelMessageGateway } from './channel.message.gateway';
       JoinedChannelEntity,
       MessageEntity,
     ]),
+    UserModule,
   ],
   providers: [
     ChannelService,
-    ChannelMessageGateway,
     ChannelMessageService,
+    ChannelMessageGateway,
     ConfigService,
   ],
   controllers: [

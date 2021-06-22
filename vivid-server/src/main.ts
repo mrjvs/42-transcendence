@@ -4,9 +4,7 @@ import { AppModule } from '$/app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as passport from 'passport';
 import * as session from 'express-session';
-import { getRepository } from 'typeorm';
-import { TypeORMSession } from '@/session.entity';
-import { TypeormStore } from 'connect-typeorm';
+import { getSessionStore } from '$/auth/auth-session';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -26,7 +24,6 @@ async function bootstrap() {
     }),
   );
   const configService = app.get(ConfigService);
-  const sessionRepo = getRepository(TypeORMSession);
 
   app.use(
     session({
@@ -36,13 +33,11 @@ async function bootstrap() {
         secure: configService.get('useHttps'),
       },
       secret: configService.get('secrets.session'),
-      name: 'vivid.login',
+      name: 'vivid.login', // TODO make config (and use in user.service.ts)
       resave: false,
       rolling: true,
       saveUninitialized: false,
-      store: new TypeormStore({
-        cleanupLimit: 42,
-      }).connect(sessionRepo),
+      store: getSessionStore(),
     }),
   );
 
