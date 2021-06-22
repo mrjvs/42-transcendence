@@ -37,6 +37,8 @@ export class UserService {
   }
 
   deleteUser(id: string) {
+    // TODO remove sessions from deleted user
+    // TODO disconnect websocket connections
     return this.userRepository.delete(id);
   }
 
