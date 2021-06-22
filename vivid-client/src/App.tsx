@@ -1,40 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import './App.css';
-import { ChannelView } from './views/channel';
+import { Link, Redirect } from 'react-router-dom';
+import { UserContext, useUser } from './hooks/useUser';
+import { RootNavigation } from './navigation/Root';
+
+function UserProtect(props: any) {
+  if (props.userData.done && !props.userData.isLoggedIn) {
+    window.location.href = 'http://localhost:8080/api/v1/auth/login';
+    return <p>You are not logged in</p>;
+  }
+  if (props.userData.error) return <p>Failed to log in</p>;
+  if (props.userData.loading) return <p>Loading...</p>;
+  if (!props.userData.done) return null;
+  return <div>{props.children}</div>;
+}
 
 function App() {
+  const userData = useUser();
+
   return (
-    <div className="App">
-      <Router>
-        <div>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/about">About</Link>
-              </li>
-            </ul>
-          </nav>
-          <Switch>
-            <Route path="/about">
-              <About />
-            </Route>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route exact path="/channel/:id">
-              <ChannelView />
-            </Route>
-            <Route path="*">
-              <NotFound />
-            </Route>
-          </Switch>
-        </div>
-      </Router>
-    </div>
+    <UserContext.Provider value={userData}>
+      <UserProtect userData={userData}>
+        <RootNavigation />
+      </UserProtect>
+    </UserContext.Provider>
   );
 }
 
