@@ -5,10 +5,14 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  BaseEntity,
 } from 'typeorm';
+import { GuildsEntity } from './guilds.entity';
 
-@Entity()
-export class UserEntity {
+@Entity({ name: 'users' })
+export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -30,6 +34,12 @@ export class UserEntity {
   getName() {
     return this.name + '!!!';
   }
+
+  @JoinColumn({ name: 'guild' })
+  @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
+    onDelete: 'SET NULL',
+  })
+  guild: GuildsEntity;
 
   // permissions
   isSiteAdmin() {

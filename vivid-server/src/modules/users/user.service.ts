@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Observable, from } from 'rxjs';
 import { Repository } from 'typeorm';
@@ -8,6 +8,7 @@ import { parse } from 'cookie';
 import { getSessionStore } from '$/auth/auth-session';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
+import { GuildsService } from '$/guilds/guilds.service';
 
 @Injectable()
 export class UserService {
@@ -15,6 +16,7 @@ export class UserService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private configService: ConfigService,
+    private guildsService: GuildsService,
   ) {}
 
   add(user: IUser): Observable<IUser> {
@@ -22,12 +24,22 @@ export class UserService {
   }
 
   async findUser(id: string): Promise<UserEntity> {
-    return await this.userRepository.findOne({
-      relations: ['joined_channels', 'joined_channels.channel'],
-      where: {
-        id,
-      },
-    });
+    return await this.userRepository
+      .findOne({
+        relations: [
+          'joined_channels',
+          'joined_channels.channel',
+          'guild',
+          'guild.users',
+        ],
+        where: {
+          id,
+        },
+      })
+      .catch((error) => {
+        if (error.code === '22P02') throw new NotFoundException();
+        throw error;
+      });
   }
 
   findAll(): Observable<IUser[]> {
@@ -54,6 +66,7 @@ export class UserService {
 
   async createUser(intraId: string): Promise<UserEntity> {
     const user: IUser = {
+      name: 'name11',
       intra_id: intraId,
     };
     return await this.userRepository.save(user);
@@ -89,5 +102,17 @@ export class UserService {
 
     // extract user from session data
     return sessionData?.passport?.user as string | null;
+  }
+
+  async update(id: string, data: IUser): Promise<any> {
+    return this.userRepository.update(id, data);
+  }
+
+  async joinGuild(userId: string, anagram: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ id: userId });
+    const guild = await this.guildsService.findGuild(anagram);
+    if (!user || !guild) throw new NotFoundException();
+    user.guild = guild;
+    return await this.userRepository.save(user);
   }
 }
