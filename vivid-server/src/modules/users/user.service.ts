@@ -6,12 +6,15 @@ import { UserEntity } from '@/user.entity';
 import { IUser } from '@/user.interface';
 import { parse } from 'cookie';
 import { getSessionStore } from '$/auth/auth-session';
+import { ConfigService } from '@nestjs/config';
+import * as cookieParser from 'cookie-parser';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private configService: ConfigService,
   ) {}
 
   add(user: IUser): Observable<IUser> {
@@ -58,25 +61,23 @@ export class UserService {
 
   async getUserIdFromCookie(cookie: string): Promise<string | null> {
     // parse cookie data
-    if (!cookie) return null;
+    if (!cookie) return null; // no cookies
     const parsedCookie = parse(cookie);
-    const cookieData = parsedCookie['vivid.login']; // TODO get from config
-    if (!cookieData) return null;
+    const cookieData = parsedCookie[this.configService.get('cookie.name')];
+    if (!cookieData) return null; // couldnt find auth cookie
 
-    // cookie format: "s:<ID>.<HASH>"
-    // this code extracts the id
-    // TODO check hash before removal
-    const hashRemoved = cookieData.split('.');
-    if (hashRemoved.length !== 2) return null;
-    const prefixRemoved = hashRemoved[0].split(':');
-    if (prefixRemoved.length !== 2) return null;
-    const id = prefixRemoved[1];
+    // parse signed cookie
+    const signedId = cookieParser.signedCookie(
+      cookieData,
+      this.configService.get('secrets.session'),
+    );
+    if (!signedId) return null; // hash modified, untrustworthy
 
     // fetch session from database
     let sessionData;
     try {
       sessionData = await new Promise((resolve, reject) => {
-        getSessionStore().get(id, (error?: any, result?: any) => {
+        getSessionStore().get(signedId, (error?: any, result?: any) => {
           if (error) reject(error);
           if (!result) reject(new Error('Unknown token'));
           resolve(result);

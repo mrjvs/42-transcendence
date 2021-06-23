@@ -16,6 +16,9 @@ export default () => {
 
   return {
     port,
+    cookie: {
+      name: process.env.COOKIE_NAME || 'vivid.login',
+    },
     useHttps: process.env.USE_HTTPS === 'true',
     saltRounds: parseInt(process.env.SALT_ROUNDS) || 10,
     db: {

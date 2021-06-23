@@ -7,10 +7,11 @@ import * as session from 'express-session';
 import { getSessionStore } from '$/auth/auth-session';
 
 async function bootstrap() {
+  if (!process.env.CORS) process.env.CORS = '';
   const app = await NestFactory.create(AppModule, {
     cors: {
       credentials: true,
-      origin: ['http://localhost:3000'], // TODO add to config
+      origin: process.env.CORS.split(' ').filter((v) => v.length > 0),
     },
   });
   app.setGlobalPrefix('api/v1');
@@ -33,7 +34,7 @@ async function bootstrap() {
         secure: configService.get('useHttps'),
       },
       secret: configService.get('secrets.session'),
-      name: 'vivid.login', // TODO make config (and use in user.service.ts)
+      name: configService.get('cookie.name'),
       resave: false,
       rolling: true,
       saveUninitialized: false,
