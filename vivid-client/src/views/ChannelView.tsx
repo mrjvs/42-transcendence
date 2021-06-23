@@ -10,6 +10,7 @@ export function ChannelView() {
   const scrollEl = React.useRef(null);
   const { id }: any = useParams();
   const messageData = useMessages(id);
+  const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     const cur: any = scrollEl?.current;
@@ -17,28 +18,70 @@ export function ChannelView() {
     setTimeout(() => {
       cur.scrollIntoView({ behavior: 'smooth' });
     }, 1);
-  }, [messageData.messages]);
+  }, [reducedMessages]);
+
+  React.useEffect(() => {
+    if (!messageData.messages) setReducedMessages([]);
+    function pushMessageCollection(acc: any[], msg: any) {
+      acc.push({
+        id: msg.id,
+        user: msg.user,
+        userData: messageData.channelInfo?.joined_users?.find(
+          (u: any) => u.user?.id === msg.user,
+        )?.user || { name: 'Unknown user' },
+        messages: [msg.content],
+        createdAt: new Date(msg.created_at),
+      });
+    }
+
+    setReducedMessages(
+      messageData.messages.reduce((acc, msg) => {
+        // if not from this channel, ignore
+        if (msg.channel !== id) return acc;
+
+        // if no messages yet or previous message collection is not the same user. add new message collection
+        if (acc.length == 0 || acc[acc.length - 1].user !== msg.user) {
+          pushMessageCollection(acc, msg);
+          return acc;
+        }
+
+        const prev = acc[acc.length - 1];
+        // if first message in collection is more than 4 minutes away than current message. create new collection
+        if (
+          new Date(msg.created_at).getTime() - prev.createdAt.getTime() >
+          1000 * 60 * 4
+        ) {
+          pushMessageCollection(acc, msg);
+          return acc;
+        }
+
+        // append to previous message collection
+        prev.messages.push(msg.content);
+        return acc;
+      }, []),
+    );
+  }, [messageData.messages, messageData.channelInfo]);
 
   return (
     <div className="contentContainer">
       <div className="contentHeader">
-        <Heading size="small">Channel title</Heading>
+        <Heading size="small">
+          {messageData.messageState.done ? messageData.channelInfo.title : '.'}
+        </Heading>
       </div>
       <div className="channelWrapper">
         <div className="channelScrollWrapper">
           <div className="channelContent">
             <NoMessage />
             <div>
-              {messageData.messageState.done
-                ? messageData.messages.map((v: any) => (
-                    <Message
-                      key={v.id}
-                      messages={[v.content]}
-                      username="mrjvs"
-                      blocked={false}
-                    />
-                  ))
-                : null}
+              {reducedMessages.map((v: any) => (
+                <Message
+                  key={v.id}
+                  messages={v.messages}
+                  username={v.userData.name}
+                  blocked={false}
+                />
+              ))}
             </div>
             <div ref={scrollEl} />
           </div>

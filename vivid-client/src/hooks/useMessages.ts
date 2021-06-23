@@ -4,6 +4,7 @@ import socketIOClient from 'socket.io-client';
 export function useMessages(channel: string) {
   const [messages, setMessages] = React.useState<any[]>([]);
   const [clientState, setClientState] = React.useState('CONNECTING');
+  const [channelInfo, setChannelInfo] = React.useState<any>(null);
 
   React.useEffect(() => {
     const client = socketIOClient('http://localhost:8080', {
@@ -41,8 +42,15 @@ export function useMessages(channel: string) {
     })
       .then((res) => res.json())
       .then((result) => {
-        setLoading(false);
         setMessages(result);
+        return fetch(`http://localhost:8080/api/v1/channels/${channel}`, {
+          credentials: 'include',
+        });
+      })
+      .then((res) => res.json())
+      .then((info) => {
+        setChannelInfo(info);
+        setLoading(false);
         setDone(true);
       })
       .catch(() => {
@@ -72,6 +80,7 @@ export function useMessages(channel: string) {
   return {
     clientState,
     messages,
+    channelInfo,
     messageState: {
       error,
       loading: isLoading,
