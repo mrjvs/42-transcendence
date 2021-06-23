@@ -40,6 +40,7 @@ export class MatchesEntity {
   @Column()
   winner_id: string;
 
-  @Column({ default: null })
-  war_id: string;
+  @ManyToOne(() => WarEntity, (war) => war.id)
+  @JoinColumn({ name: 'war_id' })
+  war_id: WarEntity;
 }

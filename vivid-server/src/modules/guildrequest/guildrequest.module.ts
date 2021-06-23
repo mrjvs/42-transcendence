@@ -7,12 +7,15 @@ import { GuildsService } from '$/guilds/guilds.service';
 import { UserService } from '$/users/user.service';
 import { GuildrequestController } from './guildrequest.controller';
 import { GuildRequestService } from './guildrequest.service';
+import { WarTimeEntity } from '~/models/war_time.entity';
+import { WarEntity } from '~/models/war.entity';
+import { WarsService } from '../wars/wars.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GuildRequestEntity, GuildsEntity, UserEntity]),
+    TypeOrmModule.forFeature([GuildRequestEntity, GuildsEntity, UserEntity, WarTimeEntity, WarEntity]),
   ],
-  providers: [GuildsService, GuildRequestService, UserService],
+  providers: [GuildsService, GuildRequestService, UserService, WarsService],
   controllers: [GuildrequestController],
   exports: [GuildRequestService],
 })

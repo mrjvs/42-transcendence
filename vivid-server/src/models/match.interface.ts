@@ -8,5 +8,4 @@ export interface IGame {
   add_ons?: string;
   game_type: string;
   winner_id?: string;
-  war_id?: WarEntity;
 }

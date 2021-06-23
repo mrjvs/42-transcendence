@@ -7,10 +7,13 @@ import { BlocksController } from './blocks.controller';
 import { BlocksService } from './blocks.service';
 import { GuildsService } from '../guilds/guilds.service';
 import { GuildsEntity } from '~/models/guilds.entity';
+import { WarTimeEntity } from '~/models/war_time.entity';
+import { WarEntity } from '~/models/war.entity';
+import { WarsService } from '../wars/wars.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([BlocksEntity, UserEntity, GuildsEntity])],
-  providers: [BlocksService, UserService, GuildsService],
+  imports: [TypeOrmModule.forFeature([BlocksEntity, UserEntity, GuildsEntity, WarTimeEntity, WarEntity])],
+  providers: [BlocksService, UserService, GuildsService, WarsService],
   controllers: [BlocksController],
   exports: [BlocksService],
 })

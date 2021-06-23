@@ -7,12 +7,15 @@ import { FriendsController } from './friends.controller';
 import { FriendsService } from './friends.service';
 import { GuildsService } from '../guilds/guilds.service';
 import { GuildsEntity } from '~/models/guilds.entity';
+import { WarsService } from '../wars/wars.service';
+import { WarEntity } from '~/models/war.entity';
+import { WarTimeEntity } from '~/models/war_time.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([FriendsEntity, UserEntity, GuildsEntity]),
+    TypeOrmModule.forFeature([FriendsEntity, UserEntity, GuildsEntity, WarEntity, WarTimeEntity]),
   ],
-  providers: [FriendsService, UserService, GuildsService],
+  providers: [FriendsService, UserService, GuildsService, WarsService],
   controllers: [FriendsController],
   exports: [FriendsService],
 })

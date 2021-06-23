@@ -22,7 +22,8 @@ export class MatchesService {
   {
     // console.log('stats', gamestats);
     const user_req = await this.userService.findUser(gamestats.user_id_req); 
-    const user_acpt = await this.userService.findUser(gamestats.user_id_acpt); 
+    const user_acpt = await this.userService.findUser(gamestats.user_id_acpt);
+    const war = await this.userService.getWarId(gamestats);
     // console.log('user_req', user_req);
     // console.log('user_acpt', user_acpt);
     return await this.matchesRepository
@@ -35,10 +36,9 @@ export class MatchesService {
       points_acpt: gamestats.points_acpt,
       add_ons: gamestats.add_ons,
       game_type: gamestats.game_type,
-      winner_id: gamestats.winner_id
+      winner_id: gamestats.winner_id,
+      war_id: war
     })
     .execute()
   }
-
-  
 }

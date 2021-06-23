@@ -23,13 +23,13 @@ export class MatchesController {
   // should this be an endpoint? nope it should probably nohhoot
   @Post('insert')
   async insertGame(@Body() gamestats: IGame): Promise<UpdateResult> {
+    //defining winner out of gamestats
     gamestats.winner_id =
       gamestats.points_acpt > gamestats.points_req
         ? gamestats.user_id_acpt
         : gamestats.user_id_req;
     console.log(gamestats.winner_id);
     // checking if both users are in the same war
-    gamestats.war_id = await this.userService.getWarId(gamestats);
     return this.matchesService.insertGame(gamestats);
   }
 }

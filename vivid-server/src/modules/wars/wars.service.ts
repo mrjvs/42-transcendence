@@ -4,7 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
+import {
+  Brackets,
+  createQueryBuilder,
+  DeleteResult,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { WarEntity } from '@/war.entity';
 import { GuildsEntity } from '@/guilds.entity';
 import { IWar } from '@/war.interface';
@@ -34,6 +40,7 @@ export class WarsService {
   }
 
   // Check if all War Times are within the timeframe of the war
+  // deze loopt niet UTC
   private validWartimes(war: IWar): boolean {
     for (const block of war.war_time) {
       if (block.start_date < war.start_date || block.end_date > war.end_date)
@@ -53,8 +60,10 @@ export class WarsService {
     if (!acceptingGuild || !requestingGuild) throw new NotFoundException();
 
     // Check if wartimes are valid
+    console.log('-------------');
     if (!this.validWartimes(warRequest)) throw new BadRequestException();
 
+    console.log('+++++++++++++');
     // Create War Time array and save it in database
     const war_time: WarTimeEntity[] = await this.warTimeRepository
       .save(warRequest.war_time)
@@ -72,6 +81,7 @@ export class WarsService {
     war.requesting_guild = requestingGuild;
     war.war_time = war_time;
 
+    console.log(requestingGuild);
     // Save war in database
     return war.save().catch((error) => {
       if (error.code === '23514') throw new BadRequestException();
@@ -162,6 +172,23 @@ export class WarsService {
     return this.guildsService.startWar(war);
   }
 
+  async checkWars(now: string): Promise<UpdateResult> {
+    // const war = await this.findWar(warId);
+    // if (!war) throw new NotFoundException();
+    console.log(now);
+    // return this.guildsService.startWar(war);
+
+    const wars = await this.warsRepository
+      .createQueryBuilder()
+      .select()
+      .where(`accepted = ${true}`)
+      .andWhere(`start_date <= '${now}'`)
+      .andWhere(`end_date >= '${now}'`)
+      .execute();
+    console.log(wars);
+    return;
+  }
+
   async endWar(warId: string): Promise<GuildsEntity[]> {
     // Find war
     const war = await this.findWar(warId);
@@ -188,6 +215,36 @@ export class WarsService {
       this.guildsService.guildLose(loser);
     }
     // TODO unupdated guilds are returned, what do we want to return?
+
+    await this.warsRepository
+      .createQueryBuilder()
+      .update()
+      .set({ accepted: false })
+      .where({ id: warId })
+      .execute();
+
     return war.guilds;
+  }
+
+  async updateWarWinReq(warId: string) {
+    await this.warsRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        points_requesting: () => 'points_requesting + 1',
+      })
+      .where({ id: warId })
+      .execute();
+  }
+
+  async updateWarWinAccept(warId: string) {
+    await this.warsRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        points_accepting: () => 'points_accepting + 1',
+      })
+      .where({ id: warId })
+      .execute();
   }
 }
