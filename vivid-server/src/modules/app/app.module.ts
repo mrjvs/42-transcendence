@@ -8,6 +8,7 @@ import { UserModule } from '$/users/user.module';
 import { WarsModule } from '~/modules/wars/wars.module';
 import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
+import { EventModule } from '$/websocket/event.module';
 import { TypeORMSession } from '@/session.entity';
 import { FriendsModule } from '$/friends/friends.module';
 import { BlocksModule } from '$/blocks/blocks.module';
@@ -42,6 +43,7 @@ const config = ConfigModule.forRoot({
     UserModule,
     ChannelModule,
     AuthModule,
+    EventModule,
     FriendsModule,
     BlocksModule,
     WarsModule,

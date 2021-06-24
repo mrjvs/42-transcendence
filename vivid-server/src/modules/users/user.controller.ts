@@ -2,19 +2,20 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Post,
-  Param,
   UseGuards,
   Patch,
+  Param,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
 import { IUser } from '@/user.interface';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
+import { IUserParam, UserParam } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
-import { DeleteResult } from 'typeorm';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -32,8 +33,12 @@ export class UserController {
   }
 
   @Get(':id')
-  async findUser(@Param('id') id: string): Promise<IUser | void> {
-    return await this.userService.findUser(id);
+  async findUser(
+    @UserParam('id') usr: IUserParam,
+    @User() user: UserEntity,
+  ): Promise<IUser> {
+    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
+    return await this.userService.findUser(usr.id);
   }
 
   @Patch(':id')
@@ -53,7 +58,8 @@ export class UserController {
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') id: string): Promise<DeleteResult> {
-    return this.userService.deleteUser(id);
+  deleteUser(@UserParam('id') usr: IUserParam, @User() user: UserEntity) {
+    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
+    return this.userService.deleteUser(usr.id);
   }
 }
