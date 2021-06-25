@@ -1,0 +1,70 @@
+.noMessageIcon,
+.noMessageHeading {
+  font-size: 2rem;
+  color: white;
+  line-height: 1.1;
+  max-width: 300px;
+}
+
+.noMessageIcon {
+  margin-top: 10rem;
+}
+
+.noMessageParagraph {
+  color: #9da6c4;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.noMessageDivider {
+  margin: 3rem 0;
+  height: 1px;
+  background-color: #4a567a;
+  opacity: 0.5;
+  border: none;
+}
+
+.messageWrapper {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.messageWrapper .messageUserAvatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 100%;
+  background: linear-gradient(to bottom right, #29419f, #a34fec);
+  margin-right: 1rem;
+}
+
+.messageWrapper:nth-child(2n) .messageUserAvatar {
+  background: linear-gradient(to bottom right, #e45655, #a13754);
+}
+
+.messageWrapper p {
+  margin: 0;
+  padding: 0;
+  color: white;
+  margin-bottom: 0.8rem;
+}
+
+.messageWrapper .messageUsernameWrap {
+  display: flex;
+  align-items: center;
+}
+
+.messageWrapper .messageUserName {
+  margin-top: 0.1rem;
+  margin-bottom: 0.5rem;
+  color: #9da6c4;
+  margin-right: 0.5rem;
+}
+
+.messageWrapper.blocked .messageUserNamem,
+.messageWrapper.blocked p {
+  color: #7c849f;
+}
+
+.messageWrapper.blocked .messageUserAvatar {
+  background: #272c43;
+}

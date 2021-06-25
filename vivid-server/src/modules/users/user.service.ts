@@ -4,6 +4,10 @@ import { Observable, from } from 'rxjs';
 import { Repository } from 'typeorm';
 import { UserEntity } from '@/user.entity';
 import { IUser } from '@/user.interface';
+import { parse } from 'cookie';
+import { getSessionStore } from '$/auth/auth-session';
+import { ConfigService } from '@nestjs/config';
+import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
 
 @Injectable()
@@ -11,6 +15,7 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private configService: ConfigService,
     private guildsService: GuildsService,
   ) {}
 
@@ -46,6 +51,8 @@ export class UserService {
   }
 
   deleteUser(id: string) {
+    // TODO remove sessions from deleted user
+    // TODO disconnect websocket connections
     return this.userRepository.delete(id);
   }
 
@@ -63,6 +70,38 @@ export class UserService {
       intra_id: intraId,
     };
     return await this.userRepository.save(user);
+  }
+
+  async getUserIdFromCookie(cookie: string): Promise<string | null> {
+    // parse cookie data
+    if (!cookie) return null; // no cookies
+    const parsedCookie = parse(cookie);
+    const cookieData = parsedCookie[this.configService.get('cookie.name')];
+    if (!cookieData) return null; // couldnt find auth cookie
+
+    // parse signed cookie
+    const signedId = cookieParser.signedCookie(
+      cookieData,
+      this.configService.get('secrets.session'),
+    );
+    if (!signedId) return null; // hash modified, untrustworthy
+
+    // fetch session from database
+    let sessionData;
+    try {
+      sessionData = await new Promise((resolve, reject) => {
+        getSessionStore().get(signedId, (error?: any, result?: any) => {
+          if (error) reject(error);
+          if (!result) reject(new Error('Unknown token'));
+          resolve(result);
+        });
+      });
+    } catch (err) {
+      return null;
+    }
+
+    // extract user from session data
+    return sessionData?.passport?.user as string | null;
   }
 
   async update(id: string, data: IUser): Promise<any> {

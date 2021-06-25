@@ -5,10 +5,11 @@ import { UserService } from '$/users/user.service';
 import { GuildsController } from './guilds.controller';
 import { GuildsService } from './guilds.service';
 import { GuildsEntity } from '@/guilds.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [TypeOrmModule.forFeature([GuildsEntity, UserEntity])],
-  providers: [GuildsService, UserService],
+  providers: [GuildsService, UserService, ConfigService],
   controllers: [GuildsController],
   exports: [GuildsService],
 })

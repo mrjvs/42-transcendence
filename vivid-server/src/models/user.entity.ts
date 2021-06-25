@@ -16,7 +16,7 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ default: '' })
   name: string;
 
   @CreateDateColumn()
@@ -28,16 +28,26 @@ export class UserEntity extends BaseEntity {
   @Column()
   intra_id: string;
 
+  @Column({ default: false })
+  site_admin: boolean;
+
   getName() {
     return this.name + '!!!';
   }
 
-  @Column('boolean', { default: false })
-  admin: boolean;
-
+  @JoinColumn({ name: 'guild' })
   @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
     onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'guild' })
   guild: GuildsEntity;
+
+  // permissions
+  isSiteAdmin() {
+    return this.site_admin;
+  }
+
+  // TODO add guards for account not being setup
+  isAccountSetup() {
+    return this.name && this.name.length > 0;
+  }
 }

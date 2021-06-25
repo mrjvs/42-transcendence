@@ -1,0 +1,13 @@
+.action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin: 0.2rem 1rem 0.7rem 1rem;
+}
+
+.action-row .action-row-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #4a567a;
+}
