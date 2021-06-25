@@ -7,12 +7,13 @@ import { GuildsService } from '$/guilds/guilds.service';
 import { UserService } from '$/users/user.service';
 import { GuildrequestController } from './guildrequest.controller';
 import { GuildRequestService } from './guildrequest.service';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([GuildRequestEntity, GuildsEntity, UserEntity]),
   ],
-  providers: [GuildsService, GuildRequestService, UserService],
+  providers: [GuildsService, GuildRequestService, UserService, ConfigService],
   controllers: [GuildrequestController],
   exports: [GuildRequestService],
 })

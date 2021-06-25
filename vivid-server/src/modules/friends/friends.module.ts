@@ -7,12 +7,13 @@ import { FriendsController } from './friends.controller';
 import { FriendsService } from './friends.service';
 import { GuildsService } from '../guilds/guilds.service';
 import { GuildsEntity } from '~/models/guilds.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([FriendsEntity, UserEntity, GuildsEntity]),
   ],
-  providers: [FriendsService, UserService, GuildsService],
+  providers: [FriendsService, UserService, GuildsService, ConfigService],
   controllers: [FriendsController],
   exports: [FriendsService],
 })

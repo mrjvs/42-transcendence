@@ -1,0 +1,13 @@
+.wrapper {
+  display: flex;
+  height: 100vh;
+}
+
+.sideNav {
+  width: 450px;
+  background-color: #15192a;
+}
+
+.content {
+  flex: 1;
+}

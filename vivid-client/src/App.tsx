@@ -1,116 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import './App.css';
-import { ChannelView } from './views/channel';
+import React from 'react';
+import { UserContext, useUser } from './hooks/useUser';
+import { RootNavigation } from './navigation/Root';
+
+function UserProtect(props: any) {
+  if (props.userData.done && !props.userData.isLoggedIn) {
+    window.location.href = 'http://localhost:8080/api/v1/auth/login';
+    return <p>You are not logged in</p>;
+  }
+  if (props.userData.error) return <p>Failed to log in</p>;
+  if (props.userData.loading) return <p>Loading...</p>;
+  if (!props.userData.done) return null;
+  return <div>{props.children}</div>;
+}
 
 function App() {
-  return (
-    <div className="App">
-      <Router>
-        <div>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/about">About</Link>
-              </li>
-            </ul>
-          </nav>
-          <Switch>
-            <Route path="/about">
-              <About />
-            </Route>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route exact path="/channel/:id">
-              <ChannelView />
-            </Route>
-            <Route path="*">
-              <NotFound />
-            </Route>
-          </Switch>
-        </div>
-      </Router>
-    </div>
-  );
-}
-
-interface IChannelList {
-  id: string;
-}
-
-function Home() {
-  const [error, setError] = useState(false);
-  const [channelList, setChannelList] = useState<IChannelList[]>([]);
-  const [isLoading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('http://localhost:8080/api/v1/channels')
-      .then((res) => res.json())
-      .then((result) => {
-        setLoading(false);
-        setChannelList(result);
-      })
-      .catch(() => {
-        setLoading(false);
-        setError(true);
-      });
-  }, []);
-
-  let channelListRender;
-
-  if (isLoading)
-    channelListRender = (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
-  else if (error)
-    channelListRender = (
-      <div>
-        <p>Something went wrong, try again later</p>
-      </div>
-    );
-  else
-    channelListRender = (
-      <div>
-        <ul>
-          {channelList.map((v) => (
-            <li key={v.id}>
-              <Link to={`/channel/${v.id}`}>{v.id}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
+  const userData = useUser();
 
   return (
-    <header>
-      <h1>Channel list:</h1>
-      {channelListRender}
-    </header>
-  );
-}
-
-function About() {
-  return (
-    <div>
-      <h2>About</h2>
-      <p>Sample text</p>
-    </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <div>
-      <h2>Whoops</h2>
-      <p>We couldn&lsquo;t find that page</p>
-      <Link to="/">Back to home</Link>
-    </div>
+    <UserContext.Provider value={userData}>
+      <UserProtect userData={userData}>
+        <RootNavigation />
+      </UserProtect>
+    </UserContext.Provider>
   );
 }
 
