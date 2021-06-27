@@ -7,7 +7,9 @@ const lines = [
   'Scanning node_modules\nfolder size',
   'Reaching 88 mph',
   'Looking for\nnorminette updates',
-  "Testing GLADoS's\nslow clap processor",
+  "Testing GLADoS'\nslow clap processor",
+  'Hacking into\nthe mainframe',
+  'Finding generic\nloading screen joke',
 ];
 
 export function LoadingScreen(props: any) {

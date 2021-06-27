@@ -9,12 +9,17 @@ import { SidebarLink } from '../components/styled/sidebar/SidebarLink';
 import { ChannelView } from '../views/ChannelView';
 import { UserContext } from '../hooks/useUser';
 import { SocketContext } from '../hooks/useWebsocket';
+import { AccountSetupModal } from '../components/styled/modals/AccountSetup.modal';
 
 export function RootNavigation() {
   const userData = React.useContext(UserContext);
   const socketData = React.useContext(SocketContext);
+
+  const [open, setOpen] = React.useState(false);
+
   return (
     <BrowserRouter>
+      <AccountSetupModal open={open} />
       <div className="wrapper-alert">
         {socketData.clientState !== 'CONNECTED' ? (
           <div className="alert">
@@ -43,7 +48,7 @@ export function RootNavigation() {
               Statistics
             </SidebarLink>
             <ActionRow label="channel">
-              <Button badge={1} small={true} onclick={() => alert('ello')}>
+              <Button badge={1} small={true} onclick={() => setOpen(true)}>
                 <Icon type="plus" />
                 New
               </Button>
