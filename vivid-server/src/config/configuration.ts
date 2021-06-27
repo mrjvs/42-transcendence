@@ -5,6 +5,7 @@ export default () => {
     'SESSION_SECRET',
     'OAUTH_INTRA_CLIENT_ID',
     'OAUTH_INTRA_CLIENT_SECRET',
+    'OAUTH_REDIRECT',
   ];
   required.forEach((v) => {
     if (!process.env[v]) {
@@ -38,6 +39,7 @@ export default () => {
         callbackHost:
           process.env.OAUTH_INTRA_CALLBACK_HOST || `http://localhost:${port}`,
       },
+      redirect: process.env.OAUTH_REDIRECT,
     },
   };
 };

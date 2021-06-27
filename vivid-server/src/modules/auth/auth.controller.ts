@@ -1,19 +1,20 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import { User } from '~/middleware/decorators/login.decorator';
 import {
   AuthenticatedGuard,
   IntraAuthGuard,
 } from '~/middleware/guards/auth.guards';
 import { UserEntity } from '@/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private configService: ConfigService) {}
+
   @Get('/login')
   @UseGuards(IntraAuthGuard)
-  login(@Req() req): any {
-    return {
-      isLoggedIn: !!req.user,
-    };
+  login(@Res() res): any {
+    res.redirect(this.configService.get('oauth.redirect'));
   }
 
   @Get('/me')

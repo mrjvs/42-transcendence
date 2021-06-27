@@ -35,7 +35,7 @@ export function ChannelView() {
     }
 
     setReducedMessages(
-      messageData.messages.reduce((acc, msg) => {
+      messageData.messages.reduce((acc: any[], msg: any) => {
         // if not from this channel, ignore
         if (msg.channel !== id) return acc;
 

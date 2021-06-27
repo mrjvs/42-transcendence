@@ -6,11 +6,14 @@ const icons: any = {
   stats: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`,
   award: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-award"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`,
   flag: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-flag"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>`,
+  alert: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16.306 16.306"><path id="Icon_ionic-ios-alert" data-name="Icon ionic-ios-alert" d="M11.528,3.375a8.153,8.153,0,1,0,8.153,8.153A8.152,8.152,0,0,0,11.528,3.375Zm.674,4.3-.122,4.511a.561.561,0,0,1-.553.58h0a.561.561,0,0,1-.553-.58l-.122-4.511a.675.675,0,0,1,.674-.69h0A.675.675,0,0,1,12.2,7.671Zm-.674,7.7a.722.722,0,1,1,.749-.721A.728.728,0,0,1,11.528,15.369Z" transform="translate(-3.375 -3.375)" fill="currentColor"/></svg>
+`,
 };
 
-export function Icon(props: { type: string }) {
+export function Icon(props: { type: string; className?: string }) {
   return (
     <div
+      className={props.className}
       style={{ width: '1em', height: '1em' }}
       dangerouslySetInnerHTML={{ __html: icons[props.type] }}
     />

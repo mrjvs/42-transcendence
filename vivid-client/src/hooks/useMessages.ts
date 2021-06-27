@@ -1,33 +1,14 @@
 import React from 'react';
-import socketIOClient from 'socket.io-client';
+import { SocketContext } from './useWebsocket';
+
+export const MessageContext = React.createContext<any>([]);
+MessageContext.displayName = 'MessageContext';
 
 export function useMessages(channel: string) {
-  const [messages, setMessages] = React.useState<any[]>([]);
-  const [clientState, setClientState] = React.useState('CONNECTING');
   const [channelInfo, setChannelInfo] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    const client = socketIOClient('http://localhost:8080', {
-      withCredentials: true,
-      path: '/api/v1/events',
-    });
-
-    client.on('connect', () => {
-      setClientState('CONNECTED');
-    });
-
-    client.on('channel_message', (data: any) => {
-      if (data?.channel === channel) setMessages((prev) => [...prev, data]);
-    });
-
-    client.on('disconnect', () => {
-      setClientState('DISCONNECTED');
-    });
-
-    return () => {
-      client.destroy();
-    };
-  }, []);
+  const [channelMessages, setMessages] = React.useState<any[]>([]);
+  const { messages, setChannelMessages, getChannelMessages } =
+    React.useContext(MessageContext);
 
   const [error, setError] = React.useState(false);
   const [isLoading, setLoading] = React.useState(true);
@@ -37,15 +18,21 @@ export function useMessages(channel: string) {
     setLoading(true);
     setError(false);
     setDone(false);
-    fetch(`http://localhost:8080/api/v1/channels/${channel}/messages`, {
-      credentials: 'include',
-    })
+    fetch(
+      `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,
+      {
+        credentials: 'include',
+      },
+    )
       .then((res) => res.json())
       .then((result) => {
-        setMessages(result);
-        return fetch(`http://localhost:8080/api/v1/channels/${channel}`, {
-          credentials: 'include',
-        });
+        setChannelMessages(channel, result);
+        return fetch(
+          `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}`,
+          {
+            credentials: 'include',
+          },
+        );
       })
       .then((res) => res.json())
       .then((info) => {
@@ -64,22 +51,28 @@ export function useMessages(channel: string) {
     requestMessages();
   }, [channel]);
 
+  React.useEffect(() => {
+    setMessages([...getChannelMessages(channel)]);
+  }, [messages]);
+
   function sendMessage(text: string) {
-    fetch(`http://localhost:8080/api/v1/channels/${channel}/messages`, {
-      method: 'POST',
-      body: JSON.stringify({
-        content: text,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
+    fetch(
+      `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          content: text,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
       },
-      credentials: 'include',
-    });
+    );
   }
 
   return {
-    clientState,
-    messages,
+    messages: channelMessages,
     channelInfo,
     messageState: {
       error,
@@ -87,5 +80,61 @@ export function useMessages(channel: string) {
       done,
     },
     sendMessage,
+  };
+}
+
+export function useMessageContext() {
+  const { client } = React.useContext(SocketContext);
+  const [messages, setMessages] = React.useState<any[]>([]);
+
+  function onMessage(data: any) {
+    setMessages((prev) => {
+      const list = [...prev];
+      let found = list.find((v) => v.id === data.channel);
+      if (!found) {
+        found = {
+          id: data.channel,
+          messages: [],
+        };
+        list.push(found);
+      }
+      found.messages.push(data);
+      return list;
+    });
+  }
+
+  function setChannelMessages(channelId: string, messages: any[]) {
+    setMessages((prev) => {
+      const list = [...prev];
+      let found = list.find((v) => v.id === channelId);
+      if (!found) {
+        found = {
+          id: channelId,
+          messages: [],
+        };
+        list.push(found);
+      }
+      found.messages = messages;
+      return list;
+    });
+  }
+
+  function getChannelMessages(channelId: string) {
+    const found = messages.find((v) => v.id === channelId);
+    if (!found) return [];
+    return found.messages;
+  }
+
+  React.useEffect(() => {
+    if (client) client.on('channel_message', onMessage);
+    return () => {
+      if (client) client.off('channel_message', onMessage);
+    };
+  }, [client]);
+
+  return {
+    messages,
+    setChannelMessages,
+    getChannelMessages,
   };
 }
