@@ -5,6 +5,9 @@ import './LoadingScreen.css';
 const lines = [
   'Calculating the\nfourth dimension',
   'Scanning node_modules\nfolder size',
+  'Reaching 88 mph',
+  'Looking for\nnorminette updates',
+  "Testing GLADoS's\nslow clap processor",
 ];
 
 export function LoadingScreen(props: any) {
