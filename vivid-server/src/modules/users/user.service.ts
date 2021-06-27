@@ -9,6 +9,7 @@ import { getSessionStore } from '$/auth/auth-session';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
+import * as cryptoRandomString from 'secure-random-string';
 
 const colors = [
   '#29419F',
@@ -121,6 +122,31 @@ export class UserService {
 
     // extract user from session data
     return sessionData?.passport?.user as string | null;
+  }
+
+  async enableTwoFactor(id: string): Promise<any> {
+    console.log(cryptoRandomString);
+    const data = {
+      secret: cryptoRandomString({ length: 20 }), // 160 bytes, recommened totp length
+      backupCodes: Array(10)
+        .fill(0)
+        .map(() => cryptoRandomString({ length: 6 })),
+    };
+    const result = this.userRepository.update(id, {
+      twofactor: data,
+    });
+    if (!result) throw new NotFoundException();
+    // TODO kill all user sessions except current one
+    // TODO encrypt secret and backup codes
+    return data;
+  }
+
+  async disableTwoFactor(id: string): Promise<any> {
+    const result = this.userRepository.update(id, {
+      twofactor: null,
+    });
+    if (!result) throw new NotFoundException();
+    return true;
   }
 
   async update(id: string, data: IUser): Promise<any> {

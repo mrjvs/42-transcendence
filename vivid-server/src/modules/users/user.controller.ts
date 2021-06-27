@@ -8,6 +8,7 @@ import {
   UseGuards,
   Patch,
   Param,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
@@ -47,6 +48,22 @@ export class UserController {
     @Body() user: IUser,
   ): Promise<IUser | void> {
     return await this.userService.update(id, user);
+  }
+
+  @Patch(':id/2fa')
+  async twofactorEnable(@UserParam('id') user: IUserParam): Promise<any> {
+    if (!user.isSelf) throw new UnauthorizedException();
+    const data = await this.userService.enableTwoFactor(user.id);
+    return data;
+  }
+
+  @Delete(':id/2fa')
+  async twofactorDisable(@UserParam('id') user: IUserParam): Promise<any> {
+    if (!user.isSelf) throw new UnauthorizedException();
+    await this.userService.disableTwoFactor(user.id);
+    return {
+      status: true,
+    };
   }
 
   @Post('join_guild/:anagram')

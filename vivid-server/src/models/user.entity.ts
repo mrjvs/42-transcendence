@@ -44,9 +44,19 @@ export class UserEntity extends BaseEntity {
   })
   guild: GuildsEntity;
 
+  @Column({ nullable: true, type: 'json' })
+  twofactor: {
+    secret: string;
+    backupCodes: string[];
+  };
+
   // permissions
   isSiteAdmin() {
     return this.site_admin;
+  }
+
+  hasTwoFactorEnabled() {
+    return this.twofactor !== null;
   }
 
   // TODO add guards for account not being setup
