@@ -17,6 +17,7 @@ export function LoadingScreen(props: any) {
     React.useContext(SocketContext);
   const [loading, setLoading] = React.useState(true);
   const [line, setLine] = React.useState('');
+  const [tokenInput, setTokenInput] = React.useState('');
   // show random loading text
   React.useEffect(() => {
     setLine(lines[Math.floor(Math.random() * lines.length)]);
@@ -24,7 +25,7 @@ export function LoadingScreen(props: any) {
 
   // connect to socket once user has been requested and is logged in
   React.useEffect(() => {
-    if (props.userData.done && props.userData.isLoggedIn && !client) {
+    if (props.userData.userState.done && props.userData.isLoggedIn && !client) {
       connect();
     }
   }, [props.userData]);
@@ -38,7 +39,7 @@ export function LoadingScreen(props: any) {
   }, []);
 
   // error connecting to api
-  if ((props.userData.error || clientError) && !loading)
+  if ((props.userData.userState.error || clientError) && !loading)
     return (
       <div className="loading-screen">
         <div className="overlay" />
@@ -53,8 +54,33 @@ export function LoadingScreen(props: any) {
       </div>
     );
 
+  // needs twofactor
+  if (props.userData.userState.needsToken && !loading) {
+    return (
+      <div className="loading-screen">
+        <div className="overlay" />
+        <div className="login-card">
+          <div className="icon" />
+          <h1 className="title">Two factor authentication</h1>
+          <p className="text">Put in your one time password to login</p>
+          <input
+            type="text"
+            value={tokenInput}
+            onChange={(e) => setTokenInput(e.target.value)}
+          />
+          <button
+            onClick={() => props.userData.sendToken(tokenInput)}
+            className="button"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // not logged in
-  if (props.userData.done && !props.userData.isLoggedIn && !loading) {
+  if (props.userData.userState.done && !props.userData.isLoggedIn && !loading) {
     return (
       <div className="loading-screen">
         <div className="overlay" />
@@ -76,7 +102,7 @@ export function LoadingScreen(props: any) {
   }
 
   // loading
-  if (props.userData.loading || !hasConnected || loading)
+  if (props.userData.userState.loading || !hasConnected || loading)
     return (
       <div className="loading-screen">
         <div className="overlay" />
@@ -95,7 +121,7 @@ export function LoadingScreen(props: any) {
     );
 
   // not done, shouldnt happen
-  if (!props.userData.done || !hasConnected) return null;
+  if (!props.userData.userState.done || !hasConnected) return null;
 
   // normal state, render like normal
   return <div>{props.children}</div>;

@@ -9,6 +9,7 @@ import { getSessionStore } from '$/auth/auth-session';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
+import { authenticator } from 'otplib';
 import * as cryptoRandomString from 'secure-random-string';
 
 const colors = [
@@ -127,7 +128,7 @@ export class UserService {
   async enableTwoFactor(id: string): Promise<any> {
     console.log(cryptoRandomString);
     const data = {
-      secret: cryptoRandomString({ length: 20 }), // 160 bytes, recommened totp length
+      secret: authenticator.generateSecret(20), // 160 bytes, recommened totp length
       backupCodes: Array(10)
         .fill(0)
         .map(() => cryptoRandomString({ length: 6 })),
