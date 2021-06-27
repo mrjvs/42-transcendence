@@ -28,7 +28,7 @@ export function ChannelView() {
         user: msg.user,
         userData: messageData.channelInfo?.joined_users?.find(
           (u: any) => u.user?.id === msg.user,
-        )?.user || { name: 'Unknown user' },
+        )?.user || { name: 'Unknown user', avatar_colors: ['', ''] },
         messages: [msg.content],
         createdAt: new Date(msg.created_at),
       });
@@ -66,23 +66,28 @@ export function ChannelView() {
     <div className="contentContainer">
       <div className="contentHeader">
         <Heading size="small">
-          {messageData.messageState.done ? messageData.channelInfo.title : '.'}
+          {messageData.messageState.done ? messageData.channelInfo.title : '‎'}
         </Heading>
       </div>
       <div className="channelWrapper">
         <div className="channelScrollWrapper">
           <div className="channelContent">
-            <NoMessage />
-            <div>
-              {reducedMessages.map((v: any) => (
-                <Message
-                  key={v.id}
-                  messages={v.messages}
-                  username={v.userData.name}
-                  blocked={false}
-                />
-              ))}
-            </div>
+            {messageData.messageState.done ? (
+              <>
+                <NoMessage />
+                <div>
+                  {reducedMessages.map((v: any) => (
+                    <Message
+                      key={v.id}
+                      messages={v.messages}
+                      username={v.userData.name}
+                      blocked={false}
+                      userColors={v.userData.avatar_colors}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : null}
             <div ref={scrollEl} />
           </div>
         </div>

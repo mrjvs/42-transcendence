@@ -10,6 +10,24 @@ import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
 
+const colors = [
+  '#29419F',
+  '#A34FEC',
+  '#E45655',
+  '#A13754',
+  '#4470C8',
+  '#CFA93E',
+];
+
+function generateGradientColors(): string[] {
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  let otherColor;
+  do {
+    otherColor = colors[Math.floor(Math.random() * colors.length)];
+  } while (otherColor === randomColor);
+  return [randomColor, otherColor];
+}
+
 @Injectable()
 export class UserService {
   constructor(
@@ -68,6 +86,7 @@ export class UserService {
     const user: IUser = {
       name: 'name11',
       intra_id: intraId,
+      avatar_colors: generateGradientColors(),
     };
     return await this.userRepository.save(user);
   }

@@ -31,6 +31,9 @@ export class UserEntity extends BaseEntity {
   @Column({ default: false })
   site_admin: boolean;
 
+  @Column({ type: 'json' })
+  avatar_colors: string[];
+
   getName() {
     return this.name + '!!!';
   }
