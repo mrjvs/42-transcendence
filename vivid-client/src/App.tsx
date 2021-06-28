@@ -2,15 +2,25 @@ import React from 'react';
 import { LoadingScreen } from './components/styled/LoadingScreen';
 import { useMessageContext, MessageContext } from './hooks/useMessages';
 import { UserContext, useUser } from './hooks/useUser';
+import { UsersContext, useUsersContext } from './hooks/useUsers';
 import { useWebsocket, SocketContext } from './hooks/useWebsocket';
 import { RootNavigation } from './navigation/Root';
 
-function StoreInit(props: { children: any }) {
+function MessageStoreInit(props: { children: any }) {
   const messageData = useMessageContext();
   return (
     <MessageContext.Provider value={messageData}>
       {props.children}
     </MessageContext.Provider>
+  );
+}
+
+function StoreInit(props: { children: any }) {
+  const usersData = useUsersContext();
+  return (
+    <UsersContext.Provider value={usersData}>
+      <MessageStoreInit>{props.children}</MessageStoreInit>
+    </UsersContext.Provider>
   );
 }
 

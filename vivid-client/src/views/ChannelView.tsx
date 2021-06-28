@@ -16,7 +16,7 @@ export function ChannelView() {
     const cur: any = scrollEl?.current;
     if (!cur) return;
     setTimeout(() => {
-      cur.scrollIntoView({ behavior: 'smooth' });
+      cur.scrollIntoView();
     }, 1);
   }, [reducedMessages]);
 
@@ -26,9 +26,10 @@ export function ChannelView() {
       acc.push({
         id: msg.id,
         user: msg.user,
-        userData: messageData.channelInfo?.joined_users?.find(
-          (u: any) => u.user?.id === msg.user,
-        )?.user || { name: 'Unknown user', avatar_colors: ['', ''] },
+        userData: messageData.getUser(msg.user)?.data || {
+          name: 'Unknown user',
+          avatar_colors: ['', ''],
+        },
         messages: [msg.content],
         createdAt: new Date(msg.created_at),
       });
@@ -60,7 +61,7 @@ export function ChannelView() {
         return acc;
       }, []),
     );
-  }, [messageData.messages, messageData.channelInfo]);
+  }, [messageData.channelInfo, messageData.messages, messageData.users]);
 
   return (
     <div className="contentContainer">

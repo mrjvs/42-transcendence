@@ -10,13 +10,14 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
+import { IsString } from 'class-validator';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ default: '' })
+  @Column({ nullable: true, default: null })
   name: string;
 
   @CreateDateColumn()
@@ -33,10 +34,6 @@ export class UserEntity extends BaseEntity {
 
   @Column({ type: 'json' })
   avatar_colors: string[];
-
-  getName() {
-    return this.name + '!!!';
-  }
 
   @JoinColumn({ name: 'guild' })
   @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
@@ -61,6 +58,12 @@ export class UserEntity extends BaseEntity {
 
   // TODO add guards for account not being setup
   isAccountSetup() {
-    return this.name && this.name.length > 0;
+    // return this.name && this.name.length > 0;
+    return true;
   }
+}
+
+export class UsernameChangeDto {
+  @IsString()
+  username: string;
 }

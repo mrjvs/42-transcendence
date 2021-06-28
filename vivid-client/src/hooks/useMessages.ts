@@ -1,4 +1,5 @@
 import React from 'react';
+import { UsersContext } from './useUsers';
 import { SocketContext } from './useWebsocket';
 
 export const MessageContext = React.createContext<any>([]);
@@ -9,6 +10,7 @@ export function useMessages(channel: string) {
   const [channelMessages, setMessages] = React.useState<any[]>([]);
   const { messages, setChannelMessages, getChannelMessages } =
     React.useContext(MessageContext);
+  const { addUser, getUser, users } = React.useContext(UsersContext);
 
   const [error, setError] = React.useState(false);
   const [isLoading, setLoading] = React.useState(true);
@@ -37,6 +39,9 @@ export function useMessages(channel: string) {
       .then((res) => res.json())
       .then((info) => {
         setChannelInfo(info);
+        info.joined_users.forEach((join: any) => {
+          addUser(join.user);
+        });
         setLoading(false);
         setDone(true);
       })
@@ -74,6 +79,8 @@ export function useMessages(channel: string) {
   return {
     messages: channelMessages,
     channelInfo,
+    getUser,
+    users,
     messageState: {
       error,
       loading: isLoading,
@@ -85,20 +92,24 @@ export function useMessages(channel: string) {
 
 export function useMessageContext() {
   const { client } = React.useContext(SocketContext);
+  const { addUser } = React.useContext(UsersContext);
   const [messages, setMessages] = React.useState<any[]>([]);
 
   function onMessage(data: any) {
+    const message = data.message;
+    addUser(data.user);
     setMessages((prev) => {
       const list = [...prev];
-      let found = list.find((v) => v.id === data.channel);
+      let found = list.find((v) => v.id === message.channel);
       if (!found) {
         found = {
-          id: data.channel,
+          id: message.channel,
           messages: [],
         };
         list.push(found);
       }
-      found.messages.push(data);
+      const foundMatch = found.messages.find((v: any) => v.id === message.id);
+      if (!foundMatch) found.messages.push(message);
       return list;
     });
   }

@@ -4,12 +4,50 @@
   color: white;
   font-size: 1rem;
   border: 0;
-  display: flex;
+  display: inline-flex;
   padding: 0.3rem 0.5rem;
   border-radius: 4px;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+
+.button-new > .loader {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 4px;
+  animation: button-loader 2s infinite ease-in-out;
+  margin-right: 1rem !important;
+  background: white;
+}
+
+.button-new.small > .loader {
+  height: 0.7rem;
+  width: 0.7rem;
+  border-radius: 2px;
+  margin-right: 0.4rem !important;
+}
+
+@keyframes button-loader {
+  0% {
+    transform: rotate(45deg);
+  }
+  100% {
+    transform: rotate(405deg);
+  }
+}
+
+.button-new:active {
+  transform: scale(1.05);
+}
+
+.button-new.button-primary {
+  background: linear-gradient(to right, #29419f, #a34fec);
+  padding: 0.7rem 3.5rem;
+}
+
+.button-new.button-primary:hover {
+  background: linear-gradient(to right, #243a94, #8c40cf);
 }
 
 .button-new > *:first-child {

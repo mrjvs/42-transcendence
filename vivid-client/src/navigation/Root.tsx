@@ -48,7 +48,12 @@ export function RootNavigation() {
               Statistics
             </SidebarLink>
             <ActionRow label="channel">
-              <Button badge={1} small={true} onclick={() => setOpen(true)}>
+              <Button
+                badge={1}
+                small={true}
+                type="secondary"
+                onclick={() => setOpen(true)}
+              >
                 <Icon type="plus" />
                 New
               </Button>

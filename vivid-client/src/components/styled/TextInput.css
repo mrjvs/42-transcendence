@@ -1,0 +1,28 @@
+.styled-input label .text {
+  color: white;
+  font-weight: bold;
+  text-align: left;
+  display: block;
+  padding: 1rem 1.5rem;
+}
+
+.styled-input input {
+  border-radius: 3px;
+  background-color: #252a40;
+  border: none;
+  display: block;
+  width: 100%;
+  color: white;
+  padding: 1rem 1.5rem;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.styled-input input:focus,
+.styled-input input:hover {
+  background-color: #2f344d;
+}
+
+.styled-input input::placeholder {
+  color: #7f86a3;
+}

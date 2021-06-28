@@ -86,7 +86,7 @@ export class UserService {
 
   async createUser(intraId: string): Promise<UserEntity> {
     const user: IUser = {
-      name: 'name11',
+      name: null,
       intra_id: intraId,
       avatar_colors: generateGradientColors(),
     };
@@ -159,5 +159,9 @@ export class UserService {
     if (!user || !guild) throw new NotFoundException();
     user.guild = guild;
     return await this.userRepository.save(user);
+  }
+
+  async updateName(userId: string, newName: string): Promise<any> {
+    return await this.userRepository.save({ id: userId, name: newName });
   }
 }

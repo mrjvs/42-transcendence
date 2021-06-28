@@ -73,10 +73,4 @@ export class UserController {
   ): Promise<UserEntity> {
     return this.userService.joinGuild(user.id, anagram);
   }
-
-  @Delete(':id')
-  deleteUser(@UserParam('id') usr: IUserParam, @User() user: UserEntity) {
-    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
-    return this.userService.deleteUser(usr.id);
-  }
 }
