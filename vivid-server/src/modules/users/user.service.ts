@@ -126,7 +126,6 @@ export class UserService {
   }
 
   async enableTwoFactor(id: string): Promise<any> {
-    console.log(cryptoRandomString);
     const data = {
       secret: authenticator.generateSecret(20), // 160 bytes, recommened totp length
       backupCodes: Array(10)
