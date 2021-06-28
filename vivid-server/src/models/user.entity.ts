@@ -17,6 +17,7 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  // TODO unique name
   @Column({ nullable: true, default: null })
   name: string;
 

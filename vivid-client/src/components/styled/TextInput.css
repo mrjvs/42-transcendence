@@ -18,6 +18,15 @@
   outline: none;
 }
 
+.styled-input input.lighter {
+  background-color: #2f344d;
+}
+
+.styled-input input.lighter:focus,
+.styled-input input.lighter:hover {
+  background-color: #383e58;
+}
+
 .styled-input input:focus,
 .styled-input input:hover {
   background-color: #2f344d;

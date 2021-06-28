@@ -1,6 +1,8 @@
 import React from 'react';
 import { SocketContext } from '../../hooks/useWebsocket';
+import { Button } from './Button';
 import './LoadingScreen.css';
+import { TextInput } from './TextInput';
 
 const lines = [
   'Calculating the\nfourth dimension',
@@ -47,9 +49,7 @@ export function LoadingScreen(props: any) {
           <div className="icon" />
           <h1 className="title">Failed to load</h1>
           <p className="text">Click the button below to try again</p>
-          <button onClick={() => window.location.reload()} className="button">
-            Retry load
-          </button>
+          <Button onclick={() => window.location.reload()}>Retry load</Button>
         </div>
       </div>
     );
@@ -63,17 +63,17 @@ export function LoadingScreen(props: any) {
           <div className="icon" />
           <h1 className="title">Two factor authentication</h1>
           <p className="text">Put in your one time password to login</p>
-          <input
-            type="text"
-            value={tokenInput}
-            onChange={(e) => setTokenInput(e.target.value)}
-          />
-          <button
-            onClick={() => props.userData.sendToken(tokenInput)}
-            className="button"
-          >
+          <div style={{ marginBottom: '2rem', width: '100%' }}>
+            <TextInput
+              value={tokenInput}
+              lighter={true}
+              set={setTokenInput}
+              placeholder="Code here..."
+            />
+          </div>
+          <Button onclick={() => props.userData.sendToken(tokenInput)}>
             Submit
-          </button>
+          </Button>
         </div>
       </div>
     );

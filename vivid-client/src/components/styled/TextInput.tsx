@@ -7,6 +7,7 @@ export function TextInput(props: {
   label?: string;
   placeholder: string;
   className?: string;
+  lighter?: boolean;
 }) {
   return (
     <div className="styled-input">
@@ -16,7 +17,12 @@ export function TextInput(props: {
           type="text"
           value={props.value}
           onChange={(e) => props.set(e.target.value)}
-          className={'styled-input ' + (props.className || '')}
+          className={
+            'styled-input ' +
+            (props.className || '') +
+            ' ' +
+            (props.lighter ? 'lighter ' : ' ')
+          }
           placeholder={props.placeholder}
         />
       </label>
