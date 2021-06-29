@@ -6,17 +6,23 @@ import './AccountSetupModal.css';
 import { Button } from '../Button';
 import { useFetch } from '../../../hooks/useFetch';
 
-export function AccountSetupModal(props: { open: boolean }) {
+export function AccountSetupModal(props: { open: boolean; close: () => void }) {
   const [username, setUsername] = React.useState('');
-  const { run, done, error, loading } = useFetch({
+  const { run, done, error, loading, reset } = useFetch({
     runOnLoad: false,
     url: '/api/v1/users/@me/name',
     method: 'PATCH',
   });
 
   React.useEffect(() => {
+    if (props.open) {
+      reset();
+    }
+  }, [props.open]);
+
+  React.useEffect(() => {
     if (done) {
-      alert('success');
+      props.close();
     }
   }, [done]);
 
@@ -38,7 +44,13 @@ export function AccountSetupModal(props: { open: boolean }) {
             label="Username"
           />
         </div>
-        {error ? <p>Something went wrong, try again later</p> : null}
+        {error && error?.data?.code === 'inuse' ? (
+          <p>That username is already in use</p>
+        ) : error && error?.res?.status === 400 ? (
+          <p>Username must be at least 1 character</p>
+        ) : error ? (
+          <p>Something went wrong, try again later</p>
+        ) : null}
         <Button loading={loading} onclick={() => run({ username })}>
           Get started
         </Button>

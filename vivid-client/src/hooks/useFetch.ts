@@ -12,13 +12,13 @@ export function useFetch(options: {
   };
 
   const [data, setData] = React.useState<any>(null);
-  const [error, setError] = React.useState(false);
+  const [error, setError] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
   const [done, setDone] = React.useState(false);
 
   function run(body?: any) {
     setLoading(true);
-    setError(false);
+    setError(null);
     fetch(`${window._env_.VIVID_BASE_URL}${options.url}`, {
       credentials: 'include',
       method: options.method,
@@ -28,18 +28,17 @@ export function useFetch(options: {
       },
     })
       .then((res) => {
-        if (res.status < 200 || res.status > 299)
-          throw new Error('Wrong status code');
-        return res.json();
+        return res.json().then((data) => ({ data, res }));
       })
       .then((data) => {
+        if (data.res.status < 200 || data.res.status > 299) throw data;
         setData(data);
         setLoading(false);
         setDone(true);
       })
-      .catch(() => {
+      .catch((err) => {
         setLoading(false);
-        setError(true);
+        setError(err);
       });
   }
 
@@ -47,11 +46,19 @@ export function useFetch(options: {
     if (options.runOnLoad) run();
   }, []);
 
+  function reset() {
+    setData(null);
+    setError(null);
+    setLoading(false);
+    setDone(false);
+  }
+
   return {
     loading,
     error,
     done,
     run,
     data,
+    reset,
   };
 }

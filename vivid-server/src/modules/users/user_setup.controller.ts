@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   ForbiddenException,
-  Param,
   Patch,
   UseGuards,
 } from '@nestjs/common';
@@ -13,8 +12,7 @@ import {
   UserParam,
 } from '~/middleware/decorators/login.decorator';
 import { AccountNotSetupGuard } from '~/middleware/guards/auth.guards';
-import { UserEntity, UsernameChangeDto } from '~/models/user.entity';
-import { IUser } from '~/models/user.interface';
+import { IUser, UserEntity, UsernameChangeDto } from '~/models/user.entity';
 import { UserService } from './user.service';
 
 @Controller('users')

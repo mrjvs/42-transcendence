@@ -19,7 +19,7 @@ export function RootNavigation() {
 
   return (
     <BrowserRouter>
-      <AccountSetupModal open={open} />
+      <AccountSetupModal open={open} close={() => setOpen(false)} />
       <div className="wrapper-alert">
         {socketData.clientState !== 'CONNECTED' ? (
           <div className="alert">

@@ -10,15 +10,14 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  // TODO unique name
-  @Column({ nullable: true, default: null })
+  @Column({ nullable: true, default: null, unique: true })
   name: string;
 
   @CreateDateColumn()
@@ -57,14 +56,23 @@ export class UserEntity extends BaseEntity {
     return this.twofactor !== null;
   }
 
-  // TODO add guards for account not being setup
   isAccountSetup() {
-    // return this.name && this.name.length > 0;
-    return true;
+    return this.name && this.name.length > 0;
   }
 }
 
 export class UsernameChangeDto {
   @IsString()
+  @IsNotEmpty()
   username: string;
+}
+
+export interface INewUser {
+  intra_id: string;
+}
+
+export interface IUser {
+  intra_id: string;
+  name: string;
+  avatar_colors: string[];
 }

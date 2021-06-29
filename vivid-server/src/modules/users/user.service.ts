@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Observable, from } from 'rxjs';
-import { Repository } from 'typeorm';
-import { UserEntity } from '@/user.entity';
-import { IUser } from '@/user.interface';
+import { getRepository, Repository } from 'typeorm';
+import { IUser, UserEntity } from '@/user.entity';
 import { parse } from 'cookie';
 import { getSessionStore } from '$/auth/auth-session';
 import { ConfigService } from '@nestjs/config';
@@ -11,6 +13,7 @@ import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
 import { authenticator } from 'otplib';
 import * as cryptoRandomString from 'secure-random-string';
+import { TypeORMSession } from '~/models/session.entity';
 
 const colors = [
   '#29419F',
@@ -39,19 +42,19 @@ export class UserService {
     private guildsService: GuildsService,
   ) {}
 
-  add(user: IUser): Observable<IUser> {
-    return from(this.userRepository.save(user));
-  }
-
-  async findUser(id: string): Promise<UserEntity> {
+  // find user, optional resolving
+  async findUser(
+    id: string,
+    resolves: string[] = [
+      'joined_channels',
+      'joined_channels.channel',
+      'guild',
+      'guild.users',
+    ],
+  ): Promise<UserEntity> {
     return await this.userRepository
       .findOne({
-        relations: [
-          'joined_channels',
-          'joined_channels.channel',
-          'guild',
-          'guild.users',
-        ],
+        relations: resolves,
         where: {
           id,
         },
@@ -62,20 +65,41 @@ export class UserService {
       });
   }
 
-  findAll(): Observable<IUser[]> {
-    return from(
-      this.userRepository.find({
-        relations: ['joined_channels', 'joined_channels.channel'],
-      }),
-    );
-  }
-
-  deleteUser(id: string) {
-    // TODO remove sessions from deleted user
+  // delete user, invalidates sessions and disconnects from websocket
+  async deleteUser(id: string): Promise<void> {
     // TODO disconnect websocket connections
-    return this.userRepository.delete(id);
+    // TODO leave guild, remove blocks, remove friends, leave channels
+    await this.killSessions(id);
+    await this.userRepository
+      .createQueryBuilder()
+      .delete()
+      .where({ id: id })
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return <UserEntity>response.raw[0];
+      }); // TODO check empty result
   }
 
+  // invalidates sessions
+  async killSessions(
+    id: string,
+    options: { except: string[] } = { except: [] },
+  ): Promise<void> {
+    await getRepository(TypeORMSession)
+      .createQueryBuilder()
+      .delete()
+      .where(
+        `regexp_replace(trim(both '"' from json::text), '\\\\"', '"', 'g')::json->'passport'->>'user' = :id AND NOT id IN (:...ids)`,
+        {
+          id,
+          ids: options.except,
+        },
+      )
+      .execute();
+  }
+
+  // find by intra id
   async findIntraUser(intraId: string): Promise<UserEntity> {
     return await this.userRepository.findOne({
       where: {
@@ -84,6 +108,7 @@ export class UserService {
     });
   }
 
+  // create a new user
   async createUser(intraId: string): Promise<UserEntity> {
     const user: IUser = {
       name: null,
@@ -93,6 +118,7 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
+  // get user, parsed from cookie string
   async getUserIdFromCookie(cookie: string): Promise<string | null> {
     // parse cookie data
     if (!cookie) return null; // no cookies
@@ -125,34 +151,39 @@ export class UserService {
     return sessionData?.passport?.user as string | null;
   }
 
-  async enableTwoFactor(id: string): Promise<any> {
+  async enableTwoFactor(id: string, session?: any): Promise<any> {
     const data = {
       secret: authenticator.generateSecret(20), // 160 bytes, recommened totp length
       backupCodes: Array(10)
         .fill(0)
         .map(() => cryptoRandomString({ length: 6 })),
     };
-    const result = this.userRepository.update(id, {
+    const result = await this.userRepository.update(id, {
       twofactor: data,
     });
-    if (!result) throw new NotFoundException();
-    // TODO kill all user sessions except current one
+    if (result.affected != 1) throw new NotFoundException();
+    const exceptArray = [];
+    if (session) exceptArray.push(session.id);
+    this.killSessions(id, { except: exceptArray });
     // TODO encrypt secret and backup codes
     return data;
   }
 
-  async disableTwoFactor(id: string): Promise<any> {
-    const result = this.userRepository.update(id, {
+  async disableTwoFactor(id: string): Promise<void> {
+    const result = await this.userRepository.update(id, {
       twofactor: null,
     });
-    if (!result) throw new NotFoundException();
-    return true;
+    if (result.affected != 1) throw new NotFoundException();
   }
 
-  async update(id: string, data: IUser): Promise<any> {
-    return this.userRepository.update(id, data);
+  async setTwoFactorData(id: string, data: any): Promise<void> {
+    const result = await this.userRepository.update(id, {
+      twofactor: data,
+    });
+    if (result.affected != 1) throw new NotFoundException();
   }
 
+  // TODO check
   async joinGuild(userId: string, anagram: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({ id: userId });
     const guild = await this.guildsService.findGuild(anagram);
@@ -161,7 +192,16 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async updateName(userId: string, newName: string): Promise<any> {
-    return await this.userRepository.save({ id: userId, name: newName });
+  async updateName(userId: string, newName: string): Promise<UserEntity> {
+    return await this.userRepository
+      .save({
+        id: userId,
+        name: newName,
+      })
+      .catch((err) => {
+        if (err.code === '23505')
+          throw new BadRequestException({ code: 'inuse' });
+        throw err;
+      });
   }
 }
