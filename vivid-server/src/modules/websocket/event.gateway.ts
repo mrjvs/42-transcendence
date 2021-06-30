@@ -9,7 +9,7 @@ import { Server, Socket } from 'socket.io';
 import { IMessage } from '~/models/messages.entity';
 import { UserService } from '$/users/user.service';
 import { IJoinedChannel } from '~/models/joined_channels.entity';
-import { GameState } from '../../../../vivid-client/src/views/Game/game';
+// import { GameState } from '../../../../vivid-client/src/views/Game/game';
 // import { gameLoop } from '../../pong/Pong';
 
 @WebSocketGateway({ path: '/api/v1/events' })
