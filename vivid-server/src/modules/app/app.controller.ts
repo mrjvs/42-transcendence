@@ -14,7 +14,7 @@ export class AppController {
 
   @Cron('*/10 * * * * *')
   runEvery10Seconds() {
-    console.log('Every 10 seconds');
+    // console.log('Every 10 seconds');
   }
 
   // @Get('pong')
