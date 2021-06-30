@@ -12,8 +12,8 @@ import { UserService } from '../users/user.service';
 export class MatchesController {
   constructor(
     private matchesService: MatchesService,
-    private userService: UserService
-    ) {}
+    private userService: UserService,
+  ) {}
 
   @Get('all')
   findAll(): Promise<MatchesEntity[]> {

@@ -2,10 +2,12 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  CreateDateColumn, ManyToOne, JoinColumn
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { WarsEntity } from './wars.entity';
+import { WarEntity } from './war.entity';
 
 @Entity({ name: 'matches' })
 export class MatchesEntity {
@@ -13,11 +15,11 @@ export class MatchesEntity {
   id: string;
 
   @ManyToOne(() => UserEntity, (user) => user.matches_req)
-  @JoinColumn({name: 'user_req'})
+  @JoinColumn({ name: 'user_req' })
   user_req: UserEntity;
-  
+
   @ManyToOne(() => UserEntity, (user) => user.matches_acpt)
-  @JoinColumn({name: 'user_acpt'})
+  @JoinColumn({ name: 'user_acpt' })
   user_acpt: UserEntity;
 
   @CreateDateColumn()
@@ -29,7 +31,7 @@ export class MatchesEntity {
   @Column()
   points_acpt: number;
 
-  @Column('varchar', { default: null})
+  @Column('varchar', { default: null })
   add_ons: string;
 
   @Column()
@@ -38,7 +40,6 @@ export class MatchesEntity {
   @Column()
   winner_id: string;
 
-  @Column({default: null})
+  @Column({ default: null })
   war_id: string;
-
 }

@@ -1,5 +1,7 @@
 import {
+  MessageBody,
   OnGatewayConnection,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -7,6 +9,8 @@ import { Server, Socket } from 'socket.io';
 import { IMessage } from '~/models/messages.entity';
 import { UserService } from '$/users/user.service';
 import { IJoinedChannel } from '~/models/joined_channels.entity';
+import { GameState } from '../../../../vivid-client/src/views/Game/game';
+// import { gameLoop } from '../../pong/Pong';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -16,6 +20,7 @@ export class EventGateway implements OnGatewayConnection {
   constructor(private readonly userService: UserService) {}
 
   async handleConnection(socket: Socket) {
+    console.log('handle connection');
     await this.putUserInSocket(socket);
   }
 
@@ -31,6 +36,23 @@ export class EventGateway implements OnGatewayConnection {
       if (!mappedJoins[client.auth]) continue; // skip if user not in channel
       client.emit('channel_message', message);
     }
+  }
+
+  @SubscribeMessage('startGame')
+  startGameInterval(@MessageBody() state: string) {
+    console.log(state);
+    console.log('hello');
+    return 'test';
+    // const intervalId = setInterval(() => {
+    //   const winner = gameLoop(gameState);
+
+    //   if (!winner) client.emit('gamestate', gameState);
+    //   // if (!winner) client.emit('gamestate', JSON.stringify(gameState));
+    //   else {
+    //     client.emit('gameOver');
+    //     clearInterval(intervalId);
+    //   }
+    // }, 1000 / 50);
   }
 
   async putUserInSocket(socket: Socket) {
