@@ -75,7 +75,7 @@ export class GuildsController {
     const guild = await this.guildsService.findGuild(anagram);
     if (!guild) throw new NotFoundException();
 
-    if (!(user.admin || guild.owner.id === user.id))
+    if (!(user.site_admin || guild.owner.id === user.id))
       throw new BadRequestException();
 
     return this.guildsService.deleteGuild(anagram);

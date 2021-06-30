@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GuildsEntity } from '~/models/guilds.entity';
 import { MatchesEntity } from '~/models/matches.entity';
@@ -16,7 +17,7 @@ import { MatchesService } from './matches.service';
 @Module({
   imports: [TypeOrmModule.forFeature([MatchesEntity, UserEntity, GuildsEntity, WarEntity, WarTimeEntity])],
   controllers: [MatchesController, UserController, GuildsController],
-  providers: [MatchesService, UserService, GuildsService, WarsService],
+  providers: [MatchesService, UserService, GuildsService, WarsService, ConfigService],
   exports: [MatchesService]
 })
 export class MatchesModule {}

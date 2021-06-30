@@ -1,0 +1,31 @@
+.sidebar-link {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  font-size: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-link:link,
+.sidebar-link:active,
+.sidebar-link:hover,
+.sidebar-link:visited {
+  text-decoration: none;
+  color: #9da6c4;
+}
+
+.sidebar-link > *:first-of-type {
+  margin-right: 0.4rem;
+}
+
+.sidebar-link:hover {
+  background-color: #191e31;
+  color: white;
+}
+
+.sidebar-link.active {
+  background-color: #252a40;
+  color: white;
+}
