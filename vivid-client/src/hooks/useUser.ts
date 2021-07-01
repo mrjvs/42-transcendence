@@ -13,7 +13,7 @@ export function useUser() {
     setLoading(true);
     setError(false);
     setDone(false);
-    fetch('http://localhost:8080/api/v1/users/@me', {
+    fetch(window._env_.VIVID_BASE_URL + '/api/v1/users/@me', {
       credentials: 'include',
     })
       .then((res) => res.json())
