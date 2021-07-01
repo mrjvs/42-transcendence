@@ -7,7 +7,6 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { WarEntity } from './war.entity';
 
 @Entity({ name: 'matches' })
 export class MatchesEntity {

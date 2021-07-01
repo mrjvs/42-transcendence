@@ -142,20 +142,18 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async getWarId(gamestats: IGame){
-    const user_acpt = await this.userRepository
-    .find({
+  async getWarId(gamestats: IGame) {
+    await this.userRepository.find({
       relations: [
         'guild',
         // 'guild.current_war'
-      ], 
+      ],
       where: {
         id: gamestats.user_id_acpt,
       },
-    })
+    });
 
-    const user_req = await this.userRepository
-    .find({
+    this.userRepository.find({
       relations: [
         'guild',
         // 'guild.current_war'
@@ -163,7 +161,7 @@ export class UserService {
       where: {
         id: gamestats.user_id_req,
       },
-    })
+    });
     // console.log("user_acpt: \n", user_acpt);
     // console.log("user_req: \n", user_req);
 
@@ -171,6 +169,6 @@ export class UserService {
     // let war_user_req = user_req.guild.current_war.id;
     // if (war_user_acpt === war_user_req)
     //   return war_user_acpt;
-    return null;  
+    return null;
   }
 }

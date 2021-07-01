@@ -1,5 +1,3 @@
-import { IBall, IPlayer } from './Constants';
-
 export function createGameState() {
   return {
     players: [

@@ -4,8 +4,9 @@ import { IGameState } from './Constants';
 export function drawGame(
   gameState: IGameState,
   canvas: HTMLCanvasElement,
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | null,
 ) {
+  if (!context) return;
   // Draw background
   context.fillStyle = 'black';
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -33,13 +34,14 @@ export function drawGame(
 }
 
 function text(
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | null,
   text: string,
   x: number,
   y: number,
   color: string,
   font: string,
 ) {
+  if (!context) return;
   context.fillStyle = color;
   context.font = font;
   context.fillText(text, x, y);

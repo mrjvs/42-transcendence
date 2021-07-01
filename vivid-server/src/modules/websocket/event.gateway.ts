@@ -22,8 +22,8 @@ interface IStates {
   [roomName: string]: IGameState; // [roomName] = GameState
 }
 
-let states: IStates = {};
-let clientRooms: IRoom = {};
+const states: IStates = {};
+const clientRooms: IRoom = {};
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -72,7 +72,7 @@ export class EventGateway implements OnGatewayConnection {
     if (clientRooms[clientId] != null) return;
 
     // Create unique game ID
-    const roomName: string = 'e372e47c-3649-44c9-9455-c48f84e3d80d'; // TODO remove this - hardcoded for testing
+    const roomName = 'e372e47c-3649-44c9-9455-c48f84e3d80d'; // TODO remove this - hardcoded for testing
     // const roomName: string = uuid();
     clientRooms[clientId] = roomName;
 

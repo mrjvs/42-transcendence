@@ -16,8 +16,6 @@ import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IUserParam, UserParam } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
-import { DeleteResult } from 'typeorm';
-import { Cron } from '@nestjs/schedule';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)

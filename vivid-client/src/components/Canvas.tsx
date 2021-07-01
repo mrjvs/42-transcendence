@@ -27,6 +27,7 @@ export function Canvas({ width, height }: CanvasProps) {
 
     client.on('connect', () => {
       setClientState('CONNECTED');
+      clientState;
     });
 
     client.on('init', (nb: number) => {
@@ -45,7 +46,7 @@ export function Canvas({ width, height }: CanvasProps) {
     client.on('render', (gameState: IGameState) => {
       if (context === null) return;
       requestAnimationFrame(() => {
-        drawGame(gameState, canvas, context!);
+        drawGame(gameState, canvas, context);
       });
     });
 

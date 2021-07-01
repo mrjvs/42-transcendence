@@ -1,10 +1,9 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { UpdateResult } from 'typeorm';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IGame } from '@/match.interface';
 import { MatchesEntity } from '@/matches.entity';
 import { MatchesService } from './matches.service';
-import { Cron } from '@nestjs/schedule';
 import { UserService } from '../users/user.service';
 
 @Controller('matches')
