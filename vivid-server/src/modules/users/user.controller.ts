@@ -9,6 +9,8 @@ import {
   Patch,
   Param,
   UnauthorizedException,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
@@ -19,6 +21,10 @@ import { UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
 import { DeleteResult } from 'typeorm';
 import { Cron } from '@nestjs/schedule';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { v4 as uuidv4 } from 'uuid';
+import { diskStorage } from 'multer';
+import { unlink } from 'fs';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -79,5 +85,51 @@ export class UserController {
     @Param('anagram') anagram: string,
   ): Promise<UserEntity> {
     return this.userService.joinGuild(user.id, anagram);
+  }
+
+  @Post(':id/avatar')
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      limits: {
+        files: 1,
+        fileSize: 5000000, // 5mb
+      },
+      storage: diskStorage({
+        destination: "./uploads",
+        filename(req, file, cb) {
+          cb(null, uuidv4() + '.png');
+      },
+      })
+    }),
+  )
+  async uploadSingle(
+    @UploadedFile() file: Express.Multer.File,
+    @UserParam('id') usr: IUserParam,
+    @User() user: UserEntity,
+  ): Promise<any> {
+    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
+
+    await this.deleteAvatarFile(usr.id);
+    return await this.userService.updateAvatarName(usr.id, file.filename);
+  }
+
+  @Delete(':id/avatar')
+  async deleteAvatar(
+    @UserParam('id') usr: IUserParam,
+    @User() user: UserEntity,
+  ): Promise<any> {
+    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
+
+    await this.deleteAvatarFile(usr.id);
+    return await this.userService.deleteAvatar(usr.id);
+  }
+
+  async deleteAvatarFile(id: string){
+    const user1 = await this.userService.findUser(id);
+    if (user1.avatar !== null){
+      unlink('uploads/' + user1.avatar, function(err) {
+        if (err) throw err;
+      });
+    }
   }
 }

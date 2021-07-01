@@ -37,9 +37,13 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'json' })
   avatar_colors: string[];
 
+  @Column({ default: null })
+  avatar: string;
+
   @JoinColumn({ name: 'guild' })
   @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
-    onDelete: 'SET NULL'})
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'guild' })
   guild: GuildsEntity;
 
@@ -48,7 +52,6 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => MatchesEntity, (matches) => matches.user_acpt)
   matches_acpt: MatchesEntity[];
-
 
   //   onDelete: 'SET NULL',
   // })
