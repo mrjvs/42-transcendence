@@ -2,20 +2,29 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Post,
-  Param,
   UseGuards,
   Patch,
+  Param,
+  UnauthorizedException,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from './user.service';
 import { IUser } from '@/user.interface';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
+import { IUserParam, UserParam } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
 import { DeleteResult } from 'typeorm';
 import { Cron } from '@nestjs/schedule';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { v4 as uuidv4 } from 'uuid';
+import { diskStorage } from 'multer';
+import { unlink } from 'fs';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -33,8 +42,12 @@ export class UserController {
   }
 
   @Get(':id')
-  async findUser(@Param('id') id: string): Promise<IUser | void> {
-    return await this.userService.findUser(id);
+  async findUser(
+    @UserParam('id') usr: IUserParam,
+    @User() user: UserEntity,
+  ): Promise<IUser> {
+    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
+    return await this.userService.findUser(usr.id);
   }
 
   @Get('matches/:id')
@@ -50,6 +63,22 @@ export class UserController {
     return await this.userService.update(id, user);
   }
 
+  @Patch(':id/2fa')
+  async twofactorEnable(@UserParam('id') user: IUserParam): Promise<any> {
+    if (!user.isSelf) throw new UnauthorizedException();
+    const data = await this.userService.enableTwoFactor(user.id);
+    return data;
+  }
+
+  @Delete(':id/2fa')
+  async twofactorDisable(@UserParam('id') user: IUserParam): Promise<any> {
+    if (!user.isSelf) throw new UnauthorizedException();
+    await this.userService.disableTwoFactor(user.id);
+    return {
+      status: true,
+    };
+  }
+
   @Post('join_guild/:anagram')
   async join_guild(
     @User() user: UserEntity,
@@ -58,8 +87,49 @@ export class UserController {
     return this.userService.joinGuild(user.id, anagram);
   }
 
-  @Delete(':id')
-  deleteUser(@Param('id') id: string): Promise<DeleteResult> {
-    return this.userService.deleteUser(id);
+  @Post(':id/avatar')
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      limits: {
+        files: 1,
+        fileSize: 5000000, // 5mb
+      },
+      storage: diskStorage({
+        destination: "./uploads",
+        filename(req, file, cb) {
+          cb(null, uuidv4() + '.png');
+      },
+      })
+    }),
+  )
+  async uploadSingle(
+    @UploadedFile() file: Express.Multer.File,
+    @UserParam('id') usr: IUserParam,
+    @User() user: UserEntity,
+  ): Promise<any> {
+    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
+
+    await this.deleteAvatarFile(usr.id);
+    return await this.userService.updateAvatarName(usr.id, file.filename);
+  }
+
+  @Delete(':id/avatar')
+  async deleteAvatar(
+    @UserParam('id') usr: IUserParam,
+    @User() user: UserEntity,
+  ): Promise<any> {
+    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
+
+    await this.deleteAvatarFile(usr.id);
+    return await this.userService.deleteAvatar(usr.id);
+  }
+
+  async deleteAvatarFile(id: string){
+    const user1 = await this.userService.findUser(id);
+    if (user1.avatar !== null){
+      unlink('uploads/' + user1.avatar, function(err) {
+        if (err) throw err;
+      });
+    }
   }
 }

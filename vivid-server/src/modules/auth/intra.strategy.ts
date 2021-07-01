@@ -9,7 +9,7 @@ export class IntraStrategy extends PassportStrategy(Strategy) {
   constructor(
     private authService: AuthService,
     private httpService: HttpService,
-    private configService: ConfigService,
+    configService: ConfigService,
   ) {
     super({
       authorizationURL: 'https://api.intra.42.fr/oauth/authorize',

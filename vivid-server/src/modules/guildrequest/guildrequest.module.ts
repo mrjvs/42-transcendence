@@ -10,12 +10,13 @@ import { GuildRequestService } from './guildrequest.service';
 import { WarTimeEntity } from '~/models/war_time.entity';
 import { WarEntity } from '~/models/war.entity';
 import { WarsService } from '../wars/wars.service';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([GuildRequestEntity, GuildsEntity, UserEntity, WarTimeEntity, WarEntity]),
   ],
-  providers: [GuildsService, GuildRequestService, UserService, WarsService],
+  providers: [GuildsService, GuildRequestService, UserService, WarsService, ConfigService],
   controllers: [GuildrequestController],
   exports: [GuildRequestService],
 })
