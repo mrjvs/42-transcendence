@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import socketIOClient from 'socket.io-client';
 import { drawGame } from '../views/game/Draw';
 import { IGameState } from '../views/game/Constants';
+import usePong from '../hooks/usePong';
 
 interface CanvasProps {
   width: number;
@@ -10,14 +11,14 @@ interface CanvasProps {
 
 export function Canvas({ width, height }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [client2, setClient] = React.useState<any>(null);
-  const [clientState, setClientState] = React.useState('CONNECTING');
+  const [client2, setClient] = useState<any>(null);
+  const [clientState, setClientState] = useState('CONNECTING');
 
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
   let playerNumber: number;
 
-  React.useEffect(() => {
+  useEffect(() => {
     const client = socketIOClient(window._env_.VIVID_BASE_URL, {
       withCredentials: true,
       path: '/api/v1/events',
@@ -45,6 +46,7 @@ export function Canvas({ width, height }: CanvasProps) {
 
     client.on('render', (gameState: IGameState) => {
       if (context === null) return;
+
       requestAnimationFrame(() => {
         drawGame(gameState, canvas, context);
       });

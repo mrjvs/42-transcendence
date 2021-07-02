@@ -80,8 +80,16 @@ function moveRightPlayer(state: IGameState) {
 
 // Update player locations
 function updatePlayerLocation(state: IGameState) {
-  state.players[0].y += state.players[0].move;
-  state.players[1].y += moveRightPlayer(state);
+  if (
+    state.players[0].y + state.players[0].move <= 1 &&
+    state.players[0].y + state.playerHeight + state.players[0].move >= 0
+  )
+    state.players[0].y += state.players[0].move;
+  if (
+    state.players[1].y + state.players[1].move <= 1 &&
+    state.players[1].y + state.playerHeight + state.players[1].move >= 0
+  )
+    state.players[1].y += moveRightPlayer(state);
 }
 
 // Game loop
