@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import socketIOClient from 'socket.io-client';
 import { drawGame } from '../views/game/Draw';
 import { IGameState } from '../views/game/Constants';
-import usePong from '../hooks/usePong';
 
 interface CanvasProps {
   width: number;
