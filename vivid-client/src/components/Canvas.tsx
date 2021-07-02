@@ -43,9 +43,8 @@ export function Canvas({ width, height }: CanvasProps) {
       document.addEventListener('keyup', keyup);
     });
 
-    client.on('render', (gameState: IGameState) => {
+    client.on('drawGame', (gameState: IGameState) => {
       if (context === null) return;
-
       requestAnimationFrame(() => {
         drawGame(gameState, canvas, context);
       });

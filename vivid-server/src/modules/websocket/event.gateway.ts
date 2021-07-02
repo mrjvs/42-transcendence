@@ -134,7 +134,7 @@ export class EventGateway implements OnGatewayConnection {
 
       if (!winner) {
         // If no winner, render GameState for both clients
-        clients.emit('render', states[roomName]);
+        clients.emit('drawGame', states[roomName]);
       } else {
         clients.emit('gameOver', winner);
         clearInterval(intervalId);
