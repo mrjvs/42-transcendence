@@ -1,5 +1,5 @@
-import { IPlayer } from './Constants';
-import { IGameState } from './Constants';
+import { IPlayer } from '@/game.interface';
+import { IGameState } from '@/game.interface';
 
 function resetBall(state: IGameState) {
   state.ball.x = 0.5;
@@ -37,12 +37,20 @@ function updateBallLocation(state: IGameState): number {
     state.ball.velocityY = -state.ball.velocityY;
 
   // Check on which player's side the ball is
-  const player = state.ball.x < 0.5 ? state.players[0] : state.players[1];
+  let defendingPlayer: IPlayer;
+  let attackingPlayer: IPlayer;
+  if (state.ball.x < 0.5) {
+    defendingPlayer = state.players[0];
+    attackingPlayer = state.players[1];
+  } else {
+    defendingPlayer = state.players[1];
+    attackingPlayer = state.players[0];
+  }
 
   // Check for pad collision and change ball direction
-  if (collision(player, state)) {
+  if (collision(defendingPlayer, state)) {
     const collidePoint =
-      (state.ball.y - (player.y + state.playerHeight / 2)) /
+      (state.ball.y - (defendingPlayer.y + state.playerHeight / 2)) /
       (state.playerHeight / 2);
     const angleRad = collidePoint * (Math.PI / 4);
     const direction = state.ball.x < 0.5 ? 1 : -1;
@@ -56,8 +64,8 @@ function updateBallLocation(state: IGameState): number {
     state.ball.x - state.ball.radius < 0 ||
     state.ball.x + state.ball.radius > 1
   ) {
-    player.score += 1;
-    if (player.score === 10) return player.playerNumber;
+    attackingPlayer.score += 1;
+    if (attackingPlayer.score === 10) return attackingPlayer.playerNumber;
     resetBall(state);
   }
 

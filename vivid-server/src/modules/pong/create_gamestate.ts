@@ -25,7 +25,7 @@ export function createGameState() {
       velocityY: 0.01,
       color: 'ORANGE',
     },
-    twoPlayers: false,
+    twoPlayers: true,
     computerLevel: 0.01,
     increaseSpeedAfterContact: 0.0001,
     playerWidth: 0.02,

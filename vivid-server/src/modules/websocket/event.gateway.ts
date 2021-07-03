@@ -1,4 +1,5 @@
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   SubscribeMessage,
@@ -6,31 +7,20 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { IMessage } from '~/models/messages.entity';
+import { IMessage } from '@/messages.entity';
 import { UserService } from '$/users/user.service';
-import { IJoinedChannel } from '~/models/joined_channels.entity';
-import { createGameState } from '../pong/GameState';
-import { IGameState } from '../pong/Constants';
-import { gameLoop } from '../pong/Pong';
-import { v4 as uuid } from 'uuid';
-
-interface IRoom {
-  [clientId: string]: uuid; // [clientId] = roomName
-}
-
-interface IStates {
-  [roomName: string]: IGameState; // [roomName] = GameState
-}
-
-const states: IStates = {};
-const clientRooms: IRoom = {};
+import { IJoinedChannel } from '@/joined_channels.entity';
+import { PongService } from '$/pong/pong.service';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly pongService: PongService,
+  ) {}
 
   async handleConnection(socket: Socket) {
     await this.putUserInSocket(socket);
@@ -64,81 +54,30 @@ export class EventGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('newGame')
-  newGame(@MessageBody() clientId: string) {
-    const client = this.server.sockets.connected[clientId];
-    if (!client) return;
-
-    // Return if client is already in existing game
-    if (clientRooms[clientId] != null) return;
-
-    // Create unique game ID
-    const roomName = 'e372e47c-3649-44c9-9455-c48f84e3d80d'; // TODO remove this - hardcoded for testing
-    // const roomName: string = uuid();
-    clientRooms[clientId] = roomName;
-
-    // Create GameState and save it in states
-    states[roomName] = createGameState();
-
-    // Join client to room
-    client.join(roomName);
-
-    // Init canvas, context and eventlisteners
-    client.emit('init', 1);
-
-    // Set client player number
-    client.number = 1;
+  newGame(@ConnectedSocket() client: Socket) {
+    if (!client.auth) return; // TODO do we need to throw something (unauthorized) here?
+    this.pongService.newGame(client);
   }
 
   @SubscribeMessage('joinGame')
-  joinGame(@MessageBody() body: { clientId: string; roomName: string }) {
-    const client = this.server.sockets.connected[body.clientId];
-    if (!client) return;
-
-    // Return if client is already in existing game
-    if (clientRooms[body.clientId] != null) return;
-
-    if (clientRooms[body.roomName]) clientRooms[body.clientId] = body.roomName;
-
-    // Join client to room
-    client.join(body.roomName);
-
-    // Init canvas, context and eventlisteners
-    client.emit('init', 2);
-
-    // Set client player number
-    client.number = 2;
-
-    // Start game
-    this.startGameInterval(body.roomName);
+  joinGame(@ConnectedSocket() client: Socket, @MessageBody() roomName: string) {
+    if (!client.auth) return;
+    this.pongService.joinGame(client, roomName);
+    this.startGameInterval(roomName);
   }
 
   @SubscribeMessage('keydown')
-  handleKeydown(@MessageBody() body: { clientId: string; move: number }) {
-    const client = this.server.sockets.connected[body.clientId];
-    if (!client) return;
-
-    // Find room
-    const roomName = clientRooms[body.clientId];
-    if (!roomName) return;
-
-    // Set player move
-    states[roomName].players[client.number - 1].move = body.move;
+  handleKeydown(
+    @MessageBody() move: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!client.auth) return;
+    this.pongService.handleKeydown(client, move);
   }
 
-  startGameInterval(roomName: string) {
-    // Get clients in game
+  private startGameInterval(roomName: string) {
     const clients = this.server.sockets.in(roomName);
-
-    const intervalId = setInterval(() => {
-      const winner: number = gameLoop(states[roomName]);
-
-      if (!winner) {
-        // If no winner, render GameState for both clients
-        clients.emit('drawGame', states[roomName]);
-      } else {
-        clients.emit('gameOver', winner);
-        clearInterval(intervalId);
-      }
-    }, 1000 / 50); // 50 FPS
+    if (!clients) return;
+    this.pongService.startGameInterval(clients, roomName);
   }
 }

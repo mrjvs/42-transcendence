@@ -32,12 +32,11 @@ export function Canvas({ width, height }: CanvasProps) {
 
     client.on('init', (nb: number) => {
       playerNumber = nb;
+
       if (!canvasRef.current) return;
 
       canvas = canvasRef.current;
       context = canvas.getContext('2d');
-
-      if (!context) return;
 
       document.addEventListener('keydown', keydown);
       document.addEventListener('keyup', keyup);
@@ -60,16 +59,12 @@ export function Canvas({ width, height }: CanvasProps) {
     });
 
     function keydown(event: KeyboardEvent) {
-      let move: number;
-      if (event.key === 'w') move = -0.01;
-      else if (event.key === 's') move = 0.01;
-      else return;
-      client.emit('keydown', { clientId: client.id, move });
+      if (event.key === 'w') client.emit('keydown', -0.01);
+      else if (event.key === 's') client.emit('keydown', 0.01);
     }
 
     function keyup(event: KeyboardEvent) {
-      if (event.key === 'w' || event.key === 's')
-        client.emit('keydown', { clientId: client.id, move: 0 });
+      if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
     }
 
     return () => {
@@ -80,14 +75,14 @@ export function Canvas({ width, height }: CanvasProps) {
   }, []);
 
   function newGame() {
-    client2.emit('newGame', client2.id);
+    client2.emit('newGame');
   }
 
   function joinGame() {
-    client2.emit('joinGame', {
-      clientId: client2.id,
-      roomName: 'e372e47c-3649-44c9-9455-c48f84e3d80d', // TODO how to join game?
-    });
+    client2.emit(
+      'joinGame',
+      'e372e47c-3649-44c9-9455-c48f84e3d80d', // TODO how to join game?
+    );
   }
 
   return (
