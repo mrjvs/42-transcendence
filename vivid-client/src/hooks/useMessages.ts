@@ -13,8 +13,6 @@ export function useMessages(channel: string) {
     });
 
     client.on('connect', () => {
-      console.log('at useMessage');
-
       setClientState('CONNECTED');
     });
 
