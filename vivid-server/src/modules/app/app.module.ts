@@ -13,6 +13,7 @@ import { FriendsModule } from '$/friends/friends.module';
 import { BlocksModule } from '$/blocks/blocks.module';
 import { GuildsModule } from '$/guilds/guilds.module';
 import { GuildrequestModule } from '$/guildrequest/guildrequest.module';
+import { LadderModule } from '$/ladder/ladder.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -48,6 +49,7 @@ const config = ConfigModule.forRoot({
     GuildsModule,
     WarsModule,
     GuildrequestModule,
+    LadderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

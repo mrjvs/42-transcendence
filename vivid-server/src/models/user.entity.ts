@@ -10,6 +10,7 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
+import { LadderUserEntity } from '@/ladder_user.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -24,6 +25,9 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => JoinedChannelEntity, (channel) => channel.user)
   joined_channels: JoinedChannelEntity[];
+
+  @OneToMany(() => LadderUserEntity, (ladder_user) => ladder_user.user)
+  ranks: LadderUserEntity[];
 
   @Column()
   intra_id: string;
