@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   ForbiddenException,
-  Param,
   Patch,
   UseGuards,
 } from '@nestjs/common';

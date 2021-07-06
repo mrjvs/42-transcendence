@@ -4,13 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Brackets,
-  createQueryBuilder,
-  DeleteResult,
-  Repository,
-  UpdateResult,
-} from 'typeorm';
+import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { WarEntity } from '@/war.entity';
 import { GuildsEntity } from '@/guilds.entity';
 import { IWar } from '@/war.interface';

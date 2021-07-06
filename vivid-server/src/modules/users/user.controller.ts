@@ -11,20 +11,20 @@ import {
   UnauthorizedException,
   UseInterceptors,
   UploadedFile,
+  Res,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { UserService } from './user.service';
 import { IUser } from '@/user.interface';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IUserParam, UserParam } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
-import { DeleteResult } from 'typeorm';
-import { Cron } from '@nestjs/schedule';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
 import { unlink } from 'fs';
+import { join } from 'path';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -95,11 +95,11 @@ export class UserController {
         fileSize: 5000000, // 5mb
       },
       storage: diskStorage({
-        destination: "./uploads",
+        destination: './uploads',
         filename(req, file, cb) {
           cb(null, uuidv4() + '.png');
-      },
-      })
+        },
+      }),
     }),
   )
   async uploadSingle(
@@ -124,12 +124,17 @@ export class UserController {
     return await this.userService.deleteAvatar(usr.id);
   }
 
-  async deleteAvatarFile(id: string){
+  async deleteAvatarFile(id: string) {
     const user1 = await this.userService.findUser(id);
-    if (user1.avatar !== null){
-      unlink('uploads/' + user1.avatar, function(err) {
+    if (user1.avatar !== null) {
+      unlink('uploads/' + user1.avatar, function (err) {
         if (err) throw err;
       });
     }
+  }
+
+  @Get('avatar/:avatar_name')
+  findAvatar(@Param('avatar_name') avatar_name, @Res() res): Observable<any> {
+    return of(res.sendFile(join(process.cwd(), 'uploads/' + avatar_name)));
   }
 }

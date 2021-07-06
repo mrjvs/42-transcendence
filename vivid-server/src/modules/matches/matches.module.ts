@@ -15,9 +15,23 @@ import { MatchesController } from './matches.controller';
 import { MatchesService } from './matches.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MatchesEntity, UserEntity, GuildsEntity, WarEntity, WarTimeEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      MatchesEntity,
+      UserEntity,
+      GuildsEntity,
+      WarEntity,
+      WarTimeEntity,
+    ]),
+  ],
   controllers: [MatchesController, UserController, GuildsController],
-  providers: [MatchesService, UserService, GuildsService, WarsService, ConfigService],
-  exports: [MatchesService]
+  providers: [
+    MatchesService,
+    UserService,
+    GuildsService,
+    WarsService,
+    ConfigService,
+  ],
+  exports: [MatchesService],
 })
 export class MatchesModule {}

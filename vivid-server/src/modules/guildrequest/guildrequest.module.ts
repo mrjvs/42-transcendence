@@ -14,9 +14,21 @@ import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GuildRequestEntity, GuildsEntity, UserEntity, WarTimeEntity, WarEntity]),
+    TypeOrmModule.forFeature([
+      GuildRequestEntity,
+      GuildsEntity,
+      UserEntity,
+      WarTimeEntity,
+      WarEntity,
+    ]),
   ],
-  providers: [GuildsService, GuildRequestService, UserService, WarsService, ConfigService],
+  providers: [
+    GuildsService,
+    GuildRequestService,
+    UserService,
+    WarsService,
+    ConfigService,
+  ],
   controllers: [GuildrequestController],
   exports: [GuildRequestService],
 })

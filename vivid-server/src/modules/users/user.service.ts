@@ -239,21 +239,21 @@ export class UserService {
     return await this.userRepository.save({ id: userId, name: newName });
   }
 
-  async updateAvatarName(userId: string, filename: string):Promise<any> {
+  async updateAvatarName(userId: string, filename: string): Promise<any> {
     return await this.userRepository
-    .createQueryBuilder()
-    .update()
-    .set({ avatar: filename})
-    .where({ id: userId})
-    .execute();
+      .createQueryBuilder()
+      .update()
+      .set({ avatar: filename })
+      .where({ id: userId })
+      .execute();
   }
-  
-  async deleteAvatar(userId: string):Promise<any>{
+
+  async deleteAvatar(userId: string): Promise<any> {
     return await this.userRepository
-    .createQueryBuilder()
-    .update()
-    .set({avatar: null})
-    .where({ id: userId})
-    .execute();
+      .createQueryBuilder()
+      .update()
+      .set({ avatar: null })
+      .where({ id: userId })
+      .execute();
   }
 }

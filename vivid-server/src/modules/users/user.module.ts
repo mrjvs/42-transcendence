@@ -15,8 +15,22 @@ import { WarTimeEntity } from '~/models/war_time.entity';
 import { UserSetupController } from './user_setup.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, GuildsEntity, MatchesEntity, WarEntity, WarTimeEntity])],
-  providers: [UserService, GuildsService, MatchesService, WarsService, ConfigService],
+  imports: [
+    TypeOrmModule.forFeature([
+      UserEntity,
+      GuildsEntity,
+      MatchesEntity,
+      WarEntity,
+      WarTimeEntity,
+    ]),
+  ],
+  providers: [
+    UserService,
+    GuildsService,
+    MatchesService,
+    WarsService,
+    ConfigService,
+  ],
   controllers: [UserController, MatchesController, UserSetupController],
   exports: [UserService],
 })

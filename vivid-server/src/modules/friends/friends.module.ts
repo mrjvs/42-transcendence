@@ -14,9 +14,21 @@ import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([FriendsEntity, UserEntity, GuildsEntity, WarEntity, WarTimeEntity]),
+    TypeOrmModule.forFeature([
+      FriendsEntity,
+      UserEntity,
+      GuildsEntity,
+      WarEntity,
+      WarTimeEntity,
+    ]),
   ],
-  providers: [FriendsService, UserService, GuildsService, WarsService, ConfigService],
+  providers: [
+    FriendsService,
+    UserService,
+    GuildsService,
+    WarsService,
+    ConfigService,
+  ],
   controllers: [FriendsController],
   exports: [FriendsService],
 })

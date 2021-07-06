@@ -1,5 +1,3 @@
-import { WarEntity } from './war.entity';
-
 export interface IGame {
   user_id_req: string;
   user_id_acpt: string;

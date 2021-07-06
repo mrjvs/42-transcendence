@@ -13,8 +13,22 @@ import { WarsService } from '../wars/wars.service';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([BlocksEntity, UserEntity, GuildsEntity, WarTimeEntity, WarEntity])],
-  providers: [BlocksService, UserService, GuildsService, WarsService, ConfigService],
+  imports: [
+    TypeOrmModule.forFeature([
+      BlocksEntity,
+      UserEntity,
+      GuildsEntity,
+      WarTimeEntity,
+      WarEntity,
+    ]),
+  ],
+  providers: [
+    BlocksService,
+    UserService,
+    GuildsService,
+    WarsService,
+    ConfigService,
+  ],
   controllers: [BlocksController],
   exports: [BlocksService],
 })

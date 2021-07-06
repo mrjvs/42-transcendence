@@ -11,7 +11,14 @@ import { WarTimeEntity } from '~/models/war_time.entity';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GuildsEntity, UserEntity, WarEntity, WarTimeEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      GuildsEntity,
+      UserEntity,
+      WarEntity,
+      WarTimeEntity,
+    ]),
+  ],
   providers: [GuildsService, UserService, WarsService, ConfigService],
   controllers: [GuildsController],
   exports: [GuildsService],
