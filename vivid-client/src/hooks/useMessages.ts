@@ -7,7 +7,7 @@ export function useMessages(channel: string) {
   const [channelInfo, setChannelInfo] = React.useState<any>(null);
 
   React.useEffect(() => {
-    const client = socketIOClient('http://localhost:8080', {
+    const client = socketIOClient(window._env_.VIVID_BASE_URL, {
       withCredentials: true,
       path: '/api/v1/events',
     });
@@ -37,15 +37,21 @@ export function useMessages(channel: string) {
     setLoading(true);
     setError(false);
     setDone(false);
-    fetch(`http://localhost:8080/api/v1/channels/${channel}/messages`, {
-      credentials: 'include',
-    })
+    fetch(
+      window._env_.VIVID_BASE_URL + `/api/v1/channels/${channel}/messages`,
+      {
+        credentials: 'include',
+      },
+    )
       .then((res) => res.json())
       .then((result) => {
         setMessages(result);
-        return fetch(`http://localhost:8080/api/v1/channels/${channel}`, {
-          credentials: 'include',
-        });
+        return fetch(
+          window._env_.VIVID_BASE_URL + `/api/v1/channels/${channel}`,
+          {
+            credentials: 'include',
+          },
+        );
       })
       .then((res) => res.json())
       .then((info) => {
@@ -65,16 +71,19 @@ export function useMessages(channel: string) {
   }, [channel]);
 
   function sendMessage(text: string) {
-    fetch(`http://localhost:8080/api/v1/channels/${channel}/messages`, {
-      method: 'POST',
-      body: JSON.stringify({
-        content: text,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
+    fetch(
+      window._env_.VIVID_BASE_URL + `/api/v1/channels/${channel}/messages`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          content: text,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
       },
-      credentials: 'include',
-    });
+    );
   }
 
   return {

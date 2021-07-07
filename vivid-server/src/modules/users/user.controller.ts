@@ -41,6 +41,11 @@ export class UserController {
     return await this.userService.findUser(usr.id);
   }
 
+  @Get('matches/:id')
+  async findUsermatches(@Param('id') id: string): Promise<IUser | void> {
+    return await this.userService.findUserMatches(id);
+  }
+
   @Patch(':id')
   async update(
     @Param('id') id: string,

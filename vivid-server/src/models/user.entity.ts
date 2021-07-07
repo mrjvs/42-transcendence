@@ -10,6 +10,7 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
+import { MatchesEntity } from './matches.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -41,6 +42,11 @@ export class UserEntity extends BaseEntity {
   })
   guild: GuildsEntity;
 
+  @OneToMany(() => MatchesEntity, (matches) => matches.user_req)
+  matches_req: MatchesEntity[];
+
+  @OneToMany(() => MatchesEntity, (matches) => matches.user_acpt)
+  matches_acpt: MatchesEntity[];
   // permissions
   isSiteAdmin() {
     return this.site_admin;
