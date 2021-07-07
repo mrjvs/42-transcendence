@@ -13,7 +13,7 @@ import {
   UploadedFile,
   Res,
 } from '@nestjs/common';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { UserService } from './user.service';
 import { IUser } from '@/user.interface';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
@@ -23,8 +23,9 @@ import { User } from '~/middleware/decorators/login.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
-import { unlink } from 'fs';
 import { join } from 'path';
+import { unlink } from 'fs'
+import { Resolver } from 'dns';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -127,14 +128,23 @@ export class UserController {
   async deleteAvatarFile(id: string) {
     const user1 = await this.userService.findUser(id);
     if (user1.avatar !== null) {
-      unlink('uploads/' + user1.avatar, function (err) {
-        if (err) throw err;
-      });
+      const ret = () => {
+        return new Promise((resolve) => {
+          unlink('uploads/' + user1.avatar, function (err) {
+            if (err) {
+              throw (err);
+            }
+            resolve(1);
+          });
+        });
+      }
+      return await ret()
+      .catch(err => {throw err})
     }
   }
 
   @Get('avatar/:avatar_name')
   findAvatar(@Param('avatar_name') avatar_name, @Res() res): Observable<any> {
-    return of(res.sendFile(join(process.cwd(), 'uploads/' + avatar_name)));
+    return res.sendFile(join(process.cwd(), 'uploads/' + avatar_name));
   }
 }
