@@ -1,9 +1,11 @@
 export interface IPlayer {
+  userId: string;
   playerNumber: number;
   x: number;
   y: number;
   score: number;
   move: number;
+  ready: boolean;
 }
 
 export interface IBall {
@@ -24,10 +26,18 @@ export interface INet {
   color: string;
 }
 
+export interface ISettings {
+  controls: string;
+  multiPlayer: boolean;
+  addon: string;
+}
+
 export interface IGameState {
+  gameId: string;
+  settings: ISettings;
   players: IPlayer[];
   ball: IBall;
-  two_players: boolean;
+  twoPlayers: boolean;
   computerLevel: number;
   increaseSpeedAfterContact: number;
   playerWidth: number;

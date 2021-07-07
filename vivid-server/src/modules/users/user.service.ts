@@ -9,7 +9,7 @@ import { getSessionStore } from '$/auth/auth-session';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
-import { IGame } from '~/models/match.interface';
+import { IMatch } from '~/models/match.interface';
 
 @Injectable()
 export class UserService {
@@ -142,7 +142,7 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async getWarId(gamestats: IGame) {
+  async getWarId(gamestats: IMatch) {
     await this.userRepository.find({
       relations: [
         'guild',

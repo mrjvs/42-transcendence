@@ -63,21 +63,39 @@ export class EventGateway implements OnGatewayConnection {
   joinGame(@ConnectedSocket() client: Socket, @MessageBody() roomName: string) {
     if (!client.auth) return;
     this.pongService.joinGame(client, roomName);
-    this.startGameInterval(roomName);
+  }
+
+  @SubscribeMessage('ready')
+  readyEvent(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomName: string,
+  ) {
+    if (!client.auth) return;
+    this.pongService.readyEvent(client, roomName);
   }
 
   @SubscribeMessage('keydown')
   handleKeydown(
-    @MessageBody() move: number,
     @ConnectedSocket() client: Socket,
+    @MessageBody() move: number,
   ) {
     if (!client.auth) return;
     this.pongService.handleKeydown(client, move);
   }
 
-  private startGameInterval(roomName: string) {
+  @SubscribeMessage('start')
+  startGameInterval(@MessageBody() roomName: string) {
     const clients = this.server.sockets.in(roomName);
     if (!clients) return;
     this.pongService.startGameInterval(clients, roomName);
+  }
+
+  @SubscribeMessage('mouseMove')
+  handleMouseMove(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() move: number,
+  ) {
+    if (!client.auth) return;
+    this.pongService.handleMouseMove(client, move);
   }
 }

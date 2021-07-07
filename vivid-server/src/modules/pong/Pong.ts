@@ -20,6 +20,7 @@ function collision(player: IPlayer, gameState: IGameState) {
   const ballBottom = gameState.ball.y + gameState.ball.radius;
   const ballLeft = gameState.ball.x - gameState.ball.radius;
   const ballRight = gameState.ball.x + gameState.ball.radius;
+
   return (
     ballBottom > playerTop &&
     ballTop < playerBottom &&
@@ -28,7 +29,7 @@ function collision(player: IPlayer, gameState: IGameState) {
   );
 }
 
-function updateBallLocation(state: IGameState): number {
+function updateBallLocation(state: IGameState): IPlayer | null {
   // Check for wall hit
   if (
     state.ball.y + state.ball.radius > 1 ||
@@ -65,14 +66,14 @@ function updateBallLocation(state: IGameState): number {
     state.ball.x + state.ball.radius > 1
   ) {
     attackingPlayer.score += 1;
-    if (attackingPlayer.score === 10) return attackingPlayer.playerNumber;
+    if (attackingPlayer.score === 10) return attackingPlayer;
     resetBall(state);
   }
 
   // Update ball location
   state.ball.x += state.ball.velocityX;
   state.ball.y += state.ball.velocityY;
-  return 0;
+  return null;
 }
 
 function moveRightPlayer(state: IGameState) {
