@@ -4,7 +4,7 @@ import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IGame } from '@/match.interface';
 import { MatchesEntity } from '@/matches.entity';
 import { MatchesService } from './matches.service';
-import { UserService } from '../users/user.service';
+import { UserService } from '$/users/user.service';
 
 @Controller('matches')
 @UseGuards(AuthenticatedGuard)

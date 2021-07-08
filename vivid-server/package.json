@@ -57,6 +57,7 @@
     "@types/node": "^14.14.36",
     "@types/passport-local": "^1.0.33",
     "@types/socket.io": "^3.0.2",
+    "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "eslint": "^7.22.0",
