@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   ForbiddenException,
@@ -13,8 +12,9 @@ import {
 import { UserService } from './user.service';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IUserParam, UserParam } from '~/middleware/decorators/login.decorator';
-import { IUser, UserEntity } from '@/user.entity';
+import { FullDetailsUser, UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
+import { formatObject } from '~/utils/format';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -26,9 +26,10 @@ export class UserController {
   async findUser(
     @UserParam('id') usr: IUserParam,
     @User() user: UserEntity,
-  ): Promise<IUser> {
+  ): Promise<any> {
     if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
-    return await this.userService.findUser(usr.id);
+    const userRet = await this.userService.findUser(usr.id);
+    return formatObject(FullDetailsUser, userRet);
   }
 
   @Patch(':id/2fa')

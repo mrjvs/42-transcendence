@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
+import { Expose, Type, Transform, Exclude } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -75,4 +76,42 @@ export interface IUser {
   intra_id: string;
   name: string;
   avatar_colors: string[];
+}
+
+export class UnrelatedUser {
+  @Expose() id: string;
+  @Expose() name: string;
+  @Expose() avatar_colors: string[];
+}
+
+export class RelatedUser extends UnrelatedUser {
+  @Expose() intra_id: string;
+  @Expose() site_admin: boolean;
+
+  @Expose()
+  @Transform(
+    ({ obj, value }) =>
+      value.constructor === String
+        ? value
+        : obj.joined_channels
+            .filter((v: any) => v.is_joined)
+            .map((v: any) =>
+              v.channel.constructor === String ? v.channel : v.channel.id,
+            ),
+    { toClassOnly: true },
+  )
+  joined_channels: string[] | string;
+}
+
+export class FullDetailsUser extends RelatedUser {
+  @Expose()
+  @Transform(({ obj }) => obj.joined_channels, { toClassOnly: true })
+  joined_channels: any;
+
+  private twofactor: any;
+
+  @Expose()
+  get twoFactorEnabled() {
+    return !!this.twofactor;
+  }
 }
