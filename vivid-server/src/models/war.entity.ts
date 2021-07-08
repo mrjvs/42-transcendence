@@ -10,12 +10,14 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
+import { MatchesEntity } from './matches.entity';
 import { WarTimeEntity } from './war_time.entity';
 
 @Check(`"end_date" > "start_date"`)
 @Check(`"start_date" > "created_at"`)
 @Entity({ name: 'wars' })
 export class WarEntity extends BaseEntity {
+  @OneToMany(() => MatchesEntity, (match) => match.war_id)
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -59,10 +61,6 @@ export class WarEntity extends BaseEntity {
 
   @OneToMany(() => WarTimeEntity, (warTime) => warTime.war)
   war_time: WarTimeEntity[];
-
-  // Need merge with matches
-  // @OneToMany(() => MatchesEntity, (matches) => matches.war)
-  // matches: MatchesEntity[];
 
   @OneToMany(() => GuildsEntity, (guild) => guild.current_war)
   guilds: GuildsEntity[];
