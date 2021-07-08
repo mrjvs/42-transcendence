@@ -79,7 +79,7 @@ export class UserController {
         fileSize: 5000000, // 5mb
       },
       storage: diskStorage({
-        destination: './uploads',
+        destination: join(__dirname, '../../../uploads/'),
         filename(req, file, cb) {
           cb(null, uuidv4() + '.png');
         },
@@ -111,18 +111,14 @@ export class UserController {
   async deleteAvatarFile(id: string) {
     const user1 = await this.userService.findUser(id);
     if (user1.avatar !== null) {
-      const ret = () => {
-        return new Promise((resolve) => {
-          unlink('uploads/' + user1.avatar, function (err) {
-            if (err) {
-              throw err;
-            }
-            resolve(1);
-          });
-        });
-      };
-      return await ret().catch((err) => {
-        throw err;
+      await new Promise<void>((resolve, reject) => {
+        unlink(
+          join(__dirname, '../../../uploads/', user1.avatar),
+          function (err) {
+            if (err) reject(err);
+            resolve();
+          },
+        );
       });
     }
   }
@@ -132,6 +128,6 @@ export class UserController {
     @Param('avatar_name') avatar_name: string,
     @Res() res: Response,
   ): void {
-    res.sendFile(join(process.cwd(), 'uploads/' + avatar_name));
+    res.sendFile(join(__dirname, '../../../uploads/', avatar_name));
   }
 }
