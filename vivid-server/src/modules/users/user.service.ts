@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -42,7 +44,9 @@ export class UserService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private configService: ConfigService,
+    @Inject(forwardRef(() => GuildsService))
     private guildsService: GuildsService,
+    @Inject(forwardRef(() => WarsService))
     private warsService: WarsService,
   ) {}
 

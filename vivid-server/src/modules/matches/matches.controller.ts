@@ -4,15 +4,11 @@ import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IGame } from '@/match.interface';
 import { MatchesEntity } from '@/matches.entity';
 import { MatchesService } from './matches.service';
-import { UserService } from '$/users/user.service';
 
 @Controller('matches')
 @UseGuards(AuthenticatedGuard)
 export class MatchesController {
-  constructor(
-    private matchesService: MatchesService,
-    private userService: UserService,
-  ) {}
+  constructor(private matchesService: MatchesService) {}
 
   @Get('all')
   findAll(): Promise<MatchesEntity[]> {
