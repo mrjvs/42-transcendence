@@ -14,6 +14,10 @@ import { FriendsModule } from '$/friends/friends.module';
 import { BlocksModule } from '$/blocks/blocks.module';
 import { GuildsModule } from '$/guilds/guilds.module';
 import { GuildrequestModule } from '$/guildrequest/guildrequest.module';
+import { MatchesModule } from '../matches/matches.module';
+import { ScheduleModule } from '@nestjs/schedule';
+// import { ServeStaticModule } from '@nestjs/serve-static';
+// import { join } from 'path';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -24,7 +28,7 @@ const config = ConfigModule.forRoot({
     // config & database
     config,
     TypeOrmModule.forRootAsync({
-      imports: [config],
+      imports: [config, ScheduleModule.forRoot()],
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('db.host'),
@@ -38,6 +42,9 @@ const config = ConfigModule.forRoot({
       }),
       inject: [ConfigService],
     }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'uploads'),
+    // }),
 
     // modules
     UserModule,
@@ -50,6 +57,7 @@ const config = ConfigModule.forRoot({
     GuildsModule,
     WarsModule,
     GuildrequestModule,
+    MatchesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

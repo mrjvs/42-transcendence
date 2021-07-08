@@ -10,6 +10,7 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
+import { MatchesEntity } from './matches.entity';
 import { IsString } from 'class-validator';
 
 @Entity({ name: 'users' })
@@ -36,11 +37,25 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'json' })
   avatar_colors: string[];
 
+  @Column({ default: null })
+  avatar: string;
+
   @JoinColumn({ name: 'guild' })
   @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
     onDelete: 'SET NULL',
   })
+  @JoinColumn({ name: 'guild' })
   guild: GuildsEntity;
+
+  @OneToMany(() => MatchesEntity, (matches) => matches.user_req)
+  matches_req: MatchesEntity[];
+
+  @OneToMany(() => MatchesEntity, (matches) => matches.user_acpt)
+  matches_acpt: MatchesEntity[];
+
+  //   onDelete: 'SET NULL',
+  // })
+  // guild: GuildsEntity;
 
   @Column({ nullable: true, type: 'json' })
   twofactor: {
