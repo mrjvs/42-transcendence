@@ -24,8 +24,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
 import { join } from 'path';
-import { unlink } from 'fs'
-import { Resolver } from 'dns';
+import { unlink } from 'fs';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -132,14 +131,15 @@ export class UserController {
         return new Promise((resolve) => {
           unlink('uploads/' + user1.avatar, function (err) {
             if (err) {
-              throw (err);
+              throw err;
             }
             resolve(1);
           });
         });
-      }
-      return await ret()
-      .catch(err => {throw err})
+      };
+      return await ret().catch((err) => {
+        throw err;
+      });
     }
   }
 
