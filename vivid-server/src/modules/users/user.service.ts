@@ -11,6 +11,9 @@ import { getSessionStore } from '$/auth/auth-session';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
+import { IGame } from '~/models/match.interface';
+import { WarEntity } from '~/models/war.entity';
+import { WarsService } from '../wars/wars.service';
 import { authenticator } from 'otplib';
 import * as cryptoRandomString from 'secure-random-string';
 import { TypeORMSession } from '~/models/session.entity';
@@ -40,6 +43,7 @@ export class UserService {
     private userRepository: Repository<UserEntity>,
     private configService: ConfigService,
     private guildsService: GuildsService,
+    private warsService: WarsService,
   ) {}
 
   // find user, optional resolving
@@ -79,6 +83,31 @@ export class UserService {
       .then((response) => {
         return <UserEntity>response.raw[0];
       }); // TODO check empty result
+  }
+
+  async findUserMatches(id: string): Promise<UserEntity> {
+    return await this.userRepository
+      .findOne({
+        relations: [
+          'joined_channels',
+          'joined_channels.channel',
+          'guild',
+          'guild.users',
+          'matches_req',
+          'matches_req.user_req',
+          'matches_req.user_acpt',
+          'matches_acpt',
+          'matches_acpt.user_req',
+          'matches_acpt.user_acpt',
+        ],
+        where: {
+          id,
+        },
+      })
+      .catch((error) => {
+        if (error.code === '22P02') throw new NotFoundException();
+        throw error;
+      });
   }
 
   // invalidates sessions
@@ -203,5 +232,68 @@ export class UserService {
           throw new BadRequestException({ code: 'inuse' });
         throw err;
       });
+  }
+
+  async getWarId(gamestats: IGame): Promise<WarEntity> {
+    const user_acpt = await this.userRepository.findOne({
+      relations: ['guild', 'guild.current_war'],
+      where: {
+        id: gamestats.user_id_acpt,
+      },
+    });
+
+    const user_req = await this.userRepository.findOne({
+      relations: ['guild', 'guild.current_war'],
+      where: {
+        id: gamestats.user_id_req,
+      },
+    });
+    console.log('user_acpt: \n', user_acpt);
+    console.log('user_req: \n', user_req);
+    if (
+      user_acpt.guild &&
+      user_acpt.guild.current_war &&
+      user_req.guild &&
+      user_req.guild.current_war
+    ) {
+      if (
+        user_acpt.guild.current_war.id === user_req.guild.current_war.id &&
+        user_acpt.guild.id !== user_req.guild.id
+      ) {
+        console.log('found mutual war');
+        if (gamestats.winner_id === user_req.id)
+          await this.warsService.updateWarWinReq(
+            user_acpt.guild.current_war.id,
+          );
+        else
+          await this.warsService.updateWarWinAccept(
+            user_acpt.guild.current_war.id,
+          );
+        return user_acpt.guild.current_war;
+      }
+    }
+  }
+  // let war_user_acpt = user_acpt.guild.current_war.id;
+  // let war_user_req = user_req.guild.current_war.id;
+  // if (war_user_acpt === war_user_req)
+  //   return war_user_acpt;
+  // return null;
+
+  async updateAvatarName(userId: string, filename: string): Promise<any> {
+    return await this.userRepository
+      .createQueryBuilder()
+      .update()
+      .set({ avatar: filename })
+      .where({ id: userId })
+      .execute();
+  }
+
+  async deleteAvatar(userId: string): Promise<any> {
+    return await this.userRepository
+      .createQueryBuilder()
+      .update()
+      .set({ avatar: null })
+      .where({ id: userId })
+      .execute();
   }
 }
