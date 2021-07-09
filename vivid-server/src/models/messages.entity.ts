@@ -1,4 +1,10 @@
-import { IsDate, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsDate,
+  IsJSON,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
 import {
   Column,
   Entity,
@@ -17,6 +23,12 @@ export class MessageEntity {
   @Column()
   content: string;
 
+  @Column({ type: 'json', nullable: true, default: null })
+  aux_content: IAuxContent;
+
+  @Column({ default: 0 })
+  message_type: number;
+
   @Column({ type: 'uuid' })
   user: string;
 
@@ -30,10 +42,14 @@ export class IMessage {
   user: string;
   channel: string;
   content: string;
+  aux_content: IAuxContent;
+  message_type: number;
 }
 
 export class IMessageInput {
   content: string;
+  message_type?: number;
+  aux_content?: IAuxContent;
   user: string;
   channel: string;
 }
@@ -41,6 +57,14 @@ export class IMessageInput {
 export class MessageDto {
   @IsNotEmpty()
   content: string;
+
+  @IsOptional()
+  @IsNumber()
+  message_type?: number;
+
+  @IsOptional()
+  @IsJSON()
+  aux_content?: IAuxContent;
 }
 
 export class PaginationDto {
@@ -51,4 +75,9 @@ export class PaginationDto {
   @IsOptional()
   @IsDate()
   date2: Date;
+}
+
+export interface IAuxContent {
+  type: number;
+  aux_content: string;
 }

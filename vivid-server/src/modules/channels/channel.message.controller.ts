@@ -72,6 +72,8 @@ export class ChannelMessageController {
   ): Promise<IMessage> {
     const input: IMessageInput = {
       content: messageBody.content,
+      aux_content: messageBody.aux_content,
+      message_type: messageBody.message_type,
       user: user.id,
       channel: channelId,
     };
