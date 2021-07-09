@@ -97,7 +97,7 @@ export class PongService {
         clients.emit('gameOver', winner.userId);
         clearInterval(intervalId);
 
-        this.matchService.insertGame({
+        this.matchService.createGame({
           user_id_req: game.players[0].userId,
           points_req: game.players[0].score,
           user_id_acpt: game.players[1].userId,

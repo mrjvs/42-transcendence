@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
-import { IMatch } from '@/match.interface';
+import { IGame } from '@/match.interface';
 import { MatchesEntity } from '@/matches.entity';
 import { UserService } from '$/users/user.service';
 
@@ -17,10 +17,16 @@ export class MatchesService {
     return await this.matchesRepository.createQueryBuilder().select().execute();
   }
 
-  async insertGame(match: IMatch): Promise<UpdateResult> {
-    // console.log('stats', match);
-    const user_req = await this.userService.findUser(match.user_id_req);
-    const user_acpt = await this.userService.findUser(match.user_id_acpt);
+  async createGame(gamestats: IGame): Promise<UpdateResult> {
+    gamestats.winner_id =
+      gamestats.points_acpt > gamestats.points_req
+        ? gamestats.user_id_acpt
+        : gamestats.user_id_req;
+    // console.log('stats', gamestats);
+    const user_req = await this.userService.findUser(gamestats.user_id_req);
+    const user_acpt = await this.userService.findUser(gamestats.user_id_acpt);
+    if (!user_req || !user_acpt) return;
+    const war = await this.userService.getWarId(gamestats);
     // console.log('user_req', user_req);
     // console.log('user_acpt', user_acpt);
     return await this.matchesRepository
@@ -29,11 +35,12 @@ export class MatchesService {
       .values({
         user_req: user_req,
         user_acpt: user_acpt,
-        points_req: match.points_req,
-        points_acpt: match.points_acpt,
-        add_ons: match.add_ons,
-        game_type: match.game_type,
-        winner_id: match.winner_id,
+        points_req: gamestats.points_req,
+        points_acpt: gamestats.points_acpt,
+        add_ons: gamestats.add_ons,
+        game_type: gamestats.game_type,
+        winner_id: gamestats.winner_id,
+        war_id: war,
       })
       .execute();
   }

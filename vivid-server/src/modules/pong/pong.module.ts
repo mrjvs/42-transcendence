@@ -1,26 +1,16 @@
-import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GuildsEntity } from '~/models/guilds.entity';
-import { MatchesEntity } from '~/models/matches.entity';
 import { UserEntity } from '~/models/user.entity';
-import { GuildsService } from '../guilds/guilds.service';
-import { MatchesService } from '../matches/matches.service';
-import { UserService } from '../users/user.service';
+import { MatchesModule } from '../matches/matches.module';
 import { PongService } from './pong.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, GuildsEntity, MatchesEntity]),
+    TypeOrmModule.forFeature([UserEntity]),
+    forwardRef(() => MatchesModule),
   ],
   controllers: [],
-  providers: [
-    PongService,
-    UserService,
-    ConfigService,
-    GuildsService,
-    MatchesService,
-  ],
+  providers: [PongService],
   exports: [PongService],
 })
 export class PongModule {}

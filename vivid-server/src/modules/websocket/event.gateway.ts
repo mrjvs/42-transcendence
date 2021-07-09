@@ -9,8 +9,9 @@ import {
 import { Server, Socket } from 'socket.io';
 import { IMessage } from '@/messages.entity';
 import { UserService } from '$/users/user.service';
-import { IJoinedChannel } from '@/joined_channels.entity';
-import { PongService } from '$/pong/pong.service';
+import { IJoinedChannel } from '~/models/joined_channels.entity';
+import { UserEntity } from '~/models/user.entity';
+import { PongService } from '../pong/pong.service';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -26,7 +27,15 @@ export class EventGateway implements OnGatewayConnection {
     await this.putUserInSocket(socket);
   }
 
-  sendChannelMessage(message: IMessage, joins: IJoinedChannel[]) {
+  sendChannelMessage(
+    message: IMessage,
+    joins: IJoinedChannel[],
+    user: UserEntity,
+  ) {
+    const data = {
+      message,
+      user,
+    };
     const sockets = this.server.sockets.connected;
     const mappedJoins = joins.reduce((a, v: IJoinedChannel) => {
       a[v.user as string] = true;
@@ -36,7 +45,7 @@ export class EventGateway implements OnGatewayConnection {
       const client = sockets[socketId];
       if (!client.auth) continue; // skip user if not authed
       if (!mappedJoins[client.auth]) continue; // skip if user not in channel
-      client.emit('channel_message', message);
+      client.emit('channel_message', data);
     }
   }
 
