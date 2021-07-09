@@ -13,7 +13,7 @@ import { UserEntity } from '@/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { IsOptional, IsString } from 'class-validator';
-import { authenticator } from 'otplib';
+import { AuthService } from './auth.service';
 
 class TwoFactorDto {
   @IsOptional()
@@ -23,7 +23,10 @@ class TwoFactorDto {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private authService: AuthService,
+  ) {}
 
   @Get('/login')
   @UseGuards(IntraAuthGuard)
@@ -38,52 +41,16 @@ export class AuthController {
     @User() usr: UserEntity,
     @Body() body: TwoFactorDto,
   ): Promise<{ status: boolean; message?: string }> {
-    // if already passed, return true
-    if ((req.session as any).twofactor === 'passed') {
-      return {
-        status: true,
-      };
-    }
-
-    // if 2fa not enabled. pass check immediately
-    if (!usr.hasTwoFactorEnabled()) {
-      (req.session as any).twofactor = 'passed';
-      await req.session.save();
-      return {
-        status: true,
-      };
-    }
-
-    // check if token exists
-    if (!body.token) {
-      return {
-        status: false,
-        message: 'requireToken',
-      };
-    }
-
-    // verify token
-    const tokenCorrect = authenticator.verify({
-      token: body.token,
-      secret: usr.twofactor.secret,
-    });
-    const isInBackupCodes = !!usr.twofactor.backupCodes.find(
-      (v) => v === body.token,
+    const res = await this.authService.handleTwoFactor(
+      req.session,
+      usr,
+      body.token,
     );
-    if (!tokenCorrect && !isInBackupCodes) {
+    if (res.constructor === String)
       return {
         status: false,
-        message: 'invalidToken',
+        message: res as string,
       };
-    }
-
-    if (isInBackupCodes) {
-      // TODO remove code from backup codes
-    }
-
-    // success
-    (req.session as any).twofactor = 'passed';
-    await req.session.save();
     return {
       status: true,
     };

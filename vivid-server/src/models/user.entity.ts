@@ -10,16 +10,16 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { Expose, Transform } from 'class-transformer';
 import { MatchesEntity } from './matches.entity';
-import { IsString } from 'class-validator';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  // TODO unique name
-  @Column({ nullable: true, default: null })
+  @Column({ nullable: true, default: null, unique: true })
   name: string;
 
   @CreateDateColumn()
@@ -72,14 +72,61 @@ export class UserEntity extends BaseEntity {
     return this.twofactor !== null;
   }
 
-  // TODO add guards for account not being setup
   isAccountSetup() {
-    // return this.name && this.name.length > 0;
-    return true;
+    return this.name && this.name.length > 0;
   }
 }
 
 export class UsernameChangeDto {
   @IsString()
+  @IsNotEmpty()
   username: string;
+}
+
+export interface INewUser {
+  intra_id: string;
+}
+
+export interface IUser {
+  intra_id: string;
+  name: string;
+  avatar_colors: string[];
+}
+
+export class UnrelatedUser {
+  @Expose() id: string;
+  @Expose() name: string;
+  @Expose() avatar_colors: string[];
+}
+
+export class RelatedUser extends UnrelatedUser {
+  @Expose() intra_id: string;
+  @Expose() site_admin: boolean;
+
+  @Expose()
+  @Transform(
+    ({ obj, value }) =>
+      value.constructor === String
+        ? value
+        : obj.joined_channels
+            .filter((v: any) => v.is_joined)
+            .map((v: any) =>
+              v.channel.constructor === String ? v.channel : v.channel.id,
+            ),
+    { toClassOnly: true },
+  )
+  joined_channels: string[] | string;
+}
+
+export class FullDetailsUser extends RelatedUser {
+  @Expose()
+  @Transform(({ obj }) => obj.joined_channels, { toClassOnly: true })
+  joined_channels: any;
+
+  private twofactor: any;
+
+  @Expose()
+  get twoFactorEnabled() {
+    return !!this.twofactor;
+  }
 }

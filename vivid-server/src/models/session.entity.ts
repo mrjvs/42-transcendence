@@ -10,6 +10,6 @@ export class TypeORMSession implements ISession {
   @PrimaryColumn('varchar', { length: 255 })
   id: string;
 
-  @Column('text')
+  @Column('json')
   json: string;
 }

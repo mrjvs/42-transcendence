@@ -4,6 +4,6 @@ export interface IGame {
   points_req: number;
   points_acpt: number;
   add_ons?: string;
-  game_type: string;
+  game_type?: string;
   winner_id?: string;
 }

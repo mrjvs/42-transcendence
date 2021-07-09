@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
-import { IGame } from '~/models/match.interface';
-import { MatchesEntity } from '~/models/matches.entity';
-import { UserService } from '../users/user.service';
+import { IGame } from '@/match.interface';
+import { MatchesEntity } from '@/matches.entity';
+import { UserService } from '$/users/user.service';
 
 @Injectable()
 export class MatchesService {

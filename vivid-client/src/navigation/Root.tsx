@@ -10,6 +10,7 @@ import { ChannelView } from '../views/ChannelView';
 import { UserContext } from '../hooks/useUser';
 import { SocketContext } from '../hooks/useWebsocket';
 import { AccountSetupModal } from '../components/styled/modals/AccountSetup.modal';
+import { PongView } from '../views/PongView';
 
 export function RootNavigation() {
   const userData = React.useContext(UserContext);
@@ -19,7 +20,7 @@ export function RootNavigation() {
 
   return (
     <BrowserRouter>
-      <AccountSetupModal open={open} />
+      <AccountSetupModal open={open} close={() => setOpen(false)} />
       <div className="wrapper-alert">
         {socketData.clientState !== 'CONNECTED' ? (
           <div className="alert">
@@ -71,6 +72,10 @@ export function RootNavigation() {
               </Route>
               <Route exact path="/channel/:id">
                 <ChannelView />
+              </Route>
+              <Route exact path="/pong">
+                <p>pong</p>
+                <PongView />
               </Route>
               <Route path="*">
                 <p>Not found</p>

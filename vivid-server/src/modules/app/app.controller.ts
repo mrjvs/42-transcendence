@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import { AppService } from './app.service';
+// import { Cron } from '@nestjs/schedule';
 
 @Controller()
 export class AppController {
@@ -11,8 +11,8 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Cron('*/30 * * * * *')
-  runEvery10Seconds() {
-    console.log('Every 30 seconds');
-  }
+  // @Cron('*/30 * * * * *')
+  // runEvery10Seconds() {
+  //   console.log('Every 30 seconds');
+  // }
 }
