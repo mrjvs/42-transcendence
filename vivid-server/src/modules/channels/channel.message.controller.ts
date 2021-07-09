@@ -6,6 +6,7 @@ import {
   UseGuards,
   Param,
   Body,
+  Put,
   // Query,
 } from '@nestjs/common';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
@@ -25,11 +26,15 @@ import {
 import { UserEntity } from '@/user.entity';
 import { ChannelMessageService } from './channel.message.service';
 import { Observable } from 'rxjs';
+import { PongService } from '../pong/pong.service';
 
 @Controller('channels/:id/messages')
 @UseGuards(AuthenticatedGuard)
 export class ChannelMessageController {
-  constructor(private messageService: ChannelMessageService) {}
+  constructor(
+    private messageService: ChannelMessageService,
+    private pongService: PongService,
+  ) {}
 
   // TODO time based pagination (make it better)
   @Get('/')
@@ -95,5 +100,16 @@ export class ChannelMessageController {
       messageId,
       mod ? undefined : user.id, // if moderator, dont check for message owner
     );
+  }
+
+  @Post('/game')
+  createGame(@User() user: UserEntity) {
+    const gameId = this.pongService.createGame();
+    return this.pongService.joinGame(user.id, gameId);
+  }
+
+  @Put('/game/:gameId')
+  joinGame(@Param('gameId') @User() user: UserEntity, gameId: string) {
+    return this.pongService.joinGame(user.id, gameId);
   }
 }

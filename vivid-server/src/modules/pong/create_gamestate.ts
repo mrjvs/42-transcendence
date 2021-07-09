@@ -1,6 +1,6 @@
 export function createGameState(gameId: string) {
   return {
-    gameId: gameId,
+    gameId,
     settings: {
       controls: 'keys',
       multiPlayer: false,
@@ -41,5 +41,6 @@ export function createGameState(gameId: string) {
     playerWidth: 0.02,
     playerHeight: 0.3,
     playerColor: 'PURPLE',
+    isPlaying: false,
   };
 }

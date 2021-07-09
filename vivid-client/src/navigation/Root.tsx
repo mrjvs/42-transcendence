@@ -9,6 +9,7 @@ import { SidebarLink } from '../components/styled/sidebar/SidebarLink';
 import { ChannelView } from '../views/ChannelView';
 import { UserContext } from '../hooks/useUser';
 import { PongView } from '../views/PongView';
+import { GameView } from '../views/GameView';
 
 export function RootNavigation() {
   const userData = React.useContext(UserContext);
@@ -57,6 +58,10 @@ export function RootNavigation() {
             </Route>
             <Route exact path="/pong">
               <p>pong</p>
+              <GameView />
+            </Route>
+            <Route exact path="/pong/:id">
+              <p>game</p>
               <PongView />
             </Route>
             <Route path="*">

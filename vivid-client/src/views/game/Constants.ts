@@ -43,4 +43,5 @@ export interface IGameState {
   playerWidth: number;
   playerHeight: number;
   playerColor: string;
+  isPlaying: boolean;
 }

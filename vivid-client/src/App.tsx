@@ -4,7 +4,7 @@ import { RootNavigation } from './navigation/Root';
 
 function UserProtect(props: any) {
   if (props.userData.done && !props.userData.isLoggedIn) {
-    window.location.href = 'http://localhost:8080/api/v1/auth/login';
+    // window.location.href = 'http://localhost:8080/api/v1/auth/login';
     return <p>You are not logged in</p>;
   }
   if (props.userData.error) return <p>Failed to log in</p>;

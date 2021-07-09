@@ -53,17 +53,17 @@ export class EventGateway implements OnGatewayConnection {
     } catch (err) {}
   }
 
-  @SubscribeMessage('newGame')
-  newGame(@ConnectedSocket() client: Socket) {
-    if (!client.auth) return; // TODO do we need to throw something (unauthorized) here?
-    this.pongService.newGame(client);
-  }
+  // @SubscribeMessage('newGame')
+  // newGame(@ConnectedSocket() client: Socket) {
+  //   if (!client.auth) return; // TODO do we need to throw something (unauthorized) here?
+  //   this.pongService.newGame(client);
+  // }
 
-  @SubscribeMessage('joinGame')
-  joinGame(@ConnectedSocket() client: Socket, @MessageBody() roomName: string) {
-    if (!client.auth) return;
-    this.pongService.joinGame(client, roomName);
-  }
+  // @SubscribeMessage('joinGame')
+  // joinGame(@ConnectedSocket() client: Socket, @MessageBody() roomName: string) {
+  //   if (!client.auth) return;
+  //   this.pongService.joinGame(client, roomName);
+  // }
 
   @SubscribeMessage('ready')
   readyEvent(

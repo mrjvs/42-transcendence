@@ -10,7 +10,7 @@ interface CanvasProps {
 
 export function Canvas({ width, height }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [client2, setClient] = useState<any>(null);
+  // const [client2, setClient] = useState<any>(null); // TODO nodig?
   const [clientState, setClientState] = useState('CONNECTING');
 
   let canvas: HTMLCanvasElement;
@@ -22,12 +22,9 @@ export function Canvas({ width, height }: CanvasProps) {
       path: '/api/v1/events',
     });
 
-    setClient(client);
-
     client.on('connect', () => {
-      console.log('connected');
       setClientState('CONNECTED');
-      clientState;
+      client.emit('ready', 'e372e47c-3649-44c9-9455-c48f84e3d80d');
     });
 
     client.on('init', () => {
@@ -49,7 +46,6 @@ export function Canvas({ width, height }: CanvasProps) {
     });
 
     client.on('disconnect', () => {
-      console.log('disconnected');
       setClientState('DISCONNECTED');
     });
 
@@ -57,7 +53,9 @@ export function Canvas({ width, height }: CanvasProps) {
       alert(`User: "${winner}" won the game`);
     });
 
-    client.on('start', (roomName: string) => client.emit('start', roomName));
+    client.on('start', (roomName: string) => {
+      client.emit('start', roomName);
+    });
 
     function keydown(event: KeyboardEvent) {
       if (event.key === 'w') client.emit('keydown', -0.01);
@@ -76,26 +74,12 @@ export function Canvas({ width, height }: CanvasProps) {
       client.destroy();
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('keyup', keyup);
+      document.removeEventListener('mousemove', mouseMove);
     };
   }, []);
 
-  function newGame() {
-    client2.emit('newGame');
-  }
-
-  function joinGame() {
-    client2.emit('joinGame', 'e372e47c-3649-44c9-9455-c48f84e3d80d'); // TODO remove hardcoded
-  }
-
-  function ready() {
-    client2.emit('ready', 'e372e47c-3649-44c9-9455-c48f84e3d80d'); // TODO remove hardcoded
-  }
-
   return (
     <>
-      <button onClick={newGame}>New Game</button>
-      <button onClick={joinGame}>Join Game</button>
-      <button onClick={ready}>Ready</button>
       <canvas ref={canvasRef} height={height} width={width} />
     </>
   );
