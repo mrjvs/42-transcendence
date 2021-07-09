@@ -14,7 +14,7 @@ jobs:
       - name: Setup
         uses: actions/setup-node@v1
         with:
-          node-version: "15.x"
+          node-version: "16.x"
       - name: Installing dependencies
         working-directory: ${{env.working-directory}}
         run: npm ci
@@ -33,7 +33,9 @@ jobs:
       - name: Setup
         uses: actions/setup-node@v1
         with:
-          node-version: "15.x"
+          node-version: "16.x"
+      - name: Setting up npm
+        run: npm install -g npm@6
       - name: Installing dependencies
         working-directory: ${{env.working-directory}}
         run: npm ci
