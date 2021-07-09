@@ -1,12 +1,10 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { MessageBox } from '../components/base/MessageBox';
-import { Heading } from '../components/styled/Heading';
 import { Message, NoMessage } from '../components/styled/Message';
-import { UserDropdown } from '../components/styled/UserDropdown';
 import { useMessages } from '../hooks/useMessages';
-import './ChannelView.css';
 import { MainLayout } from './layouts/MainLayout';
+import './ChannelView.css';
 
 export function ChannelView() {
   const scrollEl = React.useRef(null);

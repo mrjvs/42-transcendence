@@ -93,7 +93,6 @@ function MainRouter() {
 }
 
 export function RootNavigation() {
-  const userData = React.useContext(UserContext);
   const socketData = React.useContext(SocketContext);
 
   const [open, setOpen] = React.useState(false);
