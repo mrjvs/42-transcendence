@@ -1,5 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { UserService } from '$/users/user.service';
+import { authenticator } from 'otplib';
+import { UserEntity } from '~/models/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -16,5 +18,52 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async passTwoFactor(session: any): Promise<any> {
+    (session as any).twofactor = 'passed';
+    await session.save();
+  }
+
+  async handleTwoFactor(
+    session: any,
+    usr: UserEntity,
+    token?: string,
+  ): Promise<boolean | string> {
+    if (session.twofactor === 'passed') return true;
+
+    if (!usr.hasTwoFactorEnabled()) {
+      await this.passTwoFactor(session);
+      return true;
+    }
+
+    // check if token exists
+    if (!token) {
+      return 'requireToken';
+    }
+
+    // verify token
+    const tokenCorrect = authenticator.verify({
+      token: token,
+      secret: usr.twofactor.secret,
+    });
+    const isInBackupCodes = !!usr.twofactor.backupCodes.find(
+      (v) => v === token,
+    );
+    if (!tokenCorrect && !isInBackupCodes) {
+      return 'invalidToken';
+    }
+
+    if (isInBackupCodes) {
+      const data = JSON.parse(JSON.stringify(usr.twofactor)); // deep copy
+      data.backupCodes = data.backupCodes.filter(
+        (code: string) => code !== token,
+      );
+      await this.userService.setTwoFactorData(usr.id, data);
+    }
+
+    // success
+    await this.passTwoFactor(session);
+    return true;
   }
 }

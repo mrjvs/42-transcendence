@@ -7,8 +7,7 @@ import {
 } from 'typeorm';
 import { IsBoolean, IsNotEmpty, IsOptional, IsPositive } from 'class-validator';
 import { ChannelEntity } from './channel.entity';
-import { UserEntity } from './user.entity';
-import { IUser } from './user.interface';
+import { IUser, UserEntity } from './user.entity';
 
 @Unique('USER_JOIN', ['user', 'channel'])
 @Entity('joined_channels')
@@ -50,7 +49,6 @@ export class JoinedChannelEntity {
 
 export class IJoinedChannel {
   id: string;
-  channel: string;
   user: string | IUser;
 }
 

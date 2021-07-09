@@ -1,26 +1,42 @@
 import React from 'react';
+import { LoadingScreen } from './components/styled/LoadingScreen';
+import { useMessageContext, MessageContext } from './hooks/useMessages';
 import { UserContext, useUser } from './hooks/useUser';
+import { UsersContext, useUsersContext } from './hooks/useUsers';
+import { useWebsocket, SocketContext } from './hooks/useWebsocket';
 import { RootNavigation } from './navigation/Root';
 
-function UserProtect(props: any) {
-  if (props.userData.done && !props.userData.isLoggedIn) {
-    // window.location.href = 'http://localhost:8080/api/v1/auth/login';
-    return <p>You are not logged in</p>;
-  }
-  if (props.userData.error) return <p>Failed to log in</p>;
-  if (props.userData.loading) return <p>Loading...</p>;
-  if (!props.userData.done) return null;
-  return <div>{props.children}</div>;
+function MessageStoreInit(props: { children: any }) {
+  const messageData = useMessageContext();
+  return (
+    <MessageContext.Provider value={messageData}>
+      {props.children}
+    </MessageContext.Provider>
+  );
+}
+
+function StoreInit(props: { children: any }) {
+  const usersData = useUsersContext();
+  return (
+    <UsersContext.Provider value={usersData}>
+      <MessageStoreInit>{props.children}</MessageStoreInit>
+    </UsersContext.Provider>
+  );
 }
 
 function App() {
   const userData = useUser();
+  const socketData = useWebsocket();
 
   return (
     <UserContext.Provider value={userData}>
-      <UserProtect userData={userData}>
-        <RootNavigation />
-      </UserProtect>
+      <SocketContext.Provider value={socketData}>
+        <StoreInit>
+          <LoadingScreen userData={userData}>
+            <RootNavigation />
+          </LoadingScreen>
+        </StoreInit>
+      </SocketContext.Provider>
     </UserContext.Provider>
   );
 }

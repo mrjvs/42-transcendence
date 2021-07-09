@@ -4,13 +4,19 @@ import './Message.css';
 export function Message(props: {
   username: string;
   tag?: string;
+  userColors: string[];
   messages: string[];
   blocked: boolean;
 }) {
   return (
     <div className={`messageWrapper ${props.blocked ? 'blocked' : ''}`}>
       <div>
-        <div className="messageUserAvatar"></div>
+        <div
+          className="messageUserAvatar"
+          style={{
+            background: `linear-gradient(to right, ${props.userColors[0]}, ${props.userColors[1]})`,
+          }}
+        ></div>
       </div>
       <div>
         <p className="messageUserName">

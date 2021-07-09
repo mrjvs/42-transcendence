@@ -80,7 +80,7 @@ export class ChannelMessageController {
       user: user.id,
       channel: channelId,
     };
-    return this.messageService.postMessage(input);
+    return this.messageService.postMessage(user, input);
   }
 
   @Delete('/:message')

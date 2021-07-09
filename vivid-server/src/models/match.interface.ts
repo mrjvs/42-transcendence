@@ -1,6 +1,4 @@
-import { WarEntity } from './war.entity';
-
-export interface IMatch {
+export interface IGame {
   user_id_req: string;
   user_id_acpt: string;
   points_req: number;
@@ -8,5 +6,4 @@ export interface IMatch {
   add_ons?: string;
   game_type?: string;
   winner_id?: string;
-  war_id?: WarEntity;
 }

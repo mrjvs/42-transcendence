@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { WarEntity } from './war.entity';
 
 @Entity({ name: 'matches' })
 export class MatchesEntity {
@@ -39,6 +40,7 @@ export class MatchesEntity {
   @Column()
   winner_id: string;
 
-  @Column({ default: null })
-  war_id: string;
+  @ManyToOne(() => WarEntity, (war) => war.id)
+  @JoinColumn({ name: 'war_id' })
+  war_id: WarEntity;
 }

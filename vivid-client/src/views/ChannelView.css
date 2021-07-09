@@ -6,8 +6,11 @@
 
 .contentHeader {
   background-color: #121727;
-  padding: 0.3rem 1.5rem;
+  padding: 0 1.5rem;
   color: white;
+  height: 4.5rem;
+  display: flex;
+  align-items: center;
 }
 
 .channelWrapper {

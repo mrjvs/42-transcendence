@@ -1,15 +1,17 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { WarEntity } from '@/war.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WarsService } from './wars.service';
 import { WarsController } from './wars.controller';
 import { WarTimeEntity } from '@/war_time.entity';
-import { GuildsEntity } from '@/guilds.entity';
-import { GuildsService } from '$/guilds/guilds.service';
+import { GuildsModule } from '../guilds/guilds.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WarEntity, WarTimeEntity, GuildsEntity])],
-  providers: [WarsService, GuildsService],
+  imports: [
+    TypeOrmModule.forFeature([WarEntity, WarTimeEntity]),
+    forwardRef(() => GuildsModule),
+  ],
+  providers: [WarsService],
   controllers: [WarsController],
   exports: [WarsService],
 })

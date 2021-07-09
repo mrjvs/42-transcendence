@@ -32,6 +32,11 @@ export class GuildsController {
     return this.guildsService.getAll();
   }
 
+  @Get(':anagram')
+  async seeOne(@Param('anagram') anagram: string): Promise<GuildsEntity> {
+    return this.guildsService.findGuild(anagram);
+  }
+
   @Patch('change_anagram/:anagram')
   async changeGuildAnagram(
     @Param('anagram') anagram: string,
@@ -55,6 +60,9 @@ export class GuildsController {
     @Body() guild: IGuild,
     @User() user: UserEntity,
   ): Promise<UserEntity> {
+    //only for testing
+    // user = await this.userService.findUser('de33df29-0037-44d9-9dfe-a6e4010a0a77');
+    //only for testing
     this.guildsService.createGuild(user, guild);
     return this.userService.joinGuild(user.id, guild.anagram);
   }
