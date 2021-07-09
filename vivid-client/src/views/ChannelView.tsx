@@ -3,8 +3,10 @@ import { useParams } from 'react-router-dom';
 import { MessageBox } from '../components/base/MessageBox';
 import { Heading } from '../components/styled/Heading';
 import { Message, NoMessage } from '../components/styled/Message';
+import { UserDropdown } from '../components/styled/UserDropdown';
 import { useMessages } from '../hooks/useMessages';
 import './ChannelView.css';
+import { MainLayout } from './layouts/MainLayout';
 
 export function ChannelView() {
   const scrollEl = React.useRef(null);
@@ -64,42 +66,39 @@ export function ChannelView() {
   }, [messageData.channelInfo, messageData.messages, messageData.users]);
 
   return (
-    <div className="contentContainer">
-      <div className="contentHeader">
-        <Heading size="small">
-          {messageData.messageState.done ? messageData.channelInfo.title : '‎'}
-        </Heading>
-      </div>
-      <div className="channelWrapper">
-        <div className="channelScrollWrapper">
-          <div className="channelContent">
-            {messageData.messageState.done ? (
-              <>
-                <NoMessage />
-                <div>
-                  {reducedMessages.map((v: any) => (
-                    <Message
-                      key={v.id}
-                      messages={v.messages}
-                      username={v.userData.name}
-                      blocked={false}
-                      userColors={v.userData.avatar_colors}
-                    />
-                  ))}
-                </div>
-              </>
-            ) : null}
-            <div ref={scrollEl} />
-          </div>
-        </div>
-        <div className="channelBottomWrapper">
-          <MessageBox
-            placeholder="Type your message here..."
-            disabled={!messageData.messageState.done}
-            onSend={(text: string) => messageData.sendMessage(text)}
-          />
+    <MainLayout
+      title={
+        messageData.messageState.done ? messageData.channelInfo.title : '‎'
+      }
+    >
+      <div className="channelScrollWrapper">
+        <div className="channelContent">
+          {messageData.messageState.done ? (
+            <>
+              <NoMessage />
+              <div>
+                {reducedMessages.map((v: any) => (
+                  <Message
+                    key={v.id}
+                    messages={v.messages}
+                    username={v.userData.name}
+                    blocked={false}
+                    userColors={v.userData.avatar_colors}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
+          <div ref={scrollEl} />
         </div>
       </div>
-    </div>
+      <div className="channelBottomWrapper">
+        <MessageBox
+          placeholder="Type your message here..."
+          disabled={!messageData.messageState.done}
+          onSend={(text: string) => messageData.sendMessage(text)}
+        />
+      </div>
+    </MainLayout>
   );
 }

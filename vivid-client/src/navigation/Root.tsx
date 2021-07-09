@@ -11,6 +11,86 @@ import { UserContext } from '../hooks/useUser';
 import { SocketContext } from '../hooks/useWebsocket';
 import { AccountSetupModal } from '../components/styled/modals/AccountSetup.modal';
 import { PongView } from '../views/PongView';
+import { SettingsView } from '../views/SettingsView';
+
+function SideBarRouter() {
+  const userData = React.useContext(UserContext);
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <div className="wrapper">
+      <AccountSetupModal open={open} close={() => setOpen(false)} />
+      <nav className="sideNav">
+        <div className="top">
+          <Heading size="small">Vivid</Heading>
+        </div>
+        <ActionRow label="guild" />
+        <SidebarLink link="/guilds">
+          <Icon type="gear" />
+          Guild Settings
+        </SidebarLink>
+        <SidebarLink link="/tournaments">
+          <Icon type="flag" />
+          Tournaments
+        </SidebarLink>
+        <SidebarLink link="/wars">
+          <Icon type="award" />
+          War History
+        </SidebarLink>
+        <SidebarLink link="/stats">
+          <Icon type="stats" />
+          Statistics
+        </SidebarLink>
+        <ActionRow label="channel">
+          <Button
+            badge={1}
+            small={true}
+            type="secondary"
+            onclick={() => setOpen(true)}
+          >
+            <Icon type="plus" />
+            New
+          </Button>
+        </ActionRow>
+        {userData.user.joined_channels.map((v: any) => (
+          <SidebarLink key={v.channel.id} link={`/channel/${v.channel.id}`}>
+            {v.channel.title}
+          </SidebarLink>
+        ))}
+      </nav>
+      <div className="content">
+        <Switch>
+          <Route exact path="/">
+            <p>home</p>
+          </Route>
+          <Route exact path="/channel/:id">
+            <ChannelView />
+          </Route>
+          <Route exact path="/pong">
+            <p>pong</p>
+            <PongView />
+          </Route>
+          <Route path="*">
+            <p>Not found</p>
+          </Route>
+        </Switch>
+      </div>
+    </div>
+  );
+}
+
+function MainRouter() {
+  return (
+    <Switch>
+      <Route exact path="/settings">
+        <SettingsView />
+      </Route>
+      <Route path="*">
+        <SideBarRouter />
+      </Route>
+    </Switch>
+  );
+}
 
 export function RootNavigation() {
   const userData = React.useContext(UserContext);
@@ -28,61 +108,7 @@ export function RootNavigation() {
             Not connected to the Vivid servers
           </div>
         ) : null}
-        <div className="wrapper">
-          <nav className="sideNav">
-            <Heading size="big">Vivid</Heading>
-            <ActionRow label="guild" />
-            <SidebarLink link="/guilds">
-              <Icon type="gear" />
-              Guild Settings
-            </SidebarLink>
-            <SidebarLink link="/tournaments">
-              <Icon type="flag" />
-              Tournaments
-            </SidebarLink>
-            <SidebarLink link="/wars">
-              <Icon type="award" />
-              War History
-            </SidebarLink>
-            <SidebarLink link="/stats">
-              <Icon type="stats" />
-              Statistics
-            </SidebarLink>
-            <ActionRow label="channel">
-              <Button
-                badge={1}
-                small={true}
-                type="secondary"
-                onclick={() => setOpen(true)}
-              >
-                <Icon type="plus" />
-                New
-              </Button>
-            </ActionRow>
-            {userData.user.joined_channels.map((v: any) => (
-              <SidebarLink key={v.channel.id} link={`/channel/${v.channel.id}`}>
-                {v.channel.title}
-              </SidebarLink>
-            ))}
-          </nav>
-          <div className="content">
-            <Switch>
-              <Route exact path="/">
-                <p>home</p>
-              </Route>
-              <Route exact path="/channel/:id">
-                <ChannelView />
-              </Route>
-              <Route exact path="/pong">
-                <p>pong</p>
-                <PongView />
-              </Route>
-              <Route path="*">
-                <p>Not found</p>
-              </Route>
-            </Switch>
-          </div>
-        </div>
+        <MainRouter />
       </div>
     </BrowserRouter>
   );
