@@ -15,9 +15,8 @@ import {
 import { UserService } from './user.service';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IUserParam, UserParam } from '~/middleware/decorators/login.decorator';
-import { FullDetailsUser, IUser, UserEntity } from '@/user.entity';
+import { IUser, UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
-import { formatObject } from '~/utils/format';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
@@ -29,17 +28,6 @@ import { Response } from 'express';
 @UseGuards(AuthenticatedGuard)
 export class UserController {
   constructor(private userService: UserService) {}
-
-  // TODO private vs public data
-  @Get(':id')
-  async findUser(
-    @UserParam('id') usr: IUserParam,
-    @User() user: UserEntity,
-  ): Promise<any> {
-    if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
-    const userRet = await this.userService.findUser(usr.id);
-    return formatObject(FullDetailsUser, userRet);
-  }
 
   @Get('matches/:id')
   async findUsermatches(@Param('id') id: string): Promise<IUser | void> {
