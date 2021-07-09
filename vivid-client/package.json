@@ -21,6 +21,7 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
+    "s": "react-scripts start",
     "start": "cd public; node ../docker/generateEnv.js ../.env; cd ..; react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
