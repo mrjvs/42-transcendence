@@ -2,7 +2,6 @@ import {
   IsDate,
   IsJSON,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
 } from 'class-validator';
 import {
@@ -59,10 +58,6 @@ export class MessageDto {
   content: string;
 
   @IsOptional()
-  @IsNumber()
-  message_type?: number;
-
-  @IsOptional()
   @IsJSON()
   aux_content?: IAuxContent;
 }
@@ -78,6 +73,5 @@ export class PaginationDto {
 }
 
 export interface IAuxContent {
-  type: number;
-  aux_content: string;
+  invite_game_id: string;
 }

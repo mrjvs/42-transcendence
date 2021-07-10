@@ -30,7 +30,13 @@ export function ChannelView() {
           name: 'Unknown user',
           avatar_colors: ['', ''],
         },
-        messages: [msg.content],
+        messages: [
+          {
+            content: msg.content,
+            aux_content: msg.aux_content,
+            type: msg.message_type,
+          },
+        ],
         createdAt: new Date(msg.created_at),
       });
     }
@@ -57,7 +63,11 @@ export function ChannelView() {
         }
 
         // append to previous message collection
-        prev.messages.push(msg.content);
+        prev.messages.push({
+          content: msg.content,
+          aux_content: msg.aux_content,
+          type: msg.message_type,
+        });
         return acc;
       }, []),
     );
