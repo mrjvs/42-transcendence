@@ -1,9 +1,4 @@
-import {
-  IsDate,
-  IsJSON,
-  IsNotEmpty,
-  IsOptional,
-} from 'class-validator';
+import { IsDate, IsJSON, IsNotEmpty, IsOptional } from 'class-validator';
 import {
   Column,
   Entity,
