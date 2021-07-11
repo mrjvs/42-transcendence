@@ -1,4 +1,4 @@
-import { IsDate, IsJSON, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import {
   Column,
   Entity,
@@ -50,11 +50,8 @@ export class IMessageInput {
 
 export class MessageDto {
   @IsNotEmpty()
+  @IsString()
   content: string;
-
-  @IsOptional()
-  @IsJSON()
-  aux_content?: IAuxContent;
 }
 
 export class PaginationDto {

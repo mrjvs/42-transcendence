@@ -106,7 +106,9 @@ export function ChannelView() {
           <MessageBox
             placeholder="Type your message here..."
             disabled={!messageData.messageState.done}
-            onSend={(text: string) => messageData.sendMessage(text)}
+            onSend={(obj: { text: string; type: boolean }) =>
+              messageData.sendMessage(obj.text, obj.type)
+            }
           />
         </div>
       </div>

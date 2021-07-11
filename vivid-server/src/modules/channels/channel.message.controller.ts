@@ -96,12 +96,11 @@ export class ChannelMessageController {
     },
   )
   createDuelMessage(
-    @Body() messageBody: MessageDto,
     @User() user: UserEntity,
     @Param('id') channelId: string,
   ): Promise<IMessage> {
     const input: IMessageInput = {
-      content: messageBody.content,
+      content: '',
       aux_content: { invite_game_id: 'hello-world' }, // TODO create game
       message_type: 1,
       user: user.id,

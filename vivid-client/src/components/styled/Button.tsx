@@ -7,7 +7,7 @@ export function Button(props: {
   badge?: number;
   small?: boolean;
   loading?: boolean;
-  type?: 'primary' | 'secondary';
+  type?: 'primary' | 'secondary' | 'duel';
 }) {
   const type = props.type || 'primary';
   return (
