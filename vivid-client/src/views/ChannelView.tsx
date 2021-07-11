@@ -29,6 +29,7 @@ export function ChannelView() {
         userData: messageData.getUser(msg.user)?.data || {
           name: 'Unknown user',
           avatar_colors: ['', ''],
+          id: msg.user,
         },
         messages: [msg.content],
         createdAt: new Date(msg.created_at),
@@ -79,9 +80,8 @@ export function ChannelView() {
                   <Message
                     key={v.id}
                     messages={v.messages}
-                    username={v.userData.name}
+                    user={v.userData}
                     blocked={false}
-                    userColors={v.userData.avatar_colors}
                   />
                 ))}
               </div>

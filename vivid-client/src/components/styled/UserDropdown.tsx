@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../../hooks/useUser';
+import { Avatar } from './Avatar';
 import { Icon } from './Icon';
 import './UserDropdown.css';
 
@@ -12,7 +13,7 @@ export function UserDropdown() {
   return (
     <div className={'userDropdown ' + (open ? 'open' : '')}>
       <div className="cont" onClick={() => setOpen((p) => !p)}>
-        <div className="userAvatar" />
+        <Avatar user={userData?.user} />
         <div className="name">
           <p>{userData?.user?.name || 'Unknown user'}</p>
           <Icon className="icon" type="chevron" />
