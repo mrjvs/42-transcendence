@@ -1,7 +1,7 @@
 import React from 'react';
 import { SocketContext } from './useWebsocket';
 
-export const StatusContext = React.createContext<any>([]);
+export const StatusContext = React.createContext<any>({});
 StatusContext.displayName = 'StatusContext';
 
 export function useStatusContext() {

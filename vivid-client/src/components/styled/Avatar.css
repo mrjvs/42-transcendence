@@ -1,0 +1,19 @@
+.userAvatar .status-bubble {
+  /* offline defaults */
+  background-color: #353b57;
+  position: absolute;
+  bottom: -0.25em;
+  right: -0.25em;
+  border: 0.25em #1b1f31 solid;
+  height: 0.75em;
+  width: 0.75em;
+  border-radius: 1em;
+}
+
+.userAvatar .status-bubble.status-ONLINE {
+  background-color: #55b86f;
+}
+
+.userAvatar {
+  position: relative;
+}
