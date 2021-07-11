@@ -29,18 +29,6 @@
   margin-bottom: 1.5rem;
 }
 
-.messageWrapper .messageUserAvatar {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 100%;
-  background: linear-gradient(to bottom right, #29419f, #a34fec);
-  margin-right: 1rem;
-}
-
-.messageWrapper:nth-child(2n) .messageUserAvatar {
-  background: linear-gradient(to bottom right, #e45655, #a13754);
-}
-
 .messageWrapper p {
   margin: 0;
   padding: 0;
@@ -65,7 +53,7 @@
   color: #7c849f;
 }
 
-.messageWrapper.blocked .messageUserAvatar {
+.messageWrapper.blocked .userAvatar {
   background: #272c43;
 }
 
@@ -101,7 +89,7 @@
   padding-bottom: 1rem;
 }
 
-.messageInvite-user .messageUserAvatar {
+.messageInvite-user .userAvatar {
   width: 2rem;
   height: 2rem;
   margin-right: 1rem;
