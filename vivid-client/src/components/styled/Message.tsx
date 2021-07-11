@@ -1,27 +1,22 @@
 import React from 'react';
+import { Avatar } from './Avatar';
 import './Message.css';
 import { Button } from './Button';
 
 export function Message(props: {
-  username: string;
   tag?: string;
-  userColors: string[];
   messages: any[];
   blocked: boolean;
+  user: any;
 }) {
   return (
     <div className={`messageWrapper ${props.blocked ? 'blocked' : ''}`}>
       <div>
-        <div
-          className="messageUserAvatar"
-          style={{
-            background: `linear-gradient(to right, ${props.userColors[0]}, ${props.userColors[1]})`,
-          }}
-        />
+        <Avatar user={props.user} />
       </div>
       <div>
         <p className="messageUserName">
-          {props.blocked ? 'Redacted' : props.username}
+          {props.blocked ? 'Redacted' : props.user.name}
         </p>
         <div className="messageMessageContainer">
           {!props.blocked ? (

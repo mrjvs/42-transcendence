@@ -13,7 +13,17 @@
 
 .sideNav {
   width: 450px;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+
   background-color: #15192a;
+}
+
+.sideNav .top {
+  color: white;
+  height: 4.5rem;
+  padding: 0 0.8rem;
+  display: flex;
 }
 
 .content {
