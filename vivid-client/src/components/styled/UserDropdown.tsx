@@ -13,7 +13,7 @@ export function UserDropdown() {
   return (
     <div className={'userDropdown ' + (open ? 'open' : '')}>
       <div className="cont" onClick={() => setOpen((p) => !p)}>
-        <Avatar user={userData?.user} />
+        <Avatar user={userData?.user} small />
         <div className="name">
           <p>{userData?.user?.name || 'Unknown user'}</p>
           <Icon className="icon" type="chevron" />

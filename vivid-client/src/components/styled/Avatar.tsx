@@ -9,10 +9,10 @@ function StatusBubble(props: { userId: string }) {
   );
 }
 
-export function Avatar(props: { user: any }) {
+export function Avatar(props: { user: any; small?: boolean }) {
   return (
     <div
-      className="messageUserAvatar userAvatar"
+      className={`messageUserAvatar userAvatar ${props.small ? 'small' : ''}`}
       style={{
         background: `linear-gradient(to right, ${props.user?.avatar_colors?.[0]}, ${props.user?.avatar_colors?.[1]})`,
       }}

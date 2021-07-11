@@ -1,6 +1,5 @@
 .userAvatar .status-bubble {
-  /* offline defaults */
-  background-color: #353b57;
+  background-color: #353b57; /* offline defaults */
   position: absolute;
   bottom: -0.25em;
   right: -0.25em;
@@ -8,6 +7,14 @@
   height: 0.75em;
   width: 0.75em;
   border-radius: 1em;
+}
+
+.userAvatar.small .status-bubble {
+  bottom: -0.25em;
+  right: -0.25em;
+  border: 0.25em #1b1f31 solid;
+  height: 0.5em;
+  width: 0.5em;
 }
 
 .userAvatar .status-bubble.status-ONLINE {
