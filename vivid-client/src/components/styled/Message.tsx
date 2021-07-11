@@ -1,10 +1,11 @@
 import React from 'react';
 import { Avatar } from './Avatar';
 import './Message.css';
+import { Button } from './Button';
 
 export function Message(props: {
   tag?: string;
-  messages: string[];
+  messages: any[];
   blocked: boolean;
   user: any;
 }) {
@@ -19,11 +20,36 @@ export function Message(props: {
         </p>
         <div className="messageMessageContainer">
           {!props.blocked ? (
-            props.messages.map((v, i) => (
-              <p key={i} className="messageMessage">
-                {v}
-              </p>
-            ))
+            props.messages.map((v, i) => {
+              if (v.type == 0)
+                return (
+                  <p key={i} className="messageMessage">
+                    {v.content}
+                  </p>
+                );
+              else if (v.type == 1)
+                return (
+                  <div className="messageInvite-wrapper">
+                    <div className="messageInvite-accent"></div>
+                    <div className="messageInvite-content">
+                      <div className="messageInvite-user">
+                        <div
+                          className="messageUserAvatar"
+                          style={{
+                            background: `linear-gradient(to right, ${props.userColors[0]}, ${props.userColors[1]})`,
+                          }}
+                        />
+                        {props.username}
+                      </div>
+                      <p>You&apos;ve been invited to a duel!</p>
+                      <Button onclick={() => alert('Accepted')}>Accept</Button>
+                      <div className="red-cube"></div>
+                      <div className="dark-cube"></div>
+                    </div>
+                  </div>
+                );
+              else return <p>placeholder</p>;
+            })
           ) : (
             <p>you&apos;ve blocked this user</p>
           )}

@@ -60,20 +60,31 @@ export function useMessages(channel: string) {
     setMessages([...getChannelMessages(channel)]);
   }, [messages]);
 
-  function sendMessage(text: string) {
-    fetch(
-      `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          content: text,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
+  function sendMessage(text: string, type: boolean) {
+    if (type) {
+      fetch(
+        `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages/duel`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
         },
-        credentials: 'include',
-      },
-    );
+      );
+    } else {
+      fetch(
+        `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            content: text,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        },
+      );
+    }
   }
 
   return {

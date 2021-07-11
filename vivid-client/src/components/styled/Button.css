@@ -50,8 +50,26 @@
   background: linear-gradient(to right, #243a94, #8c40cf);
 }
 
+.button-new.button-duel {
+    background: #252a40;
+    color: #8892B2;
+    display: flex;
+    margin-right: 0.5rem;
+    width: 4rem;
+    font-size: 1.4rem;
+}
+
+.button-new.button-duel:hover {
+    background: #2a3453;
+    color: white;
+}
+
 .button-new > *:first-child {
   margin-right: 0.4rem;
+}
+
+.button-new.button-duel > *:first-child {
+    margin-right: 0;
 }
 
 .button-new:hover {

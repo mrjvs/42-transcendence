@@ -31,7 +31,13 @@ export function ChannelView() {
           avatar_colors: ['', ''],
           id: msg.user,
         },
-        messages: [msg.content],
+        messages: [
+          {
+            content: msg.content,
+            aux_content: msg.aux_content,
+            type: msg.message_type,
+          },
+        ],
         createdAt: new Date(msg.created_at),
       });
     }
@@ -58,7 +64,11 @@ export function ChannelView() {
         }
 
         // append to previous message collection
-        prev.messages.push(msg.content);
+        prev.messages.push({
+          content: msg.content,
+          aux_content: msg.aux_content,
+          type: msg.message_type,
+        });
         return acc;
       }, []),
     );
@@ -87,14 +97,15 @@ export function ChannelView() {
               </div>
             </>
           ) : null}
-          <div ref={scrollEl} />
         </div>
       </div>
       <div className="channelBottomWrapper">
         <MessageBox
           placeholder="Type your message here..."
           disabled={!messageData.messageState.done}
-          onSend={(text: string) => messageData.sendMessage(text)}
+          onSend={(obj: { text: string; type: boolean }) =>
+            messageData.sendMessage(obj.text, obj.type)
+          }
         />
       </div>
     </MainLayout>

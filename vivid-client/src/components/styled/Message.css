@@ -68,3 +68,79 @@
 .messageWrapper.blocked .messageUserAvatar {
   background: #272c43;
 }
+
+.messageInvite-wrapper {
+    background: #121727;
+    max-width: 100%;
+    max-height: 100%;
+    width: 500px;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    display: inline-flex;
+}
+
+.messageInvite-accent {
+    background: #35E2A2;
+    width: 10px;
+    height: 100%;
+}
+
+.messageInvite-content {
+    padding-left: 2rem;
+    position: relative;
+    width: 100%;
+}
+
+.messageInvite-user {
+    font-size: 16px;
+    color: white;
+    margin-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.messageInvite-user .messageUserAvatar {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 1rem;
+}
+
+.messageInvite-content p {
+    font-weight: bold;
+    width: 35%;
+    padding-bottom: 0.5rem;
+}
+
+.messageInvite-user {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+}
+
+.messageInvite-content .red-cube,
+.messageInvite-content .dark-cube {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 5rem;
+    width: 5rem;
+    transform: rotate(30deg);
+}
+
+.messageInvite-content .red-cube {
+    background: linear-gradient(to bottom, #e45655, #a13754);
+    height: 8rem;
+    width: 8rem;
+    right: -1.5rem;
+    top: -2rem;
+}
+
+.messageInvite-content .dark-cube {
+    background: #262B41;
+    height: 7rem;
+    width: 7rem;
+    right: -1.5rem;
+    top: 5rem;
+}
