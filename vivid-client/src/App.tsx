@@ -1,6 +1,7 @@
 import React from 'react';
 import { LoadingScreen } from './components/styled/LoadingScreen';
 import { useMessageContext, MessageContext } from './hooks/useMessages';
+import { StatusContext, useStatusContext } from './hooks/useStatuses';
 import { UserContext, useUser } from './hooks/useUser';
 import { UsersContext, useUsersContext } from './hooks/useUsers';
 import { useWebsocket, SocketContext } from './hooks/useWebsocket';
@@ -17,9 +18,13 @@ function MessageStoreInit(props: { children: any }) {
 
 function StoreInit(props: { children: any }) {
   const usersData = useUsersContext();
+  const statusData = useStatusContext();
+
   return (
     <UsersContext.Provider value={usersData}>
-      <MessageStoreInit>{props.children}</MessageStoreInit>
+      <StatusContext.Provider value={statusData}>
+        <MessageStoreInit>{props.children}</MessageStoreInit>
+      </StatusContext.Provider>
     </UsersContext.Provider>
   );
 }
