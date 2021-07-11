@@ -29,17 +29,12 @@ export function Message(props: {
                 );
               else if (v.type == 1)
                 return (
-                  <div className="messageInvite-wrapper">
+                  <div key={i} className="messageInvite-wrapper">
                     <div className="messageInvite-accent"></div>
                     <div className="messageInvite-content">
                       <div className="messageInvite-user">
-                        <div
-                          className="messageUserAvatar"
-                          style={{
-                            background: `linear-gradient(to right, ${props.userColors[0]}, ${props.userColors[1]})`,
-                          }}
-                        />
-                        {props.username}
+                        <Avatar user={props.user} />
+                        {props.user.name}
                       </div>
                       <p>You&apos;ve been invited to a duel!</p>
                       <Button onclick={() => alert('Accepted')}>Accept</Button>
