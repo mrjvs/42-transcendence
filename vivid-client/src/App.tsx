@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { LoadingScreen } from './components/styled/LoadingScreen';
 import { useMessageContext, MessageContext } from './hooks/useMessages';
 import { StatusContext, useStatusContext } from './hooks/useStatuses';
@@ -37,9 +38,11 @@ function App() {
     <UserContext.Provider value={userData}>
       <SocketContext.Provider value={socketData}>
         <StoreInit>
-          <LoadingScreen userData={userData}>
-            <RootNavigation />
-          </LoadingScreen>
+          <BrowserRouter>
+            <LoadingScreen userData={userData}>
+              <RootNavigation />
+            </LoadingScreen>
+          </BrowserRouter>
         </StoreInit>
       </SocketContext.Provider>
     </UserContext.Provider>

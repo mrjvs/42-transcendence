@@ -1,4 +1,4 @@
-import { Route, BrowserRouter, Switch } from 'react-router-dom';
+import { Route, Switch, useHistory } from 'react-router-dom';
 import React from 'react';
 import './Root.css';
 import { Heading } from '../components/styled/Heading';
@@ -15,11 +15,9 @@ import { SettingsView } from '../views/SettingsView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
-  const [open, setOpen] = React.useState(false);
 
   return (
     <div className="wrapper">
-      <AccountSetupModal open={open} close={() => setOpen(false)} />
       <nav className="sideNav">
         <div className="top">
           <Heading size="small">Vivid</Heading>
@@ -46,7 +44,7 @@ function SideBarRouter() {
             badge={1}
             small={true}
             type="secondary"
-            onclick={() => setOpen(true)}
+            onclick={() => alert('hi')}
           >
             <Icon type="plus" />
             New
@@ -80,35 +78,47 @@ function SideBarRouter() {
 }
 
 function MainRouter() {
-  return (
-    <Switch>
-      <Route exact path="/settings">
-        <SettingsView />
-      </Route>
-      <Route path="*">
-        <SideBarRouter />
-      </Route>
-    </Switch>
+  const userData = React.useContext(UserContext);
+  const [open, setOpen] = React.useState(false);
+  const history = useHistory();
+
+  React.useEffect(() => {
+    if (userData.user && !userData.user.name) {
+      history.push('/');
+      setOpen(true);
+    }
+  }, [userData.user]);
+
+  return React.useMemo(
+    () => (
+      <>
+        <AccountSetupModal open={open} close={() => setOpen(false)} />
+        <Switch>
+          <Route exact path="/settings">
+            <SettingsView />
+          </Route>
+          <Route path="*">
+            <SideBarRouter />
+          </Route>
+        </Switch>
+      </>
+    ),
+    [open],
   );
 }
 
 export function RootNavigation() {
   const socketData = React.useContext(SocketContext);
 
-  const [open, setOpen] = React.useState(false);
-
   return (
-    <BrowserRouter>
-      <AccountSetupModal open={open} close={() => setOpen(false)} />
-      <div className="wrapper-alert">
-        {socketData.clientState !== 'CONNECTED' ? (
-          <div className="alert">
-            <Icon type="alert" className="icon" />
-            Not connected to the Vivid servers
-          </div>
-        ) : null}
-        <MainRouter />
-      </div>
-    </BrowserRouter>
+    <div className="wrapper-alert">
+      {socketData.clientState !== 'CONNECTED' ? (
+        <div className="alert">
+          <Icon type="alert" className="icon" />
+          Not connected to the Vivid servers
+        </div>
+      ) : null}
+      <MainRouter />
+    </div>
   );
 }
