@@ -6,6 +6,7 @@ import { TextInput } from '../components/styled/TextInput';
 import { Avatar } from '../components/styled/Avatar';
 import { UserContext } from '../hooks/useUser';
 import './SettingsView.css';
+import { useFetch } from '../hooks/useFetch';
 
 export function SettingsView() {
   const history = useHistory();
@@ -37,6 +38,18 @@ function UserProfileCard(props: { userData: any }) {
     }
   }, [newestUsername, props.userData]);
 
+  const updateUserFetch = useFetch({
+    url: '/api/v1/users/@me/name',
+    method: 'PATCH',
+  });
+
+  React.useEffect(() => {
+    if (updateUserFetch.done) {
+      props.userData?.updateUser(updateUserFetch.data.data);
+      updateUserFetch.reset();
+    }
+  }, [updateUserFetch.done]);
+
   return (
     <div className="card">
       <div className="user-profile-columns">
@@ -56,7 +69,7 @@ function UserProfileCard(props: { userData: any }) {
               less_padding
               margin_right
               type="danger"
-              onclick={() => alert('ney')}
+              onclick={() => updateUserFetch.run()}
             >
               Remove avatar
             </Button>
@@ -71,7 +84,20 @@ function UserProfileCard(props: { userData: any }) {
                 noPadding
               />
             </div>
-            <Button less_padding onclick={() => alert('saved')}>
+            {updateUserFetch.error &&
+            updateUserFetch.error?.data?.code === 'inuse' ? (
+              <p>That username is already in use</p>
+            ) : updateUserFetch.error &&
+              updateUserFetch.error?.res?.status === 400 ? (
+              <p>Username must be at least 1 character</p>
+            ) : updateUserFetch.error ? (
+              <p>Something went wrong, try again later</p>
+            ) : null}
+            <Button
+              less_padding
+              loading={updateUserFetch.loading}
+              onclick={() => updateUserFetch.run({ username })}
+            >
               Save username
             </Button>
           </div>
