@@ -3,9 +3,9 @@ import { useHistory } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 
 export function GameView() {
-  const [client2, setClient] = useState<any>(null);
   const [clientState, setClientState] = useState('CONNECTING');
   const history = useHistory();
+  const [gameId, setGameId] = useState<string>('');
 
   useEffect(() => {
     const client = socketIOClient(window._env_.VIVID_BASE_URL, {
@@ -13,30 +13,50 @@ export function GameView() {
       path: '/api/v1/events',
     });
 
-    setClient(client);
-
     client.on('connect', () => {
       setClientState('CONNECTED');
       clientState;
     });
   }, []);
 
-  function newGame() {
-    client2.emit('newGame');
+  function createGame() {
+    fetch(`${window._env_.VIVID_BASE_URL}/api/v1/channels/game`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        history.push(`/pong/${result.gameId}`);
+      });
   }
 
-  function joinGame() {
-    client2.emit(
-      'joinGame',
-      'e372e47c-3649-44c9-9455-c48f84e3d80d', // TODO how to join game?
-    );
-    history.push('/pong/e372e47c-3649-44c9-9455-c48f84e3d80d');
+  function joinGame(gameId: any) {
+    fetch(`${window._env_.VIVID_BASE_URL}/api/v1/channels/game/${gameId}`, {
+      method: 'PUT',
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        history.push(`/pong/${result.gameId}`);
+      });
+  }
+
+  function onSubmit(e: any) {
+    e.preventDefault();
+    joinGame(gameId);
   }
 
   return (
     <>
-      <button onClick={newGame}>New Game</button>
-      <button onClick={joinGame}>Join Game</button>
+      <button onClick={createGame}>Create Game</button>
+      <form onSubmit={onSubmit}>
+        <label>GameID</label>
+        <input
+          type="text"
+          value={gameId}
+          onChange={(e) => setGameId(e.target.value)}
+        />
+      </form>
     </>
   );
 }

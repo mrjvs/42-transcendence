@@ -6,8 +6,6 @@ import { createGameState } from './create_gamestate';
 import { gameLoop } from './pong';
 import { MatchesService } from '$/matches/matches.service';
 
-// TODO change client.idto client.id
-
 interface IRoom {
   [clientId: string]: string; // [clientId] = gameId
 }
@@ -29,62 +27,53 @@ export class PongService {
   constructor(private matchService: MatchesService) {}
 
   createGame() {
-    // const gameId: string = uuid();
-    const gameId = 'e372e47c-3649-44c9-9455-c48f84e3d80d'; // TODO remove this - hardcoded for testing
-
+    const gameId: string = uuid();
     states[gameId] = createGameState(gameId);
     return gameId;
   }
 
-  joinGame(userId: string, gameId: string) {
+  joinGame(userId: string, gameId: string): { gameId: string } {
     // Return if client is already in existing game
     if (clientRooms[userId] != null) return;
 
-    // Return if game doesn't exist
     if (!states[gameId]) return;
 
     // Check for empty spot and add user. Return if game is full
-    const player = states[gameId].players.find((v) => v.userId === '');
+    const player: IPlayer = states[gameId].players.find((v) => v.userId === '');
     if (player) player.userId = userId;
     else return;
 
-    // Store client-room relation
     clientRooms[userId] = gameId;
-    return gameId;
+    return {
+      gameId: gameId,
+    };
   }
 
-  readyEvent(client: Socket, gameId: string) {
-    const game = states[gameId];
+  readyEvent(client: Socket) {
+    const gameId: string = clientRooms[client.auth];
+    if (!gameId) return;
 
-    // Return if game doesn't exist
+    const game: IGameState = states[gameId];
     if (!game) return;
 
-    const player = game.players.find((v) => v.userId === client.id);
-
-    // Set player as spectator if player wasn't found
+    // Set player as ready or spectator
+    const player = game.players.find((v) => v.userId === client.auth);
     if (!player)
       return {
         status: true,
         spectating: true,
       };
 
-    // game.players[playerNb.ONE].ready = true;
-    // if (game.players[playerNb.TWO].userId != '')
-    //   game.players[playerNb.TWO].ready = true;
     player.ready = true;
+    client.join(gameId);
+    client.emit('init');
 
     // Check if both players are ready and start game
     const readyPlayers: IPlayer[] = game.players.filter((v) => {
       if (v.ready) return v;
     });
+    if (readyPlayers.length === 2) client.emit('start', gameId);
 
-    // Init canvas, context and eventlisteners
-    client.emit('init');
-    client.join(gameId);
-
-    if (readyPlayers.length === 2) {
-      client.emit('start', gameId);
-    }
     return {
       status: true,
       spectating: false,
@@ -93,24 +82,23 @@ export class PongService {
 
   startGameInterval(clients: Socket, gameId: string) {
     const intervalId = setInterval(async () => {
-      const game = states[gameId];
+      const game: IGameState = states[gameId];
       const winner: IPlayer | null = gameLoop(game);
 
       if (!winner) {
-        // If no winner, draw GameState for both clients
         clients.emit('drawGame', game);
       } else {
         clients.emit('gameOver', winner.userId);
         clearInterval(intervalId);
 
-        // this.matchService.insertGame({
-        //   user_id_req: game.players[playerNb.ONE].userId,
-        //   points_req: game.players[playerNb.ONE].score,
-        //   user_id_acpt: game.players[playerNb.TWO].userId,
-        //   points_acpt: game.players[playerNb.TWO].score,
-        //   winner_id: winner.userId,
-        //   game_type: '',
-        // });
+        this.matchService.createGame({
+          user_id_req: game.players[playerNb.ONE].userId,
+          points_req: game.players[playerNb.ONE].score,
+          user_id_acpt: game.players[playerNb.TWO].userId,
+          points_acpt: game.players[playerNb.TWO].score,
+          winner_id: winner.userId,
+          game_type: '',
+        });
 
         delete clientRooms[game.players[playerNb.ONE].userId];
         delete clientRooms[game.players[playerNb.TWO].userId];
@@ -120,10 +108,7 @@ export class PongService {
   }
 
   handleKeydown(client: Socket, move: number) {
-    // Find room
-    // const gameId = clientRooms[client.auth];
-    const gameId = 'e372e47c-3649-44c9-9455-c48f84e3d80d';
-
+    const gameId: string = clientRooms[client.auth];
     if (!gameId) return;
 
     const playerNumber: playerNb =
@@ -131,14 +116,12 @@ export class PongService {
         ? playerNb.ONE
         : playerNb.TWO;
 
-    // Set player move
     if (states[gameId].settings.controls === 'keys')
       states[gameId].players[playerNumber].move = move;
   }
 
   handleMouseMove(client: Socket, move: number) {
-    // Find room
-    const gameId = clientRooms[client.id];
+    const gameId: string = clientRooms[client.auth];
     if (!gameId) return;
 
     const playerNumber: playerNb =
@@ -146,7 +129,6 @@ export class PongService {
         ? playerNb.ONE
         : playerNb.TWO;
 
-    // Set player move
     if (states[gameId].settings.controls === 'mouse')
       states[gameId].players[playerNumber].y =
         move - states[gameId].playerHeight / 2;

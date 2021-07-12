@@ -76,6 +76,10 @@ export function RootNavigation() {
               </Route>
               <Route exact path="/pong">
                 <p>pong</p>
+                <GameView />
+              </Route>
+              <Route exact path="/pong/:id">
+                <p>pong</p>
                 <PongView />
               </Route>
               <Route path="*">

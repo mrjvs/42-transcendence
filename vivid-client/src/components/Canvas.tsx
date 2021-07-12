@@ -10,8 +10,7 @@ interface CanvasProps {
 
 export function Canvas({ width, height }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const [client2, setClient] = useState<any>(null); // TODO nodig?
-  const [clientState, setClientState] = useState('CONNECTING');
+  const [clientState, setClientState] = useState('CONNECTING'); // TODO nodig?
 
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
@@ -24,7 +23,8 @@ export function Canvas({ width, height }: CanvasProps) {
 
     client.on('connect', () => {
       setClientState('CONNECTED');
-      client.emit('ready', 'e372e47c-3649-44c9-9455-c48f84e3d80d');
+      client.emit('ready');
+      clientState;
     });
 
     client.on('init', () => {
