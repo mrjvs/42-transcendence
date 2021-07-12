@@ -33,12 +33,15 @@
   color: white;
   font-size: 0.9rem;
   font-weight: bold;
-  max-width: 15rem;
-  width: 4rem;
+  max-width: 10rem;
   overflow-x: hidden;
   display: flex;
   align-items: center;
   justify-content: flex-start;
+}
+
+.userDropdown .name p {
+  word-break: break-all;
 }
 
 .userDropdown .name > .icon {
