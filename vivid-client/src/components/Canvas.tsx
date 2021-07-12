@@ -59,22 +59,25 @@ export function Canvas({ width, height }: CanvasProps) {
   }
 
   React.useEffect(() => {
-    if (!client) return;
-    client.on('connect', connect);
-    client.on('init', init);
-    client.on('start', start);
-    client.on('drawGame', draw);
-    client.on('gameOver', gameOver);
+    if (client) {
+      client.on('connect', connect);
+      client.on('init', init);
+      client.on('start', start);
+      client.on('drawGame', draw);
+      client.on('gameOver', gameOver);
+    }
 
     return () => {
-      client.off('connect', connect);
-      client.off('init', init);
-      client.off('start', start);
-      client.off('drawGame', draw);
-      client.off('gameOver', gameOver);
-      document.removeEventListener('keydown', keydown);
-      document.removeEventListener('keyup', keyup);
-      document.removeEventListener('mousemove', mouseMove);
+      if (client) {
+        client.off('connect', connect);
+        client.off('init', init);
+        client.off('start', start);
+        client.off('drawGame', draw);
+        client.off('gameOver', gameOver);
+        document.removeEventListener('keydown', keydown);
+        document.removeEventListener('keyup', keyup);
+        document.removeEventListener('mousemove', mouseMove);
+      }
     };
   }, [client]);
 
