@@ -7,12 +7,16 @@ export function Button(props: {
   badge?: number;
   small?: boolean;
   loading?: boolean;
-  type?: 'primary' | 'secondary' | 'duel';
+  less_padding?: boolean;
+  margin_right?: boolean;
+  type?: 'primary' | 'secondary' | 'duel' | 'danger';
 }) {
   const type = props.type || 'primary';
   return (
     <button
-      className={`button-new ${props.small ? 'small' : ''} button-${type}`}
+      className={`button-new ${props.small ? 'small' : ''} button-${type} ${
+        props.less_padding ? 'button-less-padding' : ''
+      } ${props.margin_right ? 'button-margin-right' : ''}`}
       onClick={props.onclick}
     >
       {props.loading ? <div className="loader"></div> : null}

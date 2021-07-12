@@ -64,6 +64,24 @@
     color: white;
 }
 
+.button-new.button-danger {
+    background: #9C3446;
+    color: white;
+}
+
+.button-new.button-danger:hover {
+    background: #E45655;
+    color: white;
+}
+
+.button-new.button-less-padding {
+    padding: 0.5rem 1rem;
+}
+
+.button-new.button-margin-right {
+    margin-right: 0.5rem;
+}
+
 .button-new > *:first-child {
   margin-right: 0.4rem;
 }

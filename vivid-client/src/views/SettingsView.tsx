@@ -9,57 +9,71 @@ import './SettingsView.css';
 
 export function SettingsView() {
   const history = useHistory();
-
-  const [newestUsername, setNewestUsername] = React.useState('');
-  const [username, setUsername] = React.useState('');
   const userData = React.useContext<any>(UserContext);
-
-  React.useEffect(() => {
-    if (userData?.user?.name && userData.user.name !== newestUsername) {
-      setUsername(userData.user.name);
-      setNewestUsername(userData.user.name);
-    }
-  }, [newestUsername, userData]);
 
   return (
     <div className="settings-view-wrapper">
       <Button type="secondary" onclick={() => history.push('/')}>
-        <Icon type="arrow" />
+        <Icon type="left_arrow" />
         Back home
       </Button>
+      <h1>User settings</h1>
+      <UserProfileCard userData={userData} />
+      <SecurityCard userData={userData} />
+    </div>
+  );
+}
 
-      <div className="user-settings-wrapper">
-        <h1>User settings</h1>
-        <div className="user-profile-wrapper">
-          <Avatar user={userData?.user} />
-          <div className="user-avatar">
+function UserProfileCard(props: { userData: any }) {
+  const [newestUsername, setNewestUsername] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  React.useEffect(() => {
+    if (
+      props.userData?.user?.name &&
+      props.userData.user.name !== newestUsername
+    ) {
+      setUsername(props.userData.user.name);
+      setNewestUsername(props.userData.user.name);
+    }
+  }, [newestUsername, props.userData]);
+
+  return (
+    <div className="card">
+      <div className="user-profile-columns">
+        <Avatar user={props.userData?.user} noStatus />
+        <div className="user-profile-expand">
+          <div>
             <h2>User profile</h2>
-            <Button onclick={() => alert('yey')}>Upload avatar</Button>
-            <Button onclick={() => alert('ney')}>Remove avatar</Button>
+            <Button
+              less_padding
+              margin_right
+              type="secondary"
+              onclick={() => alert('yey')}
+            >
+              Upload avatar
+            </Button>
+            <Button
+              less_padding
+              margin_right
+              type="danger"
+              onclick={() => alert('ney')}
+            >
+              Remove avatar
+            </Button>
           </div>
           <div className="user-name">
-            <h3>Username</h3>
-            <div className="paddbot">
+            <div className="text-wrapper">
               <TextInput
                 value={username}
                 set={setUsername}
                 placeholder="John Doe"
                 label="Username"
+                noPadding
               />
             </div>
-            <Button onclick={() => alert('saved')}>Save username</Button>
-          </div>
-        </div>
-        <div className="security-settings-wrapper">
-          <TwoFaInfo />
-          <div className="dangerZone-wrapper">
-            <h2>Danger Zone</h2>
-            <p>
-              Watch out, these actions can permanently affect your account. Use
-              with caution
-            </p>
-            <Button onclick={() => alert('bye')}>Delete account</Button>
-            <Button onclick={() => alert('bye')}>Logout all devices</Button>
+            <Button less_padding onclick={() => alert('saved')}>
+              Save username
+            </Button>
           </div>
         </div>
       </div>
@@ -67,24 +81,69 @@ export function SettingsView() {
   );
 }
 
-export function TwoFaInfo() {
-  // TODO
-  if (1) {
+function TwoFaInfo(props: { twoFactor: boolean }) {
+  if (!props.twoFactor) {
     return (
-      <div className="twofa-wrapper">
+      <div className="red">
         <h2>Two Factor Authentication</h2>
-        <Icon type="red-exclamation" />
-        Two factor authentication not enabled!
-        <Button onclick={() => alert('enabled')}>Enable 2fa</Button>
+        <p>
+          <Icon className="twofa-icon" type="alert" />
+          Two factor authentication is not enabled!
+        </p>
+        <Button less_padding margin_right onclick={() => alert('enabled')}>
+          Enable 2fa
+        </Button>
       </div>
     );
-  } else
-    return (
-      <div className="twofa-wrapper">
-        <h2>Two Factor Authentication</h2>
-        <Icon type="green-checkmark" />
+  }
+  return (
+    <div className="green">
+      <h2>Two Factor Authentication</h2>
+      <p>
+        <Icon className="twofa-icon" type="checkmark" />
         Two factor authentication is enabled!
-        <Button onclick={() => alert('disabled')}>Disable 2fa</Button>
+      </p>
+      <Button
+        less_padding
+        margin_right
+        type="danger"
+        onclick={() => alert('disabled')}
+      >
+        Disable 2fa
+      </Button>
+    </div>
+  );
+}
+
+function SecurityCard(props: { userData: any }) {
+  return (
+    <div className="card">
+      <div className="twofa-wrapper">
+        <TwoFaInfo twoFactor={props.userData?.user?.twofactor} />
       </div>
-    );
+      <div className="dangerZone-wrapper">
+        <h2>Danger Zone</h2>
+        <p>
+          Watch out, these actions can permanently affect your account. Use with
+          caution!
+        </p>
+        <Button
+          less_padding
+          margin_right
+          type="danger"
+          onclick={() => alert('bye')}
+        >
+          Delete account
+        </Button>
+        <Button
+          less_padding
+          margin_right
+          type="secondary"
+          onclick={() => alert('bye')}
+        >
+          Logout all devices
+        </Button>
+      </div>
+    </div>
+  );
 }

@@ -9,7 +9,11 @@ function StatusBubble(props: { userId: string }) {
   );
 }
 
-export function Avatar(props: { user: any; small?: boolean }) {
+export function Avatar(props: {
+  user: any;
+  small?: boolean;
+  noStatus?: boolean;
+}) {
   return (
     <div
       className={`userAvatar ${props.small ? 'small' : ''}`}
@@ -17,7 +21,7 @@ export function Avatar(props: { user: any; small?: boolean }) {
         background: `linear-gradient(to right, ${props.user?.avatar_colors?.[0]}, ${props.user?.avatar_colors?.[1]})`,
       }}
     >
-      <StatusBubble userId={props.user?.id} />
+      {!props.noStatus ? <StatusBubble userId={props.user?.id} /> : null}
     </div>
   );
 }
