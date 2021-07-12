@@ -77,7 +77,7 @@ export class UserService {
   async deleteUser(id: string): Promise<void> {
     // TODO disconnect websocket connections
     // TODO leave guild, remove blocks, remove friends, leave channels
-    await this.killSessions(id);
+    await this.killSessions(id, { except: ['a'] }); // TODO fix no except
     await this.userRepository
       .createQueryBuilder()
       .delete()
@@ -123,7 +123,7 @@ export class UserService {
       .createQueryBuilder()
       .delete()
       .where(
-        `regexp_replace(trim(both '"' from json::text), '\\\\"', '"', 'g')::json->'passport'->>'user' = :id AND NOT id IN (:...ids)`,
+        `regexp_replace(trim(both '"' from json::text), '\\\\"', '"', 'g')::json->'passport'->>'user' = :id AND NOT id IN (:...ids)`, // TODO fix this with no except ids
         {
           id,
           ids: options.except,

@@ -69,7 +69,7 @@ function UserProfileCard(props: { userData: any }) {
               less_padding
               margin_right
               type="danger"
-              onclick={() => updateUserFetch.run()}
+              onclick={() => alert('ney')}
             >
               Remove avatar
             </Button>
@@ -142,6 +142,15 @@ function TwoFaInfo(props: { twoFactor: boolean }) {
 }
 
 function SecurityCard(props: { userData: any }) {
+  const deleteUser = useFetch({
+    url: '/api/v1/users/@me/',
+    method: 'DELETE',
+  });
+
+  React.useEffect(() => {
+    if (deleteUser.done) window.location.href = '/'; // TODO redirect to home page
+  }, [deleteUser.done]);
+
   return (
     <div className="card">
       <div className="twofa-wrapper">
@@ -157,7 +166,8 @@ function SecurityCard(props: { userData: any }) {
           less_padding
           margin_right
           type="danger"
-          onclick={() => alert('bye')}
+          loading={deleteUser.loading}
+          onclick={() => deleteUser.run()}
         >
           Delete account
         </Button>
@@ -165,10 +175,11 @@ function SecurityCard(props: { userData: any }) {
           less_padding
           margin_right
           type="secondary"
-          onclick={() => alert('bye')}
+          onclick={() => alert('bye') /* TODO backend */}
         >
           Logout all devices
         </Button>
+        {deleteUser.error ? <p>Something went wrong, try again later</p> : null}
       </div>
     </div>
   );
