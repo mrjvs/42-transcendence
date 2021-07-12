@@ -10,9 +10,10 @@ export function useStatusContext() {
 
   function onStatusUpdate(data: any) {
     setStatuses((old: any) => {
-      if (data.status === 'OFFLINE') old[data.userId] = undefined;
-      else old[data.userId] = data.status;
-      return old;
+      const n = { ...old };
+      if (data.status === 'OFFLINE') n[data.userId] = undefined;
+      else n[data.userId] = data.status;
+      return n;
     });
   }
 

@@ -6,6 +6,7 @@ import './AccountSetupModal.css';
 import { Button } from '../Button';
 import { useFetch } from '../../../hooks/useFetch';
 
+// TODO update userContext with new name and data
 export function AccountSetupModal(props: { open: boolean; close: () => void }) {
   const [username, setUsername] = React.useState('');
   const { run, done, error, loading, reset } = useFetch({

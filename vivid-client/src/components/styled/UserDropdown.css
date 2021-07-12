@@ -16,6 +16,13 @@
   background-color: #191b2b;
 }
 
+.userDropdown .cont .userAvatar .status-bubble {
+  border-color: #121727;
+}
+.userDropdown .cont:hover .userAvatar .status-bubble {
+  border-color: #191b2b;
+}
+
 .userDropdown .messageUserAvatar {
   width: 2rem;
   height: 2rem;

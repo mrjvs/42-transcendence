@@ -70,6 +70,10 @@
   margin-bottom: 0.8rem;
 }
 
+.messageInvite-wrapper .userAvatar .status-bubble {
+  border-color: #121727;
+}
+
 .messageInvite-accent {
   background: #35e2a2;
   width: 4px;
