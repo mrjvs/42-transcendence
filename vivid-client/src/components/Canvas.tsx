@@ -15,8 +15,8 @@ export function Canvas({ width, height }: CanvasProps) {
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
 
-  function connect() {
-    client.emit('ready');
+  function ready() {
+    client?.emit('ready');
   }
 
   function init() {
@@ -42,25 +42,25 @@ export function Canvas({ width, height }: CanvasProps) {
   }
 
   function start(roomName: string) {
-    client.emit('start', roomName);
+    client?.emit('start', roomName);
   }
 
   function keydown(event: KeyboardEvent) {
-    if (event.key === 'w') client.emit('keydown', -0.01);
-    else if (event.key === 's') client.emit('keydown', 0.01);
+    if (event.key === 'w') client?.emit('keydown', -0.01);
+    else if (event.key === 's') client?.emit('keydown', 0.01);
   }
 
   function keyup(event: KeyboardEvent) {
-    if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
+    if (event.key === 'w' || event.key === 's') client?.emit('keydown', 0);
   }
 
   function mouseMove(event: MouseEvent) {
-    client.emit('mouseMove', event.clientY / canvas.height);
+    client?.emit('mouseMove', event.clientY / canvas.height);
   }
 
   React.useEffect(() => {
     if (client) {
-      client.on('connect', connect);
+      ready();
       client.on('init', init);
       client.on('start', start);
       client.on('drawGame', draw);
@@ -69,15 +69,14 @@ export function Canvas({ width, height }: CanvasProps) {
 
     return () => {
       if (client) {
-        client.off('connect', connect);
         client.off('init', init);
         client.off('start', start);
         client.off('drawGame', draw);
         client.off('gameOver', gameOver);
-        document.removeEventListener('keydown', keydown);
-        document.removeEventListener('keyup', keyup);
-        document.removeEventListener('mousemove', mouseMove);
       }
+      document.removeEventListener('keydown', keydown);
+      document.removeEventListener('keyup', keyup);
+      document.removeEventListener('mousemove', mouseMove);
     };
   }, [client]);
 
