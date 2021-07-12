@@ -11,6 +11,7 @@ import { UserContext } from '../hooks/useUser';
 import { SocketContext } from '../hooks/useWebsocket';
 import { AccountSetupModal } from '../components/styled/modals/AccountSetup.modal';
 import { PongView } from '../views/PongView';
+import { GameView } from '../views/GameView';
 
 export function RootNavigation() {
   const userData = React.useContext(UserContext);
@@ -74,6 +75,10 @@ export function RootNavigation() {
                 <ChannelView />
               </Route>
               <Route exact path="/pong">
+                <p>pong</p>
+                <GameView />
+              </Route>
+              <Route exact path="/pong/:id">
                 <p>pong</p>
                 <PongView />
               </Route>

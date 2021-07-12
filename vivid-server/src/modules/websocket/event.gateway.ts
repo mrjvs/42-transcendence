@@ -9,9 +9,9 @@ import {
 import { Server, Socket } from 'socket.io';
 import { IMessage } from '@/messages.entity';
 import { UserService } from '$/users/user.service';
-import { IJoinedChannel } from '~/models/joined_channels.entity';
-import { UserEntity } from '~/models/user.entity';
-import { PongService } from '../pong/pong.service';
+import { IJoinedChannel } from '@/joined_channels.entity';
+import { UserEntity } from '@/user.entity';
+import { PongService } from '$/pong/pong.service';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -62,25 +62,10 @@ export class EventGateway implements OnGatewayConnection {
     } catch (err) {}
   }
 
-  @SubscribeMessage('newGame')
-  newGame(@ConnectedSocket() client: Socket) {
-    if (!client.auth) return; // TODO do we need to throw something (unauthorized) here?
-    this.pongService.newGame(client);
-  }
-
-  @SubscribeMessage('joinGame')
-  joinGame(@ConnectedSocket() client: Socket, @MessageBody() roomName: string) {
-    if (!client.auth) return;
-    this.pongService.joinGame(client, roomName);
-  }
-
   @SubscribeMessage('ready')
-  readyEvent(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() roomName: string,
-  ) {
+  readyEvent(@ConnectedSocket() client: Socket) {
     if (!client.auth) return;
-    this.pongService.readyEvent(client, roomName);
+    this.pongService.readyEvent(client);
   }
 
   @SubscribeMessage('keydown')
