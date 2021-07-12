@@ -23,11 +23,9 @@
   border-color: #191b2b;
 }
 
-.userDropdown .messageUserAvatar {
+.userDropdown .userAvatar {
   width: 2rem;
   height: 2rem;
-  border-radius: 100%;
-  background: linear-gradient(to bottom right, #29419f, #a34fec);
   margin-right: 0.7rem;
 }
 

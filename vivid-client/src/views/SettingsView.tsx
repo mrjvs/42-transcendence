@@ -5,6 +5,7 @@ import { Icon } from '../components/styled/Icon';
 import { TextInput } from '../components/styled/TextInput';
 import { Avatar } from '../components/styled/Avatar';
 import { UserContext } from '../hooks/useUser';
+import './SettingsView.css';
 
 export function SettingsView() {
   const history = useHistory();
@@ -50,12 +51,7 @@ export function SettingsView() {
           </div>
         </div>
         <div className="security-settings-wrapper">
-          <div className="2fa-wrapper">
-            <h2>Two Factor Authentication</h2>
-            <Icon type="red-exclamation" />
-            Two factor authentication not enabled
-            <Button onclick={() => alert('enabled')}>Enable 2fa</Button>
-          </div>
+          <TwoFaInfo />
           <div className="dangerZone-wrapper">
             <h2>Danger Zone</h2>
             <p>
@@ -69,4 +65,26 @@ export function SettingsView() {
       </div>
     </div>
   );
+}
+
+export function TwoFaInfo() {
+  // TODO
+  if (1) {
+    return (
+      <div className="twofa-wrapper">
+        <h2>Two Factor Authentication</h2>
+        <Icon type="red-exclamation" />
+        Two factor authentication not enabled!
+        <Button onclick={() => alert('enabled')}>Enable 2fa</Button>
+      </div>
+    );
+  } else
+    return (
+      <div className="twofa-wrapper">
+        <h2>Two Factor Authentication</h2>
+        <Icon type="green-checkmark" />
+        Two factor authentication is enabled!
+        <Button onclick={() => alert('disabled')}>Disable 2fa</Button>
+      </div>
+    );
 }
