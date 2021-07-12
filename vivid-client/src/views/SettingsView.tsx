@@ -66,7 +66,7 @@ function UserProfileCard(props: { userData: any }) {
         <div className="user-profile-expand">
           <div>
             <h2>User profile</h2>
-            <label>
+            <label style={{ display: 'inline-block' }}>
               <input type="file" style={{ display: 'none' }} />
               <Button less_padding margin_right no_button type="secondary">
                 Upload avatar

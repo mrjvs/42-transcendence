@@ -1,4 +1,5 @@
 .button-new {
+  line-height: initial;
   position: relative;
   background-color: #2a3453;
   color: white;
