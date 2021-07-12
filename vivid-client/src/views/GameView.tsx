@@ -12,13 +12,11 @@ export function GameView() {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         history.push(`/pong/${result.gameId}`);
       });
   }
 
   function joinGame(gameId: any) {
-    console.log(gameId);
     fetch(`${window._env_.VIVID_BASE_URL}/api/v1/channels/game/${gameId}`, {
       method: 'PUT',
       credentials: 'include',
