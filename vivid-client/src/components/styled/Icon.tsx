@@ -16,7 +16,7 @@ const icons: any = {
 
 export function Icon(props: { type: string; className?: string }) {
   return (
-    <div
+    <span
       className={props.className}
       style={{ width: '1em', height: '1em' }}
       dangerouslySetInnerHTML={{ __html: icons[props.type] }}

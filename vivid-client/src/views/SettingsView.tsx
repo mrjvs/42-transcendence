@@ -147,6 +147,11 @@ function SecurityCard(props: { userData: any }) {
     method: 'DELETE',
   });
 
+  const logoutAll = useFetch({
+    url: '/api/v1/users/@me/sessions',
+    method: 'DELETE',
+  });
+
   React.useEffect(() => {
     if (deleteUser.done) window.location.href = '/'; // TODO redirect to home page
   }, [deleteUser.done]);
@@ -175,11 +180,15 @@ function SecurityCard(props: { userData: any }) {
           less_padding
           margin_right
           type="secondary"
-          onclick={() => alert('bye') /* TODO backend */}
+          loading={logoutAll.loading}
+          onclick={() => logoutAll.run()}
         >
           Logout all devices
         </Button>
-        {deleteUser.error ? <p>Something went wrong, try again later</p> : null}
+        {deleteUser.error || logoutAll.error ? (
+          <p>Something went wrong, try again later</p>
+        ) : null}
+        {logoutAll.done ? <p>Logged out all devices!</p> : null}
       </div>
     </div>
   );

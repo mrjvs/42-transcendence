@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Res,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
@@ -22,12 +23,22 @@ import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
 import { join } from 'path';
 import { unlink } from 'fs';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @Delete(':id/sessions')
+  async deleteSessions(
+    @UserParam('id') user: IUserParam,
+    @User('id') usr: UserEntity,
+    @Req() req: Request,
+  ): Promise<void> {
+    if (!user.isSelf && !usr.isSiteAdmin()) throw new UnauthorizedException();
+    await this.userService.killSessions(user.id, { except: [req.session.id] });
+  }
 
   @Get('matches/:id')
   async findUsermatches(@Param('id') id: string): Promise<IUser | void> {

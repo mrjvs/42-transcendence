@@ -28,6 +28,13 @@ export function useFetch(options: {
       },
     })
       .then((res) => {
+        if (
+          !res.headers.has('content-length') ||
+          res.headers.get('content-length') === '0'
+        )
+          return new Promise<any>((resolve) => {
+            resolve({});
+          }).then((data) => ({ data, res }));
         return res.json().then((data) => ({ data, res }));
       })
       .then((data) => {
