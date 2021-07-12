@@ -225,7 +225,7 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async updateName(userId: string, newName: string): Promise<UserEntity> {
+  async updateName(userId: string, newName: string): Promise<any> {
     return await this.userRepository
       .save({
         id: userId,

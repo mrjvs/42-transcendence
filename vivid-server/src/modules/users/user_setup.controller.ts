@@ -39,11 +39,15 @@ export class UserSetupController {
   }
 
   @Patch('/:id/name')
-  changeName(
+  async changeName(
     @UserParam('id') user: IUserParam,
     @Body() newName: UsernameChangeDto,
   ): Promise<any> {
-    return this.userService.updateName(user.id, newName.username);
+    const res = await this.userService.updateName(user.id, newName.username);
+    return {
+      id: res.id,
+      name: res.name,
+    };
   }
 
   @Delete(':id')
