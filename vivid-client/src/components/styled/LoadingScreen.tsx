@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { SocketContext } from '../../hooks/useWebsocket';
 import { Button } from './Button';
 import './LoadingScreen.css';
@@ -20,6 +21,8 @@ export function LoadingScreen(props: any) {
   const [loading, setLoading] = React.useState(true);
   const [line, setLine] = React.useState('');
   const [tokenInput, setTokenInput] = React.useState('');
+  const history = useHistory();
+
   // show random loading text
   React.useEffect(() => {
     setLine(lines[Math.floor(Math.random() * lines.length)]);
@@ -27,6 +30,8 @@ export function LoadingScreen(props: any) {
 
   // connect to socket once user has been requested and is logged in
   React.useEffect(() => {
+    if (props.userData.userState.done && !props.userData.user.name)
+      history.push('/');
     if (props.userData.userState.done && props.userData.isLoggedIn && !client) {
       connect();
     }

@@ -97,6 +97,7 @@ export function ChannelView() {
               </div>
             </>
           ) : null}
+          <div ref={scrollEl} />
         </div>
       </div>
       <div className="channelBottomWrapper">

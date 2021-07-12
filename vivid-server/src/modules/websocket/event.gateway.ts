@@ -12,6 +12,13 @@ import { UserService } from '$/users/user.service';
 import { IJoinedChannel } from '~/models/joined_channels.entity';
 import { UserEntity } from '~/models/user.entity';
 import { PongService } from '../pong/pong.service';
+import {
+  connectClient,
+  disconnectClient,
+  getAllStatuses,
+  registerCallback,
+  UserStatus,
+} from './statuses';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -21,12 +28,49 @@ export class EventGateway implements OnGatewayConnection {
   constructor(
     private readonly userService: UserService,
     private readonly pongService: PongService,
-  ) {}
-
-  async handleConnection(socket: Socket) {
-    await this.putUserInSocket(socket);
+  ) {
+    registerCallback((s: UserStatus) => this.statusCallback(s));
   }
 
+  /* CONNECTION HANDLING */
+  async putUserInSocket(socket: Socket) {
+    socket.auth = null;
+    if (!socket?.handshake?.headers?.cookie) {
+      return null;
+    }
+    try {
+      const res = await this.userService.getUserIdFromCookie(
+        socket.handshake.headers.cookie,
+      );
+      if (res) socket.auth = res;
+    } catch (err) {}
+  }
+
+  async handleConnection(socket: Socket) {
+    // get logged in user
+    await this.putUserInSocket(socket);
+
+    // if authenticated, connect to status listener
+    if (socket.auth) connectClient(socket.auth, socket.id);
+  }
+
+  async handleDisconnect(socket: Socket) {
+    disconnectClient(socket.id);
+  }
+
+  /* STATUSES */
+  statusCallback(status: UserStatus) {
+    // TODO only send status updates if user is related to client
+    this.server.emit('status_update', status);
+  }
+
+  @SubscribeMessage('status_request')
+  fetchStatuses(@ConnectedSocket() client: Socket) {
+    if (!client.auth) return;
+    client.emit('status_list', getAllStatuses());
+  }
+
+  /* MESSAGES */
   sendChannelMessage(
     message: IMessage,
     joins: IJoinedChannel[],
@@ -49,19 +93,7 @@ export class EventGateway implements OnGatewayConnection {
     }
   }
 
-  async putUserInSocket(socket: Socket) {
-    socket.auth = null;
-    if (!socket?.handshake?.headers?.cookie) {
-      return null;
-    }
-    try {
-      const res = await this.userService.getUserIdFromCookie(
-        socket.handshake.headers.cookie,
-      );
-      if (res) socket.auth = res;
-    } catch (err) {}
-  }
-
+  /* GAME EVENTS */
   @SubscribeMessage('newGame')
   newGame(@ConnectedSocket() client: Socket) {
     if (!client.auth) return; // TODO do we need to throw something (unauthorized) here?
