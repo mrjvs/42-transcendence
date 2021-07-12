@@ -112,7 +112,7 @@ export class PongService {
     if (!gameId) return;
 
     const playerNumber: playerNb =
-      states[gameId].players[playerNb.ONE].userId === client.id
+      states[gameId].players[playerNb.ONE].userId === client.auth
         ? playerNb.ONE
         : playerNb.TWO;
 
@@ -125,7 +125,7 @@ export class PongService {
     if (!gameId) return;
 
     const playerNumber: playerNb =
-      states[gameId].players[playerNb.ONE].userId === client.id
+      states[gameId].players[playerNb.ONE].userId === client.auth
         ? playerNb.ONE
         : playerNb.TWO;
 
