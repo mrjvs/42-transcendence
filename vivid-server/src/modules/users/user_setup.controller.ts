@@ -6,7 +6,6 @@ import {
   Get,
   Patch,
   UseGuards,
-  Get,
 } from '@nestjs/common';
 import {
   IUserParam,

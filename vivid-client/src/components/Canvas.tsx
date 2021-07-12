@@ -1,7 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
-import socketIOClient from 'socket.io-client';
+import React from 'react';
 import { drawGame } from '../views/game/Draw';
 import { IGameState } from '../views/game/Constants';
+import { SocketContext } from '../hooks/useWebsocket';
 
 interface CanvasProps {
   width: number;
@@ -9,74 +9,74 @@ interface CanvasProps {
 }
 
 export function Canvas({ width, height }: CanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [clientState, setClientState] = useState('CONNECTING'); // TODO nodig?
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const { client } = React.useContext(SocketContext);
 
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
 
-  useEffect(() => {
-    const client = socketIOClient(window._env_.VIVID_BASE_URL, {
-      withCredentials: true,
-      path: '/api/v1/events',
+  function connect() {
+    client.emit('ready');
+  }
+
+  function init() {
+    if (!canvasRef.current) return;
+
+    canvas = canvasRef.current;
+    context = canvas.getContext('2d');
+
+    document.addEventListener('keydown', keydown);
+    document.addEventListener('keyup', keyup);
+    document.addEventListener('mousemove', mouseMove);
+  }
+
+  function draw(gameState: IGameState) {
+    if (context === null) return;
+    requestAnimationFrame(() => {
+      drawGame(gameState, canvas, context);
     });
+  }
 
-    client.on('connect', () => {
-      setClientState('CONNECTED');
-      client.emit('ready');
-      clientState;
-    });
+  function gameOver(winner: string) {
+    alert(`User: "${winner}" won the game`);
+  }
 
-    client.on('init', () => {
-      if (!canvasRef.current) return;
+  function start(roomName: string) {
+    client.emit('start', roomName);
+  }
 
-      canvas = canvasRef.current;
-      context = canvas.getContext('2d');
+  function keydown(event: KeyboardEvent) {
+    if (event.key === 'w') client.emit('keydown', -0.01);
+    else if (event.key === 's') client.emit('keydown', 0.01);
+  }
 
-      document.addEventListener('keydown', keydown);
-      document.addEventListener('keyup', keyup);
-      document.addEventListener('mousemove', mouseMove);
-    });
+  function keyup(event: KeyboardEvent) {
+    if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
+  }
 
-    client.on('drawGame', (gameState: IGameState) => {
-      if (context === null) return;
-      requestAnimationFrame(() => {
-        drawGame(gameState, canvas, context);
-      });
-    });
+  function mouseMove(event: MouseEvent) {
+    client.emit('mouseMove', event.clientY / canvas.height);
+  }
 
-    client.on('disconnect', () => {
-      setClientState('DISCONNECTED');
-    });
-
-    client.on('gameOver', (winner: string) => {
-      alert(`User: "${winner}" won the game`);
-    });
-
-    client.on('start', (roomName: string) => {
-      client.emit('start', roomName);
-    });
-
-    function keydown(event: KeyboardEvent) {
-      if (event.key === 'w') client.emit('keydown', -0.01);
-      else if (event.key === 's') client.emit('keydown', 0.01);
-    }
-
-    function keyup(event: KeyboardEvent) {
-      if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
-    }
-
-    function mouseMove(event: MouseEvent) {
-      client.emit('mouseMove', event.clientY / canvas.height);
-    }
+  React.useEffect(() => {
+    if (!client) return;
+    client.on('connect', connect);
+    client.on('init', init);
+    client.on('start', start);
+    client.on('drawGame', draw);
+    client.on('gameOver', gameOver);
 
     return () => {
-      client.destroy();
+      client.off('connect', connect);
+      client.off('init', init);
+      client.off('start', start);
+      client.off('drawGame', draw);
+      client.off('gameOver', gameOver);
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('keyup', keyup);
       document.removeEventListener('mousemove', mouseMove);
     };
-  }, []);
+  }, [client]);
 
   return (
     <>

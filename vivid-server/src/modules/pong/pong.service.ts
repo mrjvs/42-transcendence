@@ -56,6 +56,8 @@ export class PongService {
     const game: IGameState = states[gameId];
     if (!game) return;
 
+    client.join(gameId);
+
     // Set player as ready or spectator
     const player = game.players.find((v) => v.userId === client.auth);
     if (!player)
@@ -65,7 +67,6 @@ export class PongService {
       };
 
     player.ready = true;
-    client.join(gameId);
     client.emit('init');
 
     // Check if both players are ready and start game
@@ -104,7 +105,7 @@ export class PongService {
         delete clientRooms[game.players[playerNb.TWO].userId];
         delete states[gameId];
       }
-    }, 1000 / 50); // 50 FPS
+    }, 1000 / 50);
   }
 
   handleKeydown(client: Socket, move: number) {
