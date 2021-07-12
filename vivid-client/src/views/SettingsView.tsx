@@ -43,12 +43,21 @@ function UserProfileCard(props: { userData: any }) {
     method: 'PATCH',
   });
 
+  const deleteAvatar = useFetch({
+    url: '/api/v1/users/@me/avatar',
+    method: 'DELETE',
+  });
+
   React.useEffect(() => {
     if (updateUserFetch.done) {
       props.userData?.updateUser(updateUserFetch.data.data);
       updateUserFetch.reset();
     }
-  }, [updateUserFetch.done]);
+    if (deleteAvatar.done) {
+      props.userData?.updateUser({ avatar: null });
+      deleteAvatar.reset();
+    }
+  }, [updateUserFetch.done, deleteAvatar.done]);
 
   return (
     <div className="card">
@@ -57,22 +66,23 @@ function UserProfileCard(props: { userData: any }) {
         <div className="user-profile-expand">
           <div>
             <h2>User profile</h2>
-            <Button
-              less_padding
-              margin_right
-              type="secondary"
-              onclick={() => alert('yey')}
-            >
-              Upload avatar
-            </Button>
+            <label>
+              <input type="file" style={{ display: 'none' }} />
+              <Button less_padding margin_right no_button type="secondary">
+                Upload avatar
+              </Button>
+            </label>
             <Button
               less_padding
               margin_right
               type="danger"
-              onclick={() => alert('ney')}
+              onclick={() => deleteAvatar.run()}
             >
               Remove avatar
             </Button>
+            {deleteAvatar.error ? (
+              <p>Something went wrong, try again later</p>
+            ) : null}
           </div>
           <div className="user-name">
             <div className="text-wrapper">
