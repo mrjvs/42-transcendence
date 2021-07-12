@@ -19,13 +19,17 @@ export function useFetch(options: {
   function run(body?: any) {
     setLoading(true);
     setError(null);
+    let b = undefined;
+    let isJson = true;
+    if (body && body.constructor === FormData) {
+      b = body;
+      isJson = false;
+    } else if (body) b = JSON.stringify(body);
     fetch(`${window._env_.VIVID_BASE_URL}${options.url}`, {
       credentials: 'include',
       method: options.method,
-      body: body ? JSON.stringify(body) : undefined,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      body: b,
+      headers: isJson ? { 'Content-Type': 'application/json' } : {},
     })
       .then((res) => {
         if (

@@ -26,6 +26,7 @@ export function SettingsView() {
 }
 
 function UserProfileCard(props: { userData: any }) {
+  const fileRef = React.useRef<any>(null);
   const [newestUsername, setNewestUsername] = React.useState('');
   const [username, setUsername] = React.useState('');
   React.useEffect(() => {
@@ -48,6 +49,11 @@ function UserProfileCard(props: { userData: any }) {
     method: 'DELETE',
   });
 
+  const uploadAvatar = useFetch({
+    url: '/api/v1/users/@me/avatar',
+    method: 'POST',
+  });
+
   React.useEffect(() => {
     if (updateUserFetch.done) {
       props.userData?.updateUser(updateUserFetch.data.data);
@@ -57,7 +63,24 @@ function UserProfileCard(props: { userData: any }) {
       props.userData?.updateUser({ avatar: null });
       deleteAvatar.reset();
     }
-  }, [updateUserFetch.done, deleteAvatar.done]);
+    if (uploadAvatar.done) {
+      // props.userData?.updateUser(); // TODO update avatar data
+      uploadAvatar.reset();
+    }
+  }, [updateUserFetch.done, deleteAvatar.done, uploadAvatar.done]);
+
+  function uploadAvatarImage() {
+    if (
+      !fileRef.current ||
+      !fileRef.current.files ||
+      fileRef.current.files.length === 0
+    )
+      return;
+    const form = new FormData();
+    form.append('photo', fileRef.current.files[0]);
+    uploadAvatar.run(form);
+    return;
+  }
 
   return (
     <div className="card">
@@ -67,7 +90,13 @@ function UserProfileCard(props: { userData: any }) {
           <div>
             <h2>User profile</h2>
             <label style={{ display: 'inline-block' }}>
-              <input type="file" style={{ display: 'none' }} />
+              <input
+                type="file"
+                style={{ display: 'none' }}
+                accept="image/*"
+                ref={fileRef}
+                onChange={() => uploadAvatarImage()}
+              />
               <Button less_padding margin_right no_button type="secondary">
                 Upload avatar
               </Button>
@@ -80,7 +109,7 @@ function UserProfileCard(props: { userData: any }) {
             >
               Remove avatar
             </Button>
-            {deleteAvatar.error ? (
+            {deleteAvatar.error || uploadAvatar.error ? (
               <p>Something went wrong, try again later</p>
             ) : null}
           </div>
@@ -117,6 +146,7 @@ function UserProfileCard(props: { userData: any }) {
   );
 }
 
+// TODO button functionality and modal
 function TwoFaInfo(props: { twoFactor: boolean }) {
   if (!props.twoFactor) {
     return (

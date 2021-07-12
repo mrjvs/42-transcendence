@@ -97,6 +97,7 @@ export class UnrelatedUser {
   @Expose() id: string;
   @Expose() name: string;
   @Expose() avatar_colors: string[];
+  @Expose() avatar?: string;
 }
 
 export class RelatedUser extends UnrelatedUser {
