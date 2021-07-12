@@ -42,7 +42,7 @@ export class UserSetupController {
   changeName(
     @UserParam('id') user: IUserParam,
     @Body() newName: UsernameChangeDto,
-  ): Promise<IUser> {
+  ): Promise<any> {
     return this.userService.updateName(user.id, newName.username);
   }
 
