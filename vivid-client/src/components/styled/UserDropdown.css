@@ -86,6 +86,16 @@
   padding: 0.5rem 1rem;
   color: #9da6c4;
   text-decoration: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.userDropdown .menu .menuItem.red {
+  color: #cd5f73;
+}
+
+.userDropdown .menu .menuItem.red:hover {
+  color: #cd5f73;
 }
 
 .userDropdown .menu .menuItem:hover {
