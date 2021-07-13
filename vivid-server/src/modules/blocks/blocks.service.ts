@@ -35,7 +35,7 @@ export class BlocksService {
     return await this.blocksRepository
       .createQueryBuilder()
       .delete()
-      .where('id = :id', { id: blockId })
+      .where('blocked_user_id = :id', { id: blockId })
       .andWhere('user_id = :u', { u: userId })
       .execute()
       .catch((error) => {

@@ -41,13 +41,15 @@ function BlockAction(props: { userData: any; userId: string }) {
     if (blockUser.done) {
       blockUser.reset();
       props.userData?.updateUser({
-        blocks: [...props.userData.data.blocks, props.userId],
+        blocks: [...props.userData.user.blocks, props.userId],
       });
     }
     if (unBlockUser.done) {
       unBlockUser.reset();
       props.userData?.updateUser({
-        blocks: props.userData.blocks.filter((v: string) => v !== props.userId),
+        blocks: props.userData.user.blocks.filter(
+          (v: string) => v !== props.userId,
+        ),
       });
     }
   }, [blockUser.done, unBlockUser.done, props.userData]);

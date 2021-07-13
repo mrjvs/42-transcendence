@@ -23,13 +23,13 @@ export class BlocksController {
   ) {}
 
   // block user
-  @Post('block/:block_id')
+  @Post(':block_id')
   async blockUser(
     @Param('block_id') userToBlockId: string,
     @User() user: UserEntity,
   ): Promise<UpdateResult> {
     // checking if friend is in general user table
-    const user_to_block = await this.userService.findUser(userToBlockId);
+    const user_to_block = await this.userService.findUser(userToBlockId, []);
     if (!user_to_block) throw new NotFoundException();
 
     // checking if friend is the logged in user
@@ -39,7 +39,7 @@ export class BlocksController {
   }
 
   // unblock user
-  @Delete('block/:block_id')
+  @Delete(':block_id')
   async unblockUser(
     @Param('block_id') blockId: string,
     @User() user: UserEntity,
