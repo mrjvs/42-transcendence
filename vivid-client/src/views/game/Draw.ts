@@ -68,6 +68,30 @@ function scores(
     'RED',
     '75px Serif',
   );
+  text(
+    context,
+    gameState.players[0].addOnPoints.toString(),
+    canvas.width / 4,
+    (canvas.height / 5) * 4,
+    'RED',
+    '75px Serif',
+  );
+  text(
+    context,
+    gameState.players[1].addOnPoints.toString(),
+    (canvas.width / 4) * 3,
+    (canvas.height / 5) * 4,
+    'RED',
+    '75px Serif',
+  );
+  text(
+    context,
+    gameState.ball.speed.toString(),
+    (canvas.width / 4) * 2,
+    (canvas.height / 5) * 2,
+    'RED',
+    '75px Serif',
+  );
 }
 
 function ball(

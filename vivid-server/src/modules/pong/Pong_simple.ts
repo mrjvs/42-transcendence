@@ -8,7 +8,6 @@ function resetBall(state: IGameState) {
   state.ball.velocityX = 0.01;
   state.ball.velocityY = 0.01;
   state.ball.velocityX = -state.ball.velocityX;
-  // state.addOnReady = 1;
 }
 
 // Calculate if the ball hit a pad
@@ -31,7 +30,6 @@ function collision(player: IPlayer, gameState: IGameState) {
 }
 
 function updateBallLocation(state: IGameState): IPlayer | null {
-  
   // Check for wall hit
   if (
     state.ball.y + state.ball.radius > 1 ||
@@ -50,37 +48,8 @@ function updateBallLocation(state: IGameState): IPlayer | null {
     attackingPlayer = state.players[0];
   }
 
-  // check for addon 'rocket'
-  if (state.settings.addon === 'trampoline')
-  {
-    if (attackingPlayer.spacebar && attackingPlayer.trampoline === false && attackingPlayer.addOnPoints > 0)
-    {
-      attackingPlayer.trampoline = true;
-      attackingPlayer.addOnPoints -= 1;
-    }
-    if (defendingPlayer.spacebar && defendingPlayer.trampoline === false && defendingPlayer.addOnPoints > 0)
-    {
-      defendingPlayer.trampoline = true
-      defendingPlayer.addOnPoints -= 1;
-    }
-  }
-    
-    // Check for pad collision and change ball direction
+  // Check for pad collision and change ball direction
   if (collision(defendingPlayer, state)) {
-      
-      // an special move (addon) can only be used once every collision
-    if (state.settings.addon === 'trampoline' && defendingPlayer.trampoline === true){
-      state.ball.speed += 0.01;
-      defendingPlayer.trampoline = false;
-      state.addOnReady = 1;
-    }
-
-    // hier ben ik gebleven fix het herstel van de ballspeed... 
-    else if (state.addOnReady === 1){
-      state.ball.speed -= 0.01;
-    }
-
-
     const collidePoint =
       (state.ball.y - (defendingPlayer.y + state.playerHeight / 2)) /
       (state.playerHeight / 2);
@@ -89,10 +58,6 @@ function updateBallLocation(state: IGameState): IPlayer | null {
     state.ball.velocityX = Math.cos(angleRad) * state.ball.speed * direction;
     state.ball.velocityY = Math.sin(angleRad) * state.ball.speed;
     state.ball.speed += state.increaseSpeedAfterContact;
-
-    // adding special at random 1 in 5 change 
-    if (Math.floor(Math.random() * 5) == 0 && defendingPlayer.addOnPoints < 3)
-      defendingPlayer.addOnPoints += 1;
   }
 
   // Check for goal and reset ball

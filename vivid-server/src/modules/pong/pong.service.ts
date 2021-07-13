@@ -123,6 +123,16 @@ export class PongService {
       states[roomName].players[client.number - 1].move = move;
   }
 
+  handleAddOns(client: Socket, spacebar: number) {
+    // Find room
+    const roomName = clientRooms[client.id];
+    if (!roomName) return;
+
+    // Set player move
+    if (states[roomName].settings.controls === 'keys')
+      states[roomName].players[client.number - 1].spacebar = spacebar;
+  }
+
   handleMouseMove(client: Socket, move: number) {
     // Find room
     const roomName = clientRooms[client.id];

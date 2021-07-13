@@ -41,6 +41,7 @@ export class AuthController {
     @User() usr: UserEntity,
     @Body() body: TwoFactorDto,
   ): Promise<{ status: boolean; message?: string }> {
+    console.log("hi-----");
     const res = await this.authService.handleTwoFactor(
       req.session,
       usr,

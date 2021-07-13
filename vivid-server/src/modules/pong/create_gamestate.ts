@@ -4,7 +4,7 @@ export function createGameState(gameId: string) {
     settings: {
       controls: 'keys',
       multiPlayer: false,
-      addon: '',
+      addon: 'trampoline',
     },
     players: [
       {
@@ -14,6 +14,9 @@ export function createGameState(gameId: string) {
         y: 0.5,
         score: 0,
         move: 0,
+        spacebar: 0,
+        addOnPoints: 0,
+        trampoline: false,
         ready: false,
       },
       {
@@ -23,6 +26,9 @@ export function createGameState(gameId: string) {
         y: 0.5,
         score: 0,
         move: 0,
+        spacebar: 0,
+        addOnPoints: 0,
+        trampoline: false,
         ready: false,
       },
     ],
@@ -41,5 +47,6 @@ export function createGameState(gameId: string) {
     playerWidth: 0.02,
     playerHeight: 0.3,
     playerColor: 'PURPLE',
+    addOnReady: 2,
   };
 }
