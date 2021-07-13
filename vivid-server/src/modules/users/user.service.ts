@@ -188,9 +188,14 @@ export class UserService {
   async enableTwoFactor(id: string, session?: any): Promise<any> {
     const data = {
       secret: authenticator.generateSecret(20), // 160 bytes, recommened totp length
-      backupCodes: Array(10)
+      backupCodes: Array(12)
         .fill(0)
-        .map(() => cryptoRandomString({ length: 6, type: 'distinguishable' }))
+        .map(() =>
+          cryptoRandomString({
+            length: 6,
+            alphanumeric: true,
+          }).toUpperCase(),
+        )
         .map((v) => `${v.slice(0, 3)}-${v.slice(3)}`),
     };
     const result = await this.userRepository.update(id, {

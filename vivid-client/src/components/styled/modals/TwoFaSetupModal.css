@@ -23,19 +23,20 @@
 
 .twofa-setup-modal .icon {
   padding-top: 8rem;
-  color: #6790E6;
+  color: #6790e6;
   font-size: 1.5rem;
 }
 
 .twofa-setup-modal .twofa-motto {
-  color: #9DA6C4;
+  color: #9da6c4;
   width: 13rem;
   text-align: center;
   margin: 1rem auto 3rem auto;
+  line-height: 1.35;
 }
 
 .twofa-setup-modal .backup-codes-card {
-  background: #252A40;
+  background: #252a40;
   border-radius: 5px;
   margin-bottom: 1rem;
   padding: 2rem;
@@ -60,7 +61,7 @@
   justify-content: space-between;
   width: 100%;
   grid-row-gap: 0.8rem;
-  color: #9DA6C4;
+  color: #9da6c4;
   font-size: 0.9rem;
 }
 
