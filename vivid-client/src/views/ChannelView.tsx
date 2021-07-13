@@ -5,12 +5,43 @@ import { Message, NoMessage } from '../components/styled/Message';
 import { useMessages } from '../hooks/useMessages';
 import { MainLayout } from './layouts/MainLayout';
 import './ChannelView.css';
+import { UserContext } from '../hooks/useUser';
 
 export function ChannelView() {
   const scrollEl = React.useRef(null);
   const { id }: any = useParams();
   const messageData = useMessages(id);
+  const userData = React.useContext(UserContext);
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
+  const [currentUser, setCurrentUser] = React.useState<{
+    user?: any | null;
+    tag?: string | null;
+  }>({ user: null, tag: null });
+
+  function getRole(userId: string) {
+    let tag = null;
+    const channelUser = messageData?.channelInfo?.joined_users.find(
+      (v: any) => v.user?.id === userId || v.user === userId,
+    );
+    if (channelUser && channelUser.is_mod) tag = 'mod';
+    if (userId === messageData?.channelInfo?.owner) tag = 'owner';
+    return tag;
+  }
+
+  React.useEffect(() => {
+    if (!messageData?.channelInfo || !userData.user?.id) {
+      setCurrentUser({ user: null, tag: null });
+      return;
+    }
+    const n = {
+      user: messageData?.channelInfo?.joined_users?.find(
+        (v: any) =>
+          v.user?.id === userData.user?.id || v.user === userData.user?.id,
+      ),
+      tag: currentUser ? getRole(userData.user?.id) : null,
+    };
+    setCurrentUser(n);
+  }, [messageData.channelInfo, userData]);
 
   React.useEffect(() => {
     const cur: any = scrollEl?.current;
@@ -31,6 +62,7 @@ export function ChannelView() {
           avatar_colors: ['', ''],
           id: msg.user,
         },
+        userTag: getRole(msg.user),
         messages: [
           {
             content: msg.content,
@@ -77,7 +109,10 @@ export function ChannelView() {
   return (
     <MainLayout
       title={
-        messageData.messageState.done ? messageData.channelInfo.title : '‎'
+        (messageData.messageState.done ? messageData.channelInfo.title : '‎') +
+        (currentUser.tag && ['owner', 'mod'].includes(currentUser.tag)
+          ? 'Edit channel'
+          : '')
       }
     >
       <div className="channelScrollWrapper">
@@ -92,6 +127,7 @@ export function ChannelView() {
                     messages={v.messages}
                     user={v.userData}
                     blocked={false}
+                    tag={v.userTag}
                   />
                 ))}
               </div>

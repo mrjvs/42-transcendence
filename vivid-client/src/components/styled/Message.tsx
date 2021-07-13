@@ -16,7 +16,18 @@ export function Message(props: {
       </div>
       <div>
         <p className="messageUserName">
-          {props.blocked ? 'Redacted' : props.user.name}
+          {props.blocked ? (
+            'Redacted'
+          ) : (
+            <span>
+              {props.user.name}
+              {props.tag ? (
+                <span className={`tag tag-${props.tag.toLowerCase()}`}>
+                  {props.tag}
+                </span>
+              ) : null}
+            </span>
+          )}
         </p>
         <div className="messageMessageContainer">
           {!props.blocked ? (
