@@ -16,6 +16,33 @@
   transform: scale(1.05);
 }
 
+.userAvatar.blocked {
+  background-color: #272c43 !important;
+  background-image: initial !important;
+  position: relative;
+}
+
+.userAvatar.blocked::after,
+.userAvatar.blocked::before {
+  background-color: #1b1f31;
+  content: '';
+  height: 2rem;
+  width: 3px;
+  border-radius: 10px;
+  position: absolute;
+  top: calc(50% - 1rem);
+  left: calc(50% - 1.5px);
+  transform-origin: center;
+  transform: rotate(-45deg);
+}
+.userAvatar.blocked::before {
+  transform: rotate(45deg);
+}
+
+.userAvatar.blocked .status-bubble {
+  display: none;
+}
+
 .userAvatar .status-bubble {
   background-color: #353b57; /* offline defaults */
   position: absolute;

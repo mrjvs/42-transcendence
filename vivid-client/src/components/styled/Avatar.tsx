@@ -15,6 +15,7 @@ export function Avatar(props: {
   small?: boolean;
   noStatus?: boolean;
   isClickable?: boolean;
+  blocked?: boolean;
 }) {
   let background;
   if (!props.user.avatar)
@@ -27,9 +28,9 @@ export function Avatar(props: {
   return (
     <div>
       <div
-        className={`userAvatar ${props.small ? 'small' : ''} ${
-          props.isClickable ? 'clickable' : ''
-        }`}
+        className={`userAvatar ${props.small ? 'small' : ''}  ${
+          props.blocked ? 'blocked' : ''
+        } ${props.isClickable ? 'clickable' : ''}`}
         style={{
           backgroundImage: background,
         }}

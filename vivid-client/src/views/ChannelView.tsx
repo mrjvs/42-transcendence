@@ -126,7 +126,7 @@ export function ChannelView() {
                     key={v.id}
                     messages={v.messages}
                     user={v.userData}
-                    blocked={false}
+                    blocked={userData.user?.blocks?.includes(v.user)}
                     tag={v.userTag}
                   />
                 ))}
