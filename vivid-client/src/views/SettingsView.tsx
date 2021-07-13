@@ -7,6 +7,7 @@ import { Avatar } from '../components/styled/Avatar';
 import { UserContext } from '../hooks/useUser';
 import './SettingsView.css';
 import { useFetch } from '../hooks/useFetch';
+import { TwoFaSetupModal } from '../components/styled/modals/TwoFaSetup.modal';
 
 export function SettingsView() {
   const history = useHistory();
@@ -148,17 +149,25 @@ function UserProfileCard(props: { userData: any }) {
 
 // TODO button functionality and modal
 function TwoFaInfo(props: { twoFactor: boolean }) {
+  const twoFa = useFetch({
+    url: '/api/v1/users/@me/2fa',
+    method: 'PATCH',
+  });
+
   if (!props.twoFactor) {
     return (
-      <div className="red">
-        <h2>Two Factor Authentication</h2>
-        <p>
-          <Icon className="twofa-icon" type="alert" />
-          Two factor authentication is not enabled!
-        </p>
-        <Button less_padding margin_right onclick={() => alert('enabled')}>
-          Enable 2fa
-        </Button>
+      <div>
+        <div className="red">
+          <h2>Two Factor Authentication</h2>
+          <p>
+            <Icon className="twofa-icon" type="alert" />
+            Two factor authentication is not enabled!
+          </p>
+          <Button less_padding margin_right onclick={() => twoFa.run()}>
+            Enable 2fa
+          </Button>
+        </div>
+        <TwoFaSetupModal open={true} close={() => false} />
       </div>
     );
   }

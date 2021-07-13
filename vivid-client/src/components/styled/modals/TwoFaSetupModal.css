@@ -1,0 +1,47 @@
+.twofa-setup-modal {
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.twofa-setup-modal .qr-icon {
+  position: absolute;
+  top: -8rem;
+  left: 5rem;
+  font-size: 10rem;
+  background: #252A40;
+  color: #6790E6;
+  border-radius: 10px;
+  padding: 1rem 1rem 0.5rem 1rem;
+}
+
+.twofa-setup-modal .icon {
+  padding-top: 8rem;
+  color: #6790E6;
+  font-size: 1.5rem;
+}
+
+.twofa-setup-modal .twofa-motto {
+  color: #9DA6C4;
+  width: 13rem;
+  text-align: center;
+  margin: 1rem auto 3rem auto;
+}
+
+.twofa-setup-modal .backup-codes-card {
+  background: #252A40;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+.twofa-setup-modal .backup-codes-card h5 {
+  text-align: left;
+  padding: 1rem;
+  margin: 0;
+}
+
+.twofa-setup-modal .backup-codes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
