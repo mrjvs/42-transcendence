@@ -148,11 +148,34 @@ function UserProfileCard(props: { userData: any }) {
 }
 
 // TODO button functionality and modal
-function TwoFaInfo(props: { twoFactor: boolean }) {
-  const twoFa = useFetch({
+function TwoFaInfo(props: { userData: any; twoFactor: boolean }) {
+  const twoFaEnable = useFetch({
     url: '/api/v1/users/@me/2fa',
     method: 'PATCH',
   });
+
+  const twoFaDisable = useFetch({
+    url: '/api/v1/users/@me/2fa',
+    method: 'DELETE',
+  });
+
+  const [openModal, setOpenModal] = React.useState(false);
+
+  React.useEffect(() => {
+    if (twoFaEnable.done) {
+      setOpenModal(true);
+      props.userData?.updateUser({ twoFactorEnabled: true, twofactor: true });
+    }
+    if (twoFaDisable.done) {
+      twoFaDisable.reset();
+      props.userData?.updateUser({ twoFactorEnabled: false, twofactor: null });
+    }
+  }, [twoFaEnable.done, twoFaDisable.done]);
+
+  function closeModal() {
+    setOpenModal(false);
+    twoFaEnable.reset();
+  }
 
   if (!props.twoFactor) {
     return (
@@ -163,29 +186,54 @@ function TwoFaInfo(props: { twoFactor: boolean }) {
             <Icon className="twofa-icon" type="alert" />
             Two factor authentication is not enabled!
           </p>
-          <Button less_padding margin_right onclick={() => twoFa.run()}>
+          <Button
+            loading={twoFaEnable.loading}
+            less_padding
+            margin_right
+            onclick={() => {
+              twoFaEnable.run();
+            }}
+          >
             Enable 2fa
           </Button>
         </div>
-        <TwoFaSetupModal open={true} close={() => false} />
+        {twoFaEnable.error ? (
+          <p>Something went wrong, try again later</p>
+        ) : null}
+        <TwoFaSetupModal
+          secret={twoFaEnable.data?.data?.secret}
+          codes={twoFaEnable.data?.data?.backupCodes}
+          open={openModal}
+          close={() => closeModal()}
+        />
       </div>
     );
   }
   return (
-    <div className="green">
-      <h2>Two Factor Authentication</h2>
-      <p>
-        <Icon className="twofa-icon" type="checkmark" />
-        Two factor authentication is enabled!
-      </p>
-      <Button
-        less_padding
-        margin_right
-        type="danger"
-        onclick={() => alert('disabled')}
-      >
-        Disable 2fa
-      </Button>
+    <div>
+      <div className="green">
+        <h2>Two Factor Authentication</h2>
+        <p>
+          <Icon className="twofa-icon" type="checkmark" />
+          Two factor authentication is enabled!
+        </p>
+        <Button
+          loading={twoFaDisable.loading}
+          less_padding
+          margin_right
+          type="danger"
+          onclick={() => twoFaDisable.run()}
+        >
+          Disable 2fa
+        </Button>
+      </div>
+      {twoFaDisable.error ? <p>Something went wrong, try again later</p> : null}
+      <TwoFaSetupModal
+        secret={twoFaEnable.data?.data?.secret}
+        codes={twoFaEnable.data?.data?.backupCodes}
+        open={openModal}
+        close={() => closeModal()}
+      />
     </div>
   );
 }
@@ -208,7 +256,10 @@ function SecurityCard(props: { userData: any }) {
   return (
     <div className="card">
       <div className="twofa-wrapper">
-        <TwoFaInfo twoFactor={props.userData?.user?.twofactor} />
+        <TwoFaInfo
+          userData={props.userData}
+          twoFactor={props.userData?.user?.twoFactorEnabled}
+        />
       </div>
       <div className="dangerZone-wrapper">
         <h2>Danger Zone</h2>

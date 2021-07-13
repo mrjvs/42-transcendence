@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { MatchesEntity } from './matches.entity';
 
 @Entity({ name: 'users' })
@@ -119,12 +119,15 @@ export class RelatedUser extends UnrelatedUser {
   joined_channels: string[] | string;
 }
 
+@Exclude()
 export class FullDetailsUser extends RelatedUser {
   @Expose()
   @Transform(({ obj }) => obj.joined_channels, { toClassOnly: true })
   joined_channels: any;
 
-  private twofactor: any;
+  @Expose()
+  @Transform(({ value }) => !!value)
+  twofactor: any;
 
   @Expose()
   get twoFactorEnabled() {

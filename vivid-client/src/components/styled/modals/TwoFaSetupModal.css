@@ -6,13 +6,19 @@
 
 .twofa-setup-modal .qr-icon {
   position: absolute;
-  top: -8rem;
-  left: 5rem;
+  top: -2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
   font-size: 10rem;
-  background: #252A40;
-  color: #6790E6;
   border-radius: 10px;
   padding: 1rem 1rem 0.5rem 1rem;
+  width: 13rem;
+}
+
+.twofa-setup-modal .qr-icon > canvas {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 10px;
 }
 
 .twofa-setup-modal .icon {
@@ -32,16 +38,36 @@
   background: #252A40;
   border-radius: 5px;
   margin-bottom: 1rem;
+  padding: 2rem;
 }
 
 .twofa-setup-modal .backup-codes-card h5 {
   text-align: left;
-  padding: 1rem;
+  padding-bottom: 1rem;
   margin: 0;
 }
 
 .twofa-setup-modal .backup-codes {
   display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.twofa-setup-modal .backup-codes > ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
+  width: 100%;
+  grid-row-gap: 0.8rem;
+  color: #9DA6C4;
+  font-size: 0.9rem;
+}
+
+.twofa-setup-modal .backup-codes li {
+  padding: 0;
+}
+
+.twofa-setup-modal Button {
+  margin-bottom: 2rem;
 }

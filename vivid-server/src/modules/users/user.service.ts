@@ -189,15 +189,16 @@ export class UserService {
       secret: authenticator.generateSecret(20), // 160 bytes, recommened totp length
       backupCodes: Array(10)
         .fill(0)
-        .map(() => cryptoRandomString({ length: 6 })),
+        .map(() => cryptoRandomString({ length: 6, type: 'distinguishable' }))
+        .map((v) => `${v.slice(0, 3)}-${v.slice(3)}`),
     };
     const result = await this.userRepository.update(id, {
       twofactor: data,
     });
     if (result.affected != 1) throw new NotFoundException();
-    const exceptArray = [];
+    const exceptArray = ['a'];
     if (session) exceptArray.push(session.id);
-    this.killSessions(id, { except: exceptArray });
+    this.killSessions(id, { except: exceptArray }); // TODO fix except session
     // TODO encrypt secret and backup codes
     return data;
   }
