@@ -194,7 +194,7 @@ function TwoFaInfo(props: { userData: any; twoFactor: boolean }) {
               twoFaEnable.run();
             }}
           >
-            Enable 2fa
+            Enable 2FA
           </Button>
         </div>
         {twoFaEnable.error ? (
@@ -224,7 +224,7 @@ function TwoFaInfo(props: { userData: any; twoFactor: boolean }) {
           type="danger"
           onclick={() => twoFaDisable.run()}
         >
-          Disable 2fa
+          Disable 2FA
         </Button>
       </div>
       {twoFaDisable.error ? <p>Something went wrong, try again later</p> : null}
