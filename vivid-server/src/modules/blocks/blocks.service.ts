@@ -14,11 +14,6 @@ export class BlocksService {
     private blocksRepository: Repository<BlocksEntity>,
   ) {}
 
-  // see all blocks
-  async findAll(): Promise<BlocksEntity[]> {
-    return await this.blocksRepository.find();
-  }
-
   // block user
   async block(userId: string, blockId: string): Promise<UpdateResult> {
     return await this.blocksRepository

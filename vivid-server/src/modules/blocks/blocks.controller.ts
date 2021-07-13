@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Controller,
   Delete,
-  Get,
   NotFoundException,
   Param,
   Post,
@@ -10,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { BlocksEntity } from '@/blocks.entity';
 import { UserEntity } from '@/user.entity';
 import { UserService } from '$/users/user.service';
 import { BlocksService } from './blocks.service';
@@ -23,13 +21,6 @@ export class BlocksController {
     private blocksService: BlocksService,
     private userService: UserService,
   ) {}
-
-  // see all blocks
-  // @MustbeAdmin() TODO
-  @Get('all')
-  findAll(): Promise<BlocksEntity[]> {
-    return this.blocksService.findAll();
-  }
 
   // block user
   @Post('block/:block_id')
@@ -48,17 +39,11 @@ export class BlocksController {
   }
 
   // unblock user
-  @Delete('unblock/:block_id')
+  @Delete('block/:block_id')
   async unblockUser(
     @Param('block_id') blockId: string,
     @User() user: UserEntity,
   ): Promise<DeleteResult> {
     return this.blocksService.unblock(user.id, blockId);
-  }
-
-  // see all blocks for user
-  @Get('blockedlist')
-  async blocked_users(@User() user: UserEntity): Promise<BlocksEntity[]> {
-    return this.blocksService.getBlocks(user.id);
   }
 }

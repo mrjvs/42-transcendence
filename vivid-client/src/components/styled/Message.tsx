@@ -12,7 +12,7 @@ export function Message(props: {
   return (
     <div className={`messageWrapper ${props.blocked ? 'blocked' : ''}`}>
       <div>
-        <Avatar user={props.user} />
+        <Avatar isClickable user={props.user} />
       </div>
       <div>
         <p className="messageUserName">

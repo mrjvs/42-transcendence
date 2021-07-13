@@ -8,6 +8,14 @@
   background-size: cover;
 }
 
+.userAvatar.clickable {
+  cursor: pointer;
+}
+
+.userAvatar.clickable:hover {
+  transform: scale(1.05);
+}
+
 .userAvatar .status-bubble {
   background-color: #353b57; /* offline defaults */
   position: absolute;

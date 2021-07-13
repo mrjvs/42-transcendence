@@ -15,7 +15,7 @@ import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
 import { IGame } from '~/models/match.interface';
 import { WarEntity } from '~/models/war.entity';
-import { WarsService } from '../wars/wars.service';
+import { WarsService } from '$/wars/wars.service';
 import { authenticator } from 'otplib';
 import * as cryptoRandomString from 'secure-random-string';
 import { TypeORMSession } from '~/models/session.entity';
@@ -58,6 +58,7 @@ export class UserService {
       'joined_channels.channel',
       'guild',
       'guild.users',
+      'blocks',
     ],
   ): Promise<UserEntity> {
     return await this.userRepository

@@ -147,7 +147,6 @@ function UserProfileCard(props: { userData: any }) {
   );
 }
 
-// TODO button functionality and modal
 function TwoFaInfo(props: { userData: any; twoFactor: boolean }) {
   const twoFaEnable = useFetch({
     url: '/api/v1/users/@me/2fa',

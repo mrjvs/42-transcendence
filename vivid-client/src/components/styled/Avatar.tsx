@@ -1,6 +1,7 @@
 import React from 'react';
 import { StatusContext } from '../../hooks/useStatuses';
 import './Avatar.css';
+import { UserProfileModal } from './modals/UserProfile.modal';
 
 function StatusBubble(props: { userId: string }) {
   const { getStatus } = React.useContext(StatusContext);
@@ -13,6 +14,7 @@ export function Avatar(props: {
   user: any;
   small?: boolean;
   noStatus?: boolean;
+  isClickable?: boolean;
 }) {
   let background;
   if (!props.user.avatar)
@@ -20,14 +22,28 @@ export function Avatar(props: {
   else
     background = `url(${window._env_.VIVID_BASE_URL}/api/v1/users/avatar/${props.user.avatar})`;
 
+  const [state, setState] = React.useState(false);
+
   return (
-    <div
-      className={`userAvatar ${props.small ? 'small' : ''}`}
-      style={{
-        backgroundImage: background,
-      }}
-    >
-      {!props.noStatus ? <StatusBubble userId={props.user?.id} /> : null}
+    <div>
+      <div
+        className={`userAvatar ${props.small ? 'small' : ''} ${
+          props.isClickable ? 'clickable' : ''
+        }`}
+        style={{
+          backgroundImage: background,
+        }}
+        onClick={() => setState(true)}
+      >
+        {!props.noStatus ? <StatusBubble userId={props.user?.id} /> : null}
+      </div>
+      {props.isClickable ? (
+        <UserProfileModal
+          user={props.user}
+          open={state}
+          close={() => setState(false)}
+        />
+      ) : null}
     </div>
   );
 }

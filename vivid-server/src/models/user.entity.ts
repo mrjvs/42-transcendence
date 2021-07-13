@@ -13,6 +13,7 @@ import { GuildsEntity } from './guilds.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { MatchesEntity } from './matches.entity';
+import { BlocksEntity } from '@/blocks.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -52,6 +53,9 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => MatchesEntity, (matches) => matches.user_acpt)
   matches_acpt: MatchesEntity[];
+
+  @OneToMany(() => BlocksEntity, (blocks) => blocks.user_id)
+  blocks: BlocksEntity[];
 
   //   onDelete: 'SET NULL',
   // })
@@ -133,4 +137,16 @@ export class FullDetailsUser extends RelatedUser {
   get twoFactorEnabled() {
     return !!this.twofactor;
   }
+
+  @Expose()
+  @Transform(
+    ({ obj, value }) =>
+      value.constructor === String
+        ? value
+        : obj.blocks?.map((v: any) =>
+            v.constructor === String ? v : v.blocked_user_id,
+          ),
+    { toClassOnly: true },
+  )
+  blocks: any;
 }
