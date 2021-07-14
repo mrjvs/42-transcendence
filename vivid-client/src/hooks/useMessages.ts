@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { UserContext } from './useUser';
 import { UsersContext } from './useUsers';
 import { SocketContext } from './useWebsocket';
@@ -11,6 +12,7 @@ export function useMessages(channel: string) {
   const [channelMessages, setMessages] = React.useState<any[]>([]);
   const { messages, setChannelMessages, getChannelMessages } =
     React.useContext(MessageContext);
+  const history = useHistory();
   const { addUser, getUser, users } = React.useContext(UsersContext);
 
   const userData = React.useContext(UserContext);
@@ -102,7 +104,13 @@ export function useMessages(channel: string) {
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
         },
-      );
+      )
+        .then((v) => v.json())
+        .then((data) => {
+          // if game id is set, go to game view
+          if (data?.aux_content?.invite_game_id)
+            history.push(`/pong/${data.aux_content.invite_game_id}`);
+        });
     } else {
       fetch(
         `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,

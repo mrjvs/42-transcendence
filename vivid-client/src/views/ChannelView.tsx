@@ -15,13 +15,13 @@ export function ChannelView() {
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
   const { user } = React.useContext(UserContext);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const cur: any = scrollEl?.current;
     if (!cur) return;
     setTimeout(() => {
       cur.scrollIntoView();
     }, 1);
-  }, [reducedMessages]);
+  }, [reducedMessages, scrollEl]);
 
   React.useEffect(() => {
     if (!messageData.messages) setReducedMessages([]);

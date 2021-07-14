@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar } from './Avatar';
 import './Message.css';
 import { Button } from './Button';
+import { useHistory } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 
 export function Message(props: {
@@ -12,6 +13,26 @@ export function Message(props: {
   user: any;
   owner: boolean;
 }) {
+  const history = useHistory();
+  const gameFetch = useFetch({
+    url: '',
+    method: 'POST',
+  });
+
+  function runDuelAccept(messageId: string) {
+    gameFetch.run(
+      null,
+      `/api/v1/channels/${props.channelId}/messages/${messageId}/duel`,
+    );
+  }
+
+  React.useEffect(() => {
+    // redirect once accepted duel
+    if (gameFetch.done) {
+      history.push(`/pong/${gameFetch.data?.data?.gameId}`);
+    }
+  }, [gameFetch.done]);
+
   const { run } = useFetch({
     runOnLoad: false,
     url: '',
@@ -66,16 +87,26 @@ export function Message(props: {
                   return (
                     <div key={v.id}>
                       <div className="messageInvite-wrapper">
-                        <div className="messageInvite-accent"></div>
+                        <div className="messageInvite-accent"/>
                         <div className="messageInvite-content">
                           <div className="messageInvite-user">
                             <Avatar user={props.user} small />
                             {props.user.name}
                           </div>
-                          <p>You&apos;ve been invited to a duel!</p>
-                          <Button onclick={() => alert('Accepted')}>
+                          <p className="text">
+                            You&apos;ve been invited to a duel!
+                          </p>
+                          <Button
+                            loading={gameFetch.loading}
+                            onclick={() => runDuelAccept(v.id)}
+                          >
                             Accept
                           </Button>
+                          {gameFetch.error ? (
+                            <p className="error">
+                              Something went wrong, try again later.
+                            </p>
+                          ) : null}
                           <div className="red-cube"></div>
                           <div className="dark-cube"></div>
                         </div>

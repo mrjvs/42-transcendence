@@ -75,9 +75,7 @@
 .messageInvite-wrapper {
   background: #121727;
   max-width: 100%;
-  max-height: 100%;
   width: 500px;
-  height: 200px;
   position: relative;
   overflow: hidden;
   border-radius: 5px;
@@ -92,19 +90,17 @@
 .messageInvite-accent {
   background: #35e2a2;
   width: 4px;
-  height: 100%;
 }
 
 .messageInvite-content {
-  padding-left: 2rem;
   position: relative;
   width: 100%;
+  padding: 1rem 0 1rem 2rem;
 }
 
 .messageInvite-user {
   font-size: 16px;
   color: white;
-  margin-top: 1rem;
   padding-bottom: 1rem;
 }
 
@@ -114,10 +110,15 @@
   margin-right: 1rem;
 }
 
-.messageInvite-content p {
+.messageInvite-content .text {
   font-weight: bold;
   width: 35%;
   padding-bottom: 0.5rem;
+}
+
+.messageInvite-content .error {
+  padding-top: 1rem;
+  color: #d46074;
 }
 
 .messageInvite-user {
