@@ -19,6 +19,7 @@ import { WarsService } from '$/wars/wars.service';
 import { authenticator } from 'otplib';
 import * as cryptoRandomString from 'secure-random-string';
 import { TypeORMSession } from '~/models/session.entity';
+import { encryptUserData } from './userEncrypt';
 
 const colors = [
   '#29419F',
@@ -198,8 +199,13 @@ export class UserService {
         )
         .map((v) => `${v.slice(0, 3)}-${v.slice(3)}`),
     };
+    const encryptedData = encryptUserData(
+      id,
+      this.configService.get('secrets.user'),
+      data,
+    );
     const result = await this.userRepository.update(id, {
-      twofactor: data,
+      twofactor: encryptedData,
     });
     if (result.affected != 1) throw new NotFoundException();
     const exceptArray = ['a'];
@@ -217,8 +223,13 @@ export class UserService {
   }
 
   async setTwoFactorData(id: string, data: any): Promise<void> {
+    const encryptedData = encryptUserData(
+      id,
+      this.configService.get('secrets.user'),
+      data,
+    );
     const result = await this.userRepository.update(id, {
-      twofactor: data,
+      twofactor: encryptedData,
     });
     if (result.affected != 1) throw new NotFoundException();
   }
@@ -291,20 +302,34 @@ export class UserService {
   // return null;
 
   async updateAvatarName(userId: string, filename: string): Promise<any> {
-    return await this.userRepository
+    const res = await this.userRepository
       .createQueryBuilder()
       .update()
       .set({ avatar: filename })
       .where({ id: userId })
-      .execute();
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return <UserEntity>response.raw[0];
+      });
+    return {
+      avatar: res.avatar,
+    };
   }
 
   async deleteAvatar(userId: string): Promise<any> {
-    return await this.userRepository
+    const res = await this.userRepository
       .createQueryBuilder()
       .update()
       .set({ avatar: null })
       .where({ id: userId })
-      .execute();
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return <UserEntity>response.raw[0];
+      });
+    return {
+      avatar: res.avatar,
+    };
   }
 }

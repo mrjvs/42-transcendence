@@ -61,11 +61,8 @@ export class UserEntity extends BaseEntity {
   // })
   // guild: GuildsEntity;
 
-  @Column({ nullable: true, type: 'json' })
-  twofactor: {
-    secret: string;
-    backupCodes: string[];
-  };
+  @Column({ nullable: true, type: 'text' })
+  twofactor: string;
 
   // permissions
   isSiteAdmin() {

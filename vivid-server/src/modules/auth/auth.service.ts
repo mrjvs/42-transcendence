@@ -2,12 +2,15 @@ import { Injectable, Inject } from '@nestjs/common';
 import { UserService } from '$/users/user.service';
 import { authenticator } from 'otplib';
 import { UserEntity } from '~/models/user.entity';
+import { decryptUserData } from '../users/userEncrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(UserService)
     private userService: UserService,
+    private configService: ConfigService,
   ) {}
 
   async validateUser(intraId: string): Promise<any> {
@@ -43,11 +46,16 @@ export class AuthService {
     }
 
     // verify token
+    const decryptedTwoFactorData = decryptUserData(
+      usr.id,
+      this.configService.get('secrets.user'),
+      usr.twofactor,
+    );
     const tokenCorrect = authenticator.verify({
       token: token,
-      secret: usr.twofactor.secret,
+      secret: decryptedTwoFactorData.secret,
     });
-    const isInBackupCodes = !!usr.twofactor.backupCodes.find(
+    const isInBackupCodes = !!decryptedTwoFactorData.backupCodes.find(
       (v) => v === token,
     );
     if (!tokenCorrect && !isInBackupCodes) {
@@ -55,7 +63,7 @@ export class AuthService {
     }
 
     if (isInBackupCodes) {
-      const data = JSON.parse(JSON.stringify(usr.twofactor)); // deep copy
+      const data = JSON.parse(JSON.stringify(decryptedTwoFactorData)); // deep copy
       data.backupCodes = data.backupCodes.filter(
         (code: string) => code !== token,
       );
