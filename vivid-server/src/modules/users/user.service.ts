@@ -211,7 +211,6 @@ export class UserService {
     const exceptArray = ['a'];
     if (session) exceptArray.push(session.id);
     this.killSessions(id, { except: exceptArray }); // TODO fix except session
-    // TODO encrypt secret and backup codes
     return data;
   }
 

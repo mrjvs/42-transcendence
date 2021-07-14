@@ -6,7 +6,6 @@ import { Icon } from './Icon';
 import './UserDropdown.css';
 import { useFetch } from '../../hooks/useFetch';
 
-// TODO logout
 export function UserDropdown() {
   const [open, setOpen] = React.useState(false);
   const userData = React.useContext(UserContext);
