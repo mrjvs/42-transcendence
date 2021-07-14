@@ -1,13 +1,26 @@
 import React from 'react';
 import './Message.css';
+import { Button } from './Button';
+import { useParams } from 'react-router-dom';
+import { useMessages } from '../../hooks/useMessages';
+import { useFetch } from '../../hooks/useFetch';
 
 export function Message(props: {
+  messageId: string;
   username: string;
   tag?: string;
   userColors: string[];
   messages: string[];
   blocked: boolean;
+  owner: boolean;
 }) {
+  const { id }: any = useParams();
+  const { run } = useFetch({
+    runOnLoad: false,
+    url: `/api/v1/channels/${id}/messages/${props.messageId}`,
+    method: 'DELETE',
+  });
+
   return (
     <div className={`messageWrapper ${props.blocked ? 'blocked' : ''}`}>
       <div>
@@ -27,6 +40,11 @@ export function Message(props: {
             props.messages.map((v, i) => (
               <p key={i} className="messageMessage">
                 {v}
+                {props.owner ? (
+                  <Button small={true} type="secondary" onclick={() => run()}>
+                    ❌
+                  </Button>
+                ) : null}
               </p>
             ))
           ) : (

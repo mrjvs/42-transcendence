@@ -5,12 +5,14 @@ import { Heading } from '../components/styled/Heading';
 import { Message, NoMessage } from '../components/styled/Message';
 import { useMessages } from '../hooks/useMessages';
 import './ChannelView.css';
+import { UserContext } from '../hooks/useUser';
 
 export function ChannelView() {
   const scrollEl = React.useRef(null);
   const { id }: any = useParams();
   const messageData = useMessages(id);
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
+  const { user } = React.useContext(UserContext);
 
   React.useEffect(() => {
     const cur: any = scrollEl?.current;
@@ -77,15 +79,19 @@ export function ChannelView() {
               <>
                 <NoMessage />
                 <div>
-                  {reducedMessages.map((v: any) => (
-                    <Message
-                      key={v.id}
-                      messages={v.messages}
-                      username={v.userData.name}
-                      blocked={false}
-                      userColors={v.userData.avatar_colors}
-                    />
-                  ))}
+                  {reducedMessages.map((v: any) => {
+                    return (
+                      <Message
+                        key={v.id}
+                        messageId={v.id}
+                        messages={v.messages}
+                        username={v.userData.name}
+                        blocked={false}
+                        userColors={v.userData.avatar_colors}
+                        owner={v.userData.id === user.id ? true : false}
+                      />
+                    );
+                  })}
                 </div>
               </>
             ) : null}
