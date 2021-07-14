@@ -112,5 +112,11 @@ export function useUser() {
     },
     user,
     isLoggedIn,
+    updateUser(obj: any) {
+      setUser((v) => ({
+        ...v,
+        ...obj,
+      }));
+    },
   };
 }

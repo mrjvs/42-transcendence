@@ -1,0 +1,74 @@
+.twofa-setup-modal {
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.twofa-setup-modal .qr-icon {
+  position: absolute;
+  top: -2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  font-size: 10rem;
+  border-radius: 10px;
+  padding: 1rem 1rem 0.5rem 1rem;
+  width: 13rem;
+}
+
+.twofa-setup-modal .qr-icon > canvas {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 10px;
+}
+
+.twofa-setup-modal .icon {
+  padding-top: 8rem;
+  color: #6790e6;
+  font-size: 1.5rem;
+}
+
+.twofa-setup-modal .twofa-motto {
+  color: #9da6c4;
+  width: 13rem;
+  text-align: center;
+  margin: 1rem auto 3rem auto;
+  line-height: 1.35;
+}
+
+.twofa-setup-modal .backup-codes-card {
+  background: #252a40;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  padding: 2rem;
+}
+
+.twofa-setup-modal .backup-codes-card h5 {
+  text-align: left;
+  padding-bottom: 1rem;
+  margin: 0;
+}
+
+.twofa-setup-modal .backup-codes {
+  display: flex;
+}
+
+.twofa-setup-modal .backup-codes > ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
+  width: 100%;
+  grid-row-gap: 0.8rem;
+  color: #9da6c4;
+  font-size: 0.9rem;
+}
+
+.twofa-setup-modal .backup-codes li {
+  padding: 0;
+}
+
+.twofa-setup-modal Button {
+  margin-bottom: 2rem;
+}

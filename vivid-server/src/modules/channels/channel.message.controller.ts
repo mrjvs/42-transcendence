@@ -72,6 +72,37 @@ export class ChannelMessageController {
   ): Promise<IMessage> {
     const input: IMessageInput = {
       content: messageBody.content,
+      aux_content: null,
+      message_type: 0,
+      user: user.id,
+      channel: channelId,
+    };
+    return this.messageService.postMessage(user, input);
+  }
+
+  @Post('/duel')
+  @ChannelRoleAuth(
+    {
+      role: ChannelRoles.USER,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.BANNED,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.MUTED,
+      channelParam: 'id',
+    },
+  )
+  createDuelMessage(
+    @User() user: UserEntity,
+    @Param('id') channelId: string,
+  ): Promise<IMessage> {
+    const input: IMessageInput = {
+      content: '',
+      aux_content: { invite_game_id: 'hello-world' }, // TODO create game
+      message_type: 1,
       user: user.id,
       channel: channelId,
     };
