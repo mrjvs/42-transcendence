@@ -79,19 +79,17 @@ export function ChannelView() {
               <>
                 <NoMessage />
                 <div>
-                  {reducedMessages.map((v: any) => {
-                    return (
-                      <Message
-                        key={v.id}
-                        messageId={v.id}
-                        messages={v.messages}
-                        username={v.userData.name}
-                        blocked={false}
-                        userColors={v.userData.avatar_colors}
-                        owner={v.userData.id === user.id ? true : false}
-                      />
-                    );
-                  })}
+                  {reducedMessages.map((v: any) => (
+                    <Message
+                      key={v.id}
+                      messageId={v.id}
+                      messages={v.messages}
+                      username={v.userData.name}
+                      blocked={false}
+                      userColors={v.userData.avatar_colors}
+                      owner={v.userData.id === user.id ? true : false}
+                    />
+                  ))}
                 </div>
               </>
             ) : null}
