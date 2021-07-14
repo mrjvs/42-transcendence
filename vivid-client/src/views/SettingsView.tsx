@@ -65,7 +65,7 @@ function UserProfileCard(props: { userData: any }) {
       deleteAvatar.reset();
     }
     if (uploadAvatar.done) {
-      // props.userData?.updateUser(); // TODO update avatar data
+      props.userData?.updateUser(uploadAvatar.data.data);
       uploadAvatar.reset();
     }
   }, [updateUserFetch.done, deleteAvatar.done, uploadAvatar.done]);
@@ -98,11 +98,18 @@ function UserProfileCard(props: { userData: any }) {
                 ref={fileRef}
                 onChange={() => uploadAvatarImage()}
               />
-              <Button less_padding margin_right no_button type="secondary">
+              <Button
+                loading={uploadAvatar.loading}
+                less_padding
+                margin_right
+                no_button
+                type="secondary"
+              >
                 Upload avatar
               </Button>
             </label>
             <Button
+              loading={deleteAvatar.loading}
               less_padding
               margin_right
               type="danger"
