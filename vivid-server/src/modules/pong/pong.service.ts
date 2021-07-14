@@ -27,14 +27,15 @@ export class PongService {
   constructor(private matchService: MatchesService) {}
 
   createGame() {
-    const gameId: string = uuid();
+    // const gameId: string = uuid();
+    const gameId = '93b66d54-e096-4a1b-8535-213111b772f2';
     states[gameId] = createGameState(gameId);
     return gameId;
   }
 
   joinGame(userId: string, gameId: string): { gameId: string } {
     // Return if client is already in existing game
-    if (clientRooms[userId] != null) return;
+    // if (clientRooms[userId] != null) return;
 
     if (!states[gameId]) return;
 
@@ -69,6 +70,8 @@ export class PongService {
     player.ready = true;
     client.emit('init');
 
+    game.players[0].ready = true;
+    if (game.players[1].userId != '') game.players[1].ready = true;
     // Check if both players are ready and start game
     const readyPlayers: IPlayer[] = game.players.filter((v) => {
       if (v.ready) return v;

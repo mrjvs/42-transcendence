@@ -252,8 +252,6 @@ export class UserService {
         id: gamestats.user_id_req,
       },
     });
-    console.log('user_acpt: \n', user_acpt);
-    console.log('user_req: \n', user_req);
     if (
       user_acpt.guild &&
       user_acpt.guild.current_war &&
@@ -264,7 +262,6 @@ export class UserService {
         user_acpt.guild.current_war.id === user_req.guild.current_war.id &&
         user_acpt.guild.id !== user_req.guild.id
       ) {
-        console.log('found mutual war');
         if (gamestats.winner_id === user_req.id)
           await this.warsService.updateWarWinReq(
             user_acpt.guild.current_war.id,
