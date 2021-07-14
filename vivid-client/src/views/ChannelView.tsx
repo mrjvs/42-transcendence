@@ -12,7 +12,6 @@ export function ChannelView() {
   const { id }: any = useParams();
   const messageData = useMessages(id);
   const { getRole, currentChannelUser } = messageData;
-  const userData = React.useContext(UserContext);
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
   const { user } = React.useContext(UserContext);
 
@@ -41,6 +40,7 @@ export function ChannelView() {
             content: msg.content,
             aux_content: msg.aux_content,
             type: msg.message_type,
+            id: msg.id,
           },
         ],
         createdAt: new Date(msg.created_at),
@@ -73,6 +73,7 @@ export function ChannelView() {
           content: msg.content,
           aux_content: msg.aux_content,
           type: msg.message_type,
+          id: msg.id,
         });
         return acc;
       }, []),
@@ -99,11 +100,9 @@ export function ChannelView() {
                   <Message
                     key={v.id}
                     channelId={id}
-                    messageId={v.id}
                     messages={v.messages}
-                    username={v.userData.name}
                     blocked={false}
-                    userColors={v.userData.avatar_colors}
+                    user={v.userData}
                     owner={v.userData.id === user.id ? true : false}
                   />
                 ))}

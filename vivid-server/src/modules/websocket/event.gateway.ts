@@ -111,7 +111,7 @@ export class EventGateway implements OnGatewayConnection {
     }
   }
 
- /* GAME EVENTS */
+  /* GAME EVENTS */
   @SubscribeMessage('ready')
   readyEvent(@ConnectedSocket() client: Socket) {
     if (!client.auth) return;
