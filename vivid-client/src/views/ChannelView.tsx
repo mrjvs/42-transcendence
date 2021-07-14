@@ -15,13 +15,13 @@ export function ChannelView() {
   const userData = React.useContext(UserContext);
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const cur: any = scrollEl?.current;
     if (!cur) return;
     setTimeout(() => {
       cur.scrollIntoView();
     }, 1);
-  }, [reducedMessages]);
+  }, [reducedMessages, scrollEl]);
 
   React.useEffect(() => {
     if (!messageData.messages) setReducedMessages([]);
@@ -40,6 +40,7 @@ export function ChannelView() {
             content: msg.content,
             aux_content: msg.aux_content,
             type: msg.message_type,
+            id: msg.id,
           },
         ],
         createdAt: new Date(msg.created_at),
@@ -72,6 +73,7 @@ export function ChannelView() {
           content: msg.content,
           aux_content: msg.aux_content,
           type: msg.message_type,
+          id: msg.id,
         });
         return acc;
       }, []),
@@ -97,6 +99,7 @@ export function ChannelView() {
                 {reducedMessages.map((v: any) => (
                   <Message
                     key={v.id}
+                    channelId={id}
                     messages={v.messages}
                     user={v.userData}
                     blocked={userData.user?.blocks?.includes(v.user)}

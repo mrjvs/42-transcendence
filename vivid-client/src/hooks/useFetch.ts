@@ -16,16 +16,18 @@ export function useFetch(options: {
   const [loading, setLoading] = React.useState(false);
   const [done, setDone] = React.useState(false);
 
-  function run(body?: any) {
+  function run(body?: any, overwriteUrl?: string) {
     setLoading(true);
     setError(null);
+    let u = options.url;
+    if (overwriteUrl) u = overwriteUrl;
     let b = undefined;
     let isJson = true;
     if (body && body.constructor === FormData) {
       b = body;
       isJson = false;
     } else if (body) b = JSON.stringify(body);
-    fetch(`${window._env_.VIVID_BASE_URL}${options.url}`, {
+    fetch(`${window._env_.VIVID_BASE_URL}${u}`, {
       credentials: 'include',
       method: options.method,
       body: b,

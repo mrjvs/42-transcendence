@@ -2,13 +2,36 @@ import React from 'react';
 import { Avatar } from './Avatar';
 import './Message.css';
 import { Button } from './Button';
+import { useHistory } from 'react-router-dom';
+import { useFetch } from '../../hooks/useFetch';
 
 export function Message(props: {
+  channelId: string;
   tag?: string;
   messages: any[];
   blocked: boolean;
   user: any;
 }) {
+  const history = useHistory();
+  const gameFetch = useFetch({
+    url: '',
+    method: 'POST',
+  });
+
+  function runDuelAccept(messageId: string) {
+    gameFetch.run(
+      null,
+      `/api/v1/channels/${props.channelId}/messages/${messageId}/duel`,
+    );
+  }
+
+  React.useEffect(() => {
+    // redirect once accepted duel
+    if (gameFetch.done) {
+      history.push(`/pong/${gameFetch.data?.data?.gameId}`);
+    }
+  }, [gameFetch.done]);
+
   return (
     <div className={`messageWrapper ${props.blocked ? 'blocked' : ''}`}>
       <div>
@@ -47,8 +70,20 @@ export function Message(props: {
                         <Avatar user={props.user} small />
                         {props.user.name}
                       </div>
-                      <p>You&apos;ve been invited to a duel!</p>
-                      <Button onclick={() => alert('Accepted')}>Accept</Button>
+                      <p className="text">
+                        You&apos;ve been invited to a duel!
+                      </p>
+                      <Button
+                        loading={gameFetch.loading}
+                        onclick={() => runDuelAccept(v.id)}
+                      >
+                        Accept
+                      </Button>
+                      {gameFetch.error ? (
+                        <p className="error">
+                          Something went wrong, try again later.
+                        </p>
+                      ) : null}
                       <div className="red-cube"></div>
                       <div className="dark-cube"></div>
                     </div>

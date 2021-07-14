@@ -64,6 +64,15 @@ export class ChannelMessageService {
     );
   }
 
+  async getMessage(
+    channelId: string,
+    messageId: string,
+  ): Promise<MessageEntity> {
+    return await this.MessageRepository.findOne({
+      where: { channel: channelId, id: messageId },
+    });
+  }
+
   async deleteMessage(
     channelId: string,
     messageId: string,
