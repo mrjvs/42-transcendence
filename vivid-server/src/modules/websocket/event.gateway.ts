@@ -94,25 +94,10 @@ export class EventGateway implements OnGatewayConnection {
   }
 
   /* GAME EVENTS */
-  @SubscribeMessage('newGame')
-  newGame(@ConnectedSocket() client: Socket) {
-    if (!client.auth) return; // TODO do we need to throw something (unauthorized) here?
-    this.pongService.newGame(client);
-  }
-
-  @SubscribeMessage('joinGame')
-  joinGame(@ConnectedSocket() client: Socket, @MessageBody() roomName: string) {
-    if (!client.auth) return;
-    this.pongService.joinGame(client, roomName);
-  }
-
   @SubscribeMessage('ready')
-  readyEvent(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() roomName: string,
-  ) {
+  readyEvent(@ConnectedSocket() client: Socket) {
     if (!client.auth) return;
-    this.pongService.readyEvent(client, roomName);
+    this.pongService.readyEvent(client);
   }
 
   @SubscribeMessage('keydown')

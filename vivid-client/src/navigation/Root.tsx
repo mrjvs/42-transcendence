@@ -12,6 +12,7 @@ import { SocketContext } from '../hooks/useWebsocket';
 import { AccountSetupModal } from '../components/styled/modals/AccountSetup.modal';
 import { PongView } from '../views/PongView';
 import { SettingsView } from '../views/SettingsView';
+import { GameView } from '../views/GameView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
@@ -65,6 +66,10 @@ function SideBarRouter() {
             <ChannelView />
           </Route>
           <Route exact path="/pong">
+            <p>pong</p>
+            <GameView />
+          </Route>
+          <Route exact path="/pong/:id">
             <p>pong</p>
             <PongView />
           </Route>

@@ -17,29 +17,23 @@ export class MatchesService {
     return await this.matchesRepository.createQueryBuilder().select().execute();
   }
 
-  async createGame(gamestats: IGame): Promise<UpdateResult> {
-    gamestats.winner_id =
-      gamestats.points_acpt > gamestats.points_req
-        ? gamestats.user_id_acpt
-        : gamestats.user_id_req;
-    // console.log('stats', gamestats);
-    const user_req = await this.userService.findUser(gamestats.user_id_req);
-    const user_acpt = await this.userService.findUser(gamestats.user_id_acpt);
+  async createGame(game: IGame): Promise<UpdateResult> {
+    const user_req = await this.userService.findUser(game.user_id_req);
+    const user_acpt = await this.userService.findUser(game.user_id_acpt);
     if (!user_req || !user_acpt) return;
-    const war = await this.userService.getWarId(gamestats);
-    // console.log('user_req', user_req);
-    // console.log('user_acpt', user_acpt);
+    const war = await this.userService.getWarId(game);
+
     return await this.matchesRepository
       .createQueryBuilder()
       .insert()
       .values({
         user_req: user_req,
         user_acpt: user_acpt,
-        points_req: gamestats.points_req,
-        points_acpt: gamestats.points_acpt,
-        add_ons: gamestats.add_ons,
-        game_type: gamestats.game_type,
-        winner_id: gamestats.winner_id,
+        points_req: game.points_req,
+        points_acpt: game.points_acpt,
+        add_ons: game.add_ons,
+        game_type: game.game_type,
+        winner_id: game.winner_id,
         war_id: war,
       })
       .execute();
