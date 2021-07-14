@@ -41,8 +41,8 @@ export function Canvas({ width, height }: CanvasProps) {
     alert(`User: "${winner}" won the game`);
   }
 
-  function start(roomName: string) {
-    client?.emit('start', roomName);
+  function start(gameId: string) {
+    client?.emit('start', gameId);
   }
 
   function keydown(event: KeyboardEvent) {
