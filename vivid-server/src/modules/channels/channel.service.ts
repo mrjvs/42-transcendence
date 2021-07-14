@@ -212,9 +212,9 @@ export class ChannelService {
     joinedChannelInput: IJoinedChannelInput,
   ): Promise<{ id: string }> {
     const channel = await this.findChannel(joinedChannelInput.channel);
+    if (!channel) throw new NotFoundException();
     if (channel.owner === joinedChannelInput.user)
       throw new ForbiddenException(null, 'Cannot remove owner from channel');
-    if (!channel) throw new NotFoundException();
 
     const alreadyRemoved = await this.JoinedChannelRepository.findOne({
       where: {

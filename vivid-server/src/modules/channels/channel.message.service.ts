@@ -8,8 +8,9 @@ import {
   IMessageInput,
   PaginationDto,
 } from '@/messages.entity';
-import { EventGateway } from '~/modules/websocket/event.gateway';
+import { EventGateway } from '$/websocket/event.gateway';
 import { ChannelService } from './channel.service';
+import { UserEntity } from '@/user.entity';
 
 @Injectable()
 export class ChannelMessageService {
@@ -20,14 +21,17 @@ export class ChannelMessageService {
     private readonly channelService: ChannelService,
   ) {}
 
-  async postMessage(messageInput: IMessageInput): Promise<IMessage> {
+  async postMessage(
+    user: UserEntity,
+    messageInput: IMessageInput,
+  ): Promise<IMessage> {
     const channel = await this.channelService.findChannel(
       messageInput.channel,
       false,
     );
     if (!channel) throw new NotFoundException();
     const result = await this.MessageRepository.save(messageInput);
-    this.eventGateway.sendChannelMessage(result, channel.joined_users);
+    this.eventGateway.sendChannelMessage(result, channel.joined_users, user);
     return result;
   }
 
@@ -77,6 +81,15 @@ export class ChannelMessageService {
 
     const result: DeleteResult = await builder.execute();
     if (result.affected !== 1) throw new NotFoundException();
+
+    const channel = await this.channelService.findChannel(channelId, false);
+    if (!channel) throw new NotFoundException();
+
+    this.eventGateway.deleteChannelMessage(
+      channelId,
+      channel.joined_users,
+      messageId,
+    );
     return { id: messageId };
   }
 }

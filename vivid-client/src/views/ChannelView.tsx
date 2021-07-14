@@ -5,18 +5,20 @@ import { Heading } from '../components/styled/Heading';
 import { Message, NoMessage } from '../components/styled/Message';
 import { useMessages } from '../hooks/useMessages';
 import './ChannelView.css';
+import { UserContext } from '../hooks/useUser';
 
 export function ChannelView() {
   const scrollEl = React.useRef(null);
   const { id }: any = useParams();
   const messageData = useMessages(id);
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
+  const { user } = React.useContext(UserContext);
 
   React.useEffect(() => {
     const cur: any = scrollEl?.current;
     if (!cur) return;
     setTimeout(() => {
-      cur.scrollIntoView({ behavior: 'smooth' });
+      cur.scrollIntoView();
     }, 1);
   }, [reducedMessages]);
 
@@ -26,16 +28,17 @@ export function ChannelView() {
       acc.push({
         id: msg.id,
         user: msg.user,
-        userData: messageData.channelInfo?.joined_users?.find(
-          (u: any) => u.user?.id === msg.user,
-        )?.user || { name: 'Unknown user' },
+        userData: messageData.getUser(msg.user)?.data || {
+          name: 'Unknown user',
+          avatar_colors: ['', ''],
+        },
         messages: [msg.content],
         createdAt: new Date(msg.created_at),
       });
     }
 
     setReducedMessages(
-      messageData.messages.reduce((acc, msg) => {
+      messageData.messages.reduce((acc: any[], msg: any) => {
         // if not from this channel, ignore
         if (msg.channel !== id) return acc;
 
@@ -60,29 +63,38 @@ export function ChannelView() {
         return acc;
       }, []),
     );
-  }, [messageData.messages, messageData.channelInfo]);
+  }, [messageData.channelInfo, messageData.messages, messageData.users]);
 
   return (
     <div className="contentContainer">
       <div className="contentHeader">
         <Heading size="small">
-          {messageData.messageState.done ? messageData.channelInfo.title : '.'}
+          {messageData.messageState.done ? messageData.channelInfo.title : '‎'}
         </Heading>
       </div>
       <div className="channelWrapper">
         <div className="channelScrollWrapper">
           <div className="channelContent">
-            <NoMessage />
-            <div>
-              {reducedMessages.map((v: any) => (
-                <Message
-                  key={v.id}
-                  messages={v.messages}
-                  username={v.userData.name}
-                  blocked={false}
-                />
-              ))}
-            </div>
+            {messageData.messageState.done ? (
+              <>
+                <NoMessage />
+                <div>
+                  {reducedMessages.map((v: any) => {
+                    return (
+                      <Message
+                        key={v.id}
+                        messageId={v.id}
+                        messages={v.messages}
+                        username={v.userData.name}
+                        blocked={false}
+                        userColors={v.userData.avatar_colors}
+                        owner={v.userData.id === user.id ? true : false}
+                      />
+                    );
+                  })}
+                </div>
+              </>
+            ) : null}
             <div ref={scrollEl} />
           </div>
         </div>

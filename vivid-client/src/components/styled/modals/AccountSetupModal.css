@@ -1,0 +1,28 @@
+.account-setup-modal .icon {
+  display: flex;
+  color: #6790e6;
+  justify-content: center;
+  align-items: center;
+  padding-top: 2rem;
+  padding-bottom: 1rem;
+  font-size: 2.5rem;
+}
+
+.account-setup-modal {
+  text-align: center;
+}
+
+.account-setup-modal .heading {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.account-setup-modal .paragraph {
+  color: #9da6c4;
+  margin-bottom: 5rem;
+  line-height: 1.5;
+}
+
+.account-setup-modal .paddbot {
+  margin-bottom: 2rem;
+}
