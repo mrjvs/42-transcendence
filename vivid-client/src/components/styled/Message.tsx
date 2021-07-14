@@ -1,11 +1,10 @@
 import React from 'react';
 import './Message.css';
 import { Button } from './Button';
-import { useParams } from 'react-router-dom';
-import { useMessages } from '../../hooks/useMessages';
 import { useFetch } from '../../hooks/useFetch';
 
 export function Message(props: {
+  channelId: string;
   messageId: string;
   username: string;
   tag?: string;
@@ -14,10 +13,9 @@ export function Message(props: {
   blocked: boolean;
   owner: boolean;
 }) {
-  const { id }: any = useParams();
   const { run } = useFetch({
     runOnLoad: false,
-    url: `/api/v1/channels/${id}/messages/${props.messageId}`,
+    url: `/api/v1/channels/${props.channelId}/messages/${props.messageId}`,
     method: 'DELETE',
   });
 
@@ -40,7 +38,7 @@ export function Message(props: {
             props.messages.map((v, i) => (
               <p key={i} className="messageMessage">
                 {v}
-                {props.owner ? (
+                {props.owner ? ( // TODO moderator/admin
                   <Button small={true} type="secondary" onclick={() => run()}>
                     ❌
                   </Button>

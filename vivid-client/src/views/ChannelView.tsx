@@ -82,6 +82,7 @@ export function ChannelView() {
                   {reducedMessages.map((v: any) => (
                     <Message
                       key={v.id}
+                      channelId={id}
                       messageId={v.id}
                       messages={v.messages}
                       username={v.userData.name}
