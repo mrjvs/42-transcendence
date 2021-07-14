@@ -209,8 +209,8 @@ export class UserService {
     });
     if (result.affected != 1) throw new NotFoundException();
     const exceptArray = ['a'];
-    if (session) exceptArray.push(session.id);
-    this.killSessions(id, { except: exceptArray }); // TODO fix except session
+    if (session && session.id) exceptArray.push(session.id);
+    this.killSessions(id, { except: exceptArray });
     return data;
   }
 

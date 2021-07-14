@@ -46,9 +46,12 @@ export class UserController {
   }
 
   @Patch(':id/2fa')
-  async twofactorEnable(@UserParam('id') user: IUserParam): Promise<any> {
+  async twofactorEnable(
+    @UserParam('id') user: IUserParam,
+    @Req() req: Request,
+  ): Promise<any> {
     if (!user.isSelf) throw new UnauthorizedException();
-    const data = await this.userService.enableTwoFactor(user.id);
+    const data = await this.userService.enableTwoFactor(user.id, req.session);
     return data;
   }
 
