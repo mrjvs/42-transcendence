@@ -5,15 +5,16 @@ import { TextInput } from '../TextInput';
 import './AccountSetupModal.css';
 import { Button } from '../Button';
 import { useFetch } from '../../../hooks/useFetch';
+import { UserContext } from '../../../hooks/useUser';
 
-// TODO update userContext with new name and data
 export function AccountSetupModal(props: { open: boolean; close: () => void }) {
   const [username, setUsername] = React.useState('');
-  const { run, done, error, loading, reset } = useFetch({
+  const { run, done, error, loading, reset, data } = useFetch({
     runOnLoad: false,
     url: '/api/v1/users/@me/name',
     method: 'PATCH',
   });
+  const userData = React.useContext(UserContext);
 
   React.useEffect(() => {
     if (props.open) {
@@ -23,6 +24,9 @@ export function AccountSetupModal(props: { open: boolean; close: () => void }) {
 
   React.useEffect(() => {
     if (done) {
+      userData.updateUser({
+        name: data?.data?.name,
+      });
       props.close();
     }
   }, [done]);
