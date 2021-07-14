@@ -93,7 +93,25 @@ export class EventGateway implements OnGatewayConnection {
     }
   }
 
-  /* GAME EVENTS */
+  deleteChannelMessage(
+    channelId: string,
+    joinedUsers: IJoinedChannel[],
+    messageId: string,
+  ) {
+    const sockets = this.server.sockets.connected;
+    const mappedJoins = joinedUsers.reduce((a, v: IJoinedChannel) => {
+      a[v.user as string] = true;
+      return a;
+    }, {});
+    for (const socketId in sockets) {
+      const client = sockets[socketId];
+      if (!client.auth) continue; // skip user if not authed
+      if (!mappedJoins[client.auth]) continue; // skip if user not in channel
+      client.emit('delete_channel_message', channelId, messageId);
+    }
+  }
+
+ /* GAME EVENTS */
   @SubscribeMessage('ready')
   readyEvent(@ConnectedSocket() client: Socket) {
     if (!client.auth) return;

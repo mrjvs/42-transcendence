@@ -160,6 +160,17 @@ export function useMessageContext() {
     });
   }
 
+  function deleteMessage(channelId: string, messageId: string) {
+    setMessages((prev) => {
+      const channel = prev.find((v) => v.id === channelId);
+      const list = channel.messages.filter((v: any) => {
+        if (v.id !== messageId) return v;
+      });
+      setChannelMessages(channelId, list);
+      return list;
+    });
+  }
+
   function setChannelMessages(channelId: string, messages: any[]) {
     setMessages((prev) => {
       const list = [...prev];
@@ -183,9 +194,15 @@ export function useMessageContext() {
   }
 
   React.useEffect(() => {
-    if (client) client.on('channel_message', onMessage);
+    if (client) {
+      client.on('channel_message', onMessage);
+      client.on('delete_channel_message', deleteMessage);
+    }
     return () => {
-      if (client) client.off('channel_message', onMessage);
+      if (client) {
+        client.off('channel_message', onMessage);
+        client.off('delete_channel_message', deleteMessage);
+      }
     };
   }, [client]);
 
