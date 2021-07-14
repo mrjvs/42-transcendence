@@ -58,7 +58,7 @@ export function connectClient(userId: string, clientId: string): void {
 
 // when client disconnects
 export function disconnectClient(clientId: string): void {
-  let found = clientStatuses.find((v) => v.clients.includes(clientId));
+  const found = clientStatuses.find((v) => v.clients.includes(clientId));
   if (!found) return;
 
   // remove client from client list

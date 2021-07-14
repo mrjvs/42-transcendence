@@ -15,7 +15,6 @@ import {
 import { AccountNotSetupGuard } from '~/middleware/guards/auth.guards';
 import {
   FullDetailsUser,
-  IUser,
   UserEntity,
   UsernameChangeDto,
 } from '~/models/user.entity';
