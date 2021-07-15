@@ -11,6 +11,7 @@ export function Message(props: {
   messages: any[];
   blocked: boolean;
   user: any;
+  tags: string[];
   owner: boolean;
 }) {
   const history = useHistory();
@@ -64,11 +65,13 @@ export function Message(props: {
           ) : (
             <span>
               {props.user.name}
-              {props.tag ? (
-                <span className={`tag tag-${props.tag.toLowerCase()}`}>
-                  {props.tag}
-                </span>
-              ) : null}
+              {props.tags
+                ? props.tags.map((v) => (
+                    <span key={v} className={`tag tag-${v.toLowerCase()}`}>
+                      {v.toLowerCase()}
+                    </span>
+                  ))
+                : null}
             </span>
           )}
         </p>

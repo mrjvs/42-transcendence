@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { MessageBox } from '../components/base/MessageBox';
 import { Message, NoMessage } from '../components/styled/Message';
 import { useMessages } from '../hooks/useMessages';
@@ -10,6 +10,7 @@ import { UserContext } from '../hooks/useUser';
 export function ChannelView() {
   const scrollEl = React.useRef(null);
   const { id }: any = useParams();
+  const history = useHistory();
   const messageData = useMessages(id);
   const { getRole, currentChannelUser } = messageData;
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
@@ -83,11 +84,14 @@ export function ChannelView() {
   return (
     <MainLayout
       title={
-        (messageData.messageState.done ? messageData.channelInfo.title : '‎') +
-        (currentChannelUser.tag &&
-        ['owner', 'mod'].includes(currentChannelUser.tag)
-          ? 'Edit channel'
-          : '')
+        (messageData.messageState.done && messageData.channelInfo.title) || '‎'
+      }
+      actions={
+        ['owner', 'mod'].includes(currentChannelUser.tag) ? (
+          <span onClick={() => history.push(`/channel/${id}/settings`)}>
+            Edit
+          </span>
+        ) : null
       }
     >
       <div className="channelScrollWrapper">
@@ -101,9 +105,10 @@ export function ChannelView() {
                     key={v.id}
                     channelId={id}
                     messages={v.messages}
-                    blocked={false}
+                    blocked={user?.blocks?.includes(v.user)}
                     user={v.userData}
-                    owner={v.userData.id === user.id ? true : false}
+                    tags={[v.userTag]}
+                    owner={v.userTag === 'owner'}
                   />
                 ))}
               </div>

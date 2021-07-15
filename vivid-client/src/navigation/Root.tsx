@@ -13,6 +13,7 @@ import { AccountSetupModal } from '../components/styled/modals/AccountSetup.moda
 import { PongView } from '../views/PongView';
 import { SettingsView } from '../views/SettingsView';
 import { GameView } from '../views/GameView';
+import { ChannelSettingsView } from '../views/ChannelSettingsView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
@@ -101,6 +102,9 @@ function MainRouter() {
         <Switch>
           <Route exact path="/settings">
             <SettingsView />
+          </Route>
+          <Route exact path="/channel/:id/settings">
+            <ChannelSettingsView />
           </Route>
           <Route path="*">
             <SideBarRouter />

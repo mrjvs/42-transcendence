@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Button } from '../components/styled/Button';
 import { Icon } from '../components/styled/Icon';
 import { ChannelContext } from '../hooks/useChannel';
@@ -9,11 +9,12 @@ import { TextInput } from '../components/styled/TextInput';
 
 export function ChannelSettingsView() {
   const history = useHistory();
+  const { id }: any = useParams();
   const channelData = React.useContext<any>(ChannelContext);
 
   return (
     <div className="channel-settings-view-wrapper">
-      <Button type="secondary" onclick={() => history.push('/')}>
+      <Button type="secondary" onclick={() => history.push(`/channel/${id}`)}>
         <Icon type="left_arrow" />
         Back to channel
       </Button>
@@ -48,37 +49,39 @@ function ChannelSettingsCard(props: { channelData: any }) {
   return (
     <div>
       <h2>test</h2>
-      <h5>Channel name</h5>
       <div className="text-wrapper">
         <TextInput
           value={channelName}
           set={setChannelName}
-          placeholder="John Doe"
-          label="Username"
+          placeholder="Best Channel Ever"
+          label="Channel name"
           noPadding
         />
-        {updateChannelFetch.error &&
-        updateChannelFetch.error?.data?.code === 'inuse' ? (
-          <p>That username is already in use</p>
-        ) : updateChannelFetch.error &&
-          updateChannelFetch.error?.res?.status === 400 ? (
-          <p>Username must be at least 1 character</p>
-        ) : updateChannelFetch.error ? (
-          <p>Something went wrong, try again later</p>
-        ) : null}
-        <Button
-          less_padding
-          loading={updateChannelFetch.loading}
-          onclick={() =>
-            updateChannelFetch.run(
-              channelName,
-              `/api/v1/channels/${props.channelData.channel.id}`,
-            )
-          }
-        >
-          Save channel name
-        </Button>
       </div>
+      <div className="security-settings">
+        <h2>Security settings</h2>
+      </div>
+      <Button
+        less_padding
+        loading={updateChannelFetch.loading}
+        onclick={() =>
+          updateChannelFetch.run(
+            channelName,
+            `/api/v1/channels/${props.channelData.channel.id}`,
+          )
+        }
+      >
+        Save settings
+      </Button>
+      {updateChannelFetch.error &&
+      updateChannelFetch.error?.data?.code === 'inuse' ? (
+        <p>That username is already in use</p>
+      ) : updateChannelFetch.error &&
+        updateChannelFetch.error?.res?.status === 400 ? (
+        <p>Username must be at least 1 character</p>
+      ) : updateChannelFetch.error ? (
+        <p>Something went wrong, try again later</p>
+      ) : null}
     </div>
   );
 }
