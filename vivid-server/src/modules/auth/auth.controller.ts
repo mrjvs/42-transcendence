@@ -34,6 +34,17 @@ export class AuthController {
     res.redirect(this.configService.get('oauth.redirect'));
   }
 
+  @Post('/logout')
+  async logout(@Req() req: Request): Promise<void> {
+    if (!req.session) return;
+    await new Promise<void>((resolve, reject) => {
+      req.session.destroy((err) => {
+        if (err) reject(err);
+        resolve();
+      });
+    });
+  }
+
   @Post('/2fa')
   @UseGuards(No2faGuard)
   async twofactor(

@@ -6,6 +6,8 @@ import {
   UseGuards,
   Param,
   Body,
+  BadRequestException,
+  NotFoundException,
   // Query,
 } from '@nestjs/common';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
@@ -25,11 +27,15 @@ import {
 import { UserEntity } from '@/user.entity';
 import { ChannelMessageService } from './channel.message.service';
 import { Observable } from 'rxjs';
+import { PongService } from '../pong/pong.service';
 
 @Controller('channels/:id/messages')
 @UseGuards(AuthenticatedGuard)
 export class ChannelMessageController {
-  constructor(private messageService: ChannelMessageService) {}
+  constructor(
+    private messageService: ChannelMessageService,
+    private pongService: PongService,
+  ) {}
 
   // TODO time based pagination (make it better)
   @Get('/')
@@ -72,10 +78,78 @@ export class ChannelMessageController {
   ): Promise<IMessage> {
     const input: IMessageInput = {
       content: messageBody.content,
+      aux_content: null,
+      message_type: 0,
       user: user.id,
       channel: channelId,
     };
     return this.messageService.postMessage(user, input);
+  }
+
+  @Post('/duel')
+  @ChannelRoleAuth(
+    {
+      role: ChannelRoles.USER,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.BANNED,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.MUTED,
+      channelParam: 'id',
+    },
+  )
+  createDuelMessage(
+    @User() user: UserEntity,
+    @Param('id') channelId: string,
+  ): Promise<IMessage> {
+    const gameId = this.pongService.createGame();
+    this.pongService.joinGame(user.id, gameId);
+    const input: IMessageInput = {
+      content: '',
+      aux_content: { invite_game_id: gameId },
+      message_type: 1,
+      user: user.id,
+      channel: channelId,
+    };
+    return this.messageService.postMessage(user, input);
+  }
+
+  @Post('/:message/duel')
+  @ChannelRoleAuth(
+    {
+      role: ChannelRoles.USER,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.BANNED,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.MUTED,
+      channelParam: 'id',
+    },
+  )
+  async acceptDuelMessage(
+    @User() user: UserEntity,
+    @Param('message') messageId: string,
+    @Param('id') channelId: string,
+  ): Promise<{ gameId: string }> {
+    const message: MessageEntity = await this.messageService.getMessage(
+      channelId,
+      messageId,
+    );
+    if (!message) throw new NotFoundException();
+    if (message.message_type !== 1) throw new BadRequestException();
+    const game = this.pongService.joinGame(
+      user.id,
+      message.aux_content.invite_game_id,
+    );
+    return {
+      gameId: game.gameId,
+    };
   }
 
   @Delete('/:message')

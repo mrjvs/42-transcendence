@@ -1,0 +1,127 @@
+.userDropdown {
+  position: relative;
+}
+
+.userDropdown .cont {
+  display: flex;
+  align-items: center;
+  padding: 0.2rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.userDropdown .cont:hover {
+  background-color: #191b2b;
+}
+
+.userDropdown .cont .userAvatar .status-bubble {
+  border-color: #121727;
+}
+.userDropdown .cont:hover .userAvatar .status-bubble {
+  border-color: #191b2b;
+}
+
+.userDropdown .userAvatar {
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.7rem;
+}
+
+.userDropdown .name {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  max-width: 10rem;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.userDropdown .name p {
+  word-break: break-all;
+}
+
+.userDropdown .name > .icon {
+  margin-top: 0.3rem;
+  margin-left: 0.5rem;
+  transition: transform 150ms ease-in-out;
+}
+
+.userDropdown.open .name > .icon {
+  transform: rotate(180deg);
+}
+
+/* dropdown */
+.userDropdown.open .menu,
+.userDropdown.open .overlay {
+  display: flex;
+}
+
+.userDropdown.open .menu {
+  animation: slide-in-menu 150ms ease-in-out;
+}
+
+.userDropdown.open .cont {
+  z-index: 98;
+}
+
+.userDropdown .menu {
+  display: none;
+  flex-direction: column;
+  background-color: #1b1f31;
+  border-radius: 5px;
+  position: absolute;
+  top: 3.4rem;
+  right: 0;
+  z-index: 99;
+  padding: 1rem 0;
+  width: 15rem;
+}
+
+.userDropdown .menu .menuItem {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #9da6c4;
+  text-decoration: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.userDropdown .menu .menuItem.red {
+  color: #cd5f73;
+}
+
+.userDropdown .menu .menuItem.red:hover {
+  color: #cd5f73;
+}
+
+.userDropdown .menu .menuItem:hover {
+  background-color: #252a40;
+  color: white;
+}
+
+.userDropdown .overlay {
+  display: none;
+  z-index: 97;
+  position: fixed;
+  width: 100vw;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+@keyframes slide-in-menu {
+  0% {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

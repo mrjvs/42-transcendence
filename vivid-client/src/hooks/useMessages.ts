@@ -1,4 +1,6 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
+import { UserContext } from './useUser';
 import { UsersContext } from './useUsers';
 import { SocketContext } from './useWebsocket';
 
@@ -10,7 +12,14 @@ export function useMessages(channel: string) {
   const [channelMessages, setMessages] = React.useState<any[]>([]);
   const { messages, setChannelMessages, getChannelMessages } =
     React.useContext(MessageContext);
+  const history = useHistory();
   const { addUser, getUser, users } = React.useContext(UsersContext);
+
+  const userData = React.useContext(UserContext);
+  const [currentChannelUser, setCurrentChannelUser] = React.useState<{
+    user: any;
+    tag: any;
+  }>({ user: null, tag: null });
 
   const [error, setError] = React.useState(false);
   const [isLoading, setLoading] = React.useState(true);
@@ -52,6 +61,32 @@ export function useMessages(channel: string) {
       });
   }
 
+  function getRole(userId: string) {
+    if (!userId) return null;
+    let tag = null;
+    const channelUser = channelInfo?.joined_users.find(
+      (v: any) => v.user?.id === userId || v.user === userId,
+    );
+    if (channelUser && channelUser.is_mod) tag = 'mod';
+    if (userId === channelInfo?.owner) tag = 'owner';
+    return tag;
+  }
+
+  React.useEffect(() => {
+    if (!channelInfo || !userData.user?.id) {
+      setCurrentChannelUser({ user: null, tag: null });
+      return;
+    }
+    const n = {
+      user: channelInfo?.joined_users?.find(
+        (v: any) =>
+          v.user?.id === userData.user?.id || v.user === userData.user?.id,
+      ),
+      tag: getRole(userData.user?.id),
+    };
+    setCurrentChannelUser(n);
+  }, [channelInfo, userData]);
+
   React.useEffect(() => {
     requestMessages();
   }, [channel]);
@@ -60,20 +95,37 @@ export function useMessages(channel: string) {
     setMessages([...getChannelMessages(channel)]);
   }, [messages]);
 
-  function sendMessage(text: string) {
-    fetch(
-      `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          content: text,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
+  function sendMessage(text: string, type: boolean) {
+    if (type) {
+      fetch(
+        `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages/duel`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
         },
-        credentials: 'include',
-      },
-    );
+      )
+        .then((v) => v.json())
+        .then((data) => {
+          // if game id is set, go to game view
+          if (data?.aux_content?.invite_game_id)
+            history.push(`/pong/${data.aux_content.invite_game_id}`);
+        });
+    } else {
+      fetch(
+        `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            content: text,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        },
+      );
+    }
   }
 
   return {
@@ -81,6 +133,8 @@ export function useMessages(channel: string) {
     channelInfo,
     getUser,
     users,
+    currentChannelUser,
+    getRole,
     messageState: {
       error,
       loading: isLoading,
