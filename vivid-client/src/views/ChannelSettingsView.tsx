@@ -4,6 +4,8 @@ import { Button } from '../components/styled/Button';
 import { Icon } from '../components/styled/Icon';
 import { ChannelContext } from '../hooks/useChannel';
 import './ChannelSettingsView.css';
+import { useFetch } from '../hooks/useFetch';
+import { TextInput } from '../components/styled/TextInput';
 
 export function ChannelSettingsView() {
   const history = useHistory();
