@@ -42,7 +42,7 @@ export function useUser() {
             .then((res) => res.json())
             .then((user) => {
               setUser(user);
-              // loop addChannel(user.joined_channel.channel_id);
+              // TODO loop through all joined channels and add them with setChannel()
               setLoading(false);
               setDone(true);
             })

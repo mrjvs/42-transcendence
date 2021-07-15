@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const ChannelsContext = React.createContext<any>([]);
-ChannelsContext.displayName = 'ChannelContext';
+ChannelsContext.displayName = 'ChannelsContext';
 
 export function useChannelsContext() {
   const [channels, setChannels] = React.useState<any[]>([]);

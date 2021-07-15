@@ -3,10 +3,9 @@ import { useHistory } from 'react-router-dom';
 import { Button } from '../components/styled/Button';
 import { Icon } from '../components/styled/Icon';
 import { ChannelContext } from '../hooks/useChannel';
-import { TextInput } from '../components/styled/TextInput';
-import { useFetch } from '../hooks/useFetch';
+import './ChannelSettingsView.css';
 
-export function SettingsView() {
+export function ChannelSettingsView() {
   const history = useHistory();
   const channelData = React.useContext<any>(ChannelContext);
 
