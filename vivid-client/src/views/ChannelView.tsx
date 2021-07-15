@@ -12,8 +12,8 @@ export function ChannelView() {
   const { id }: any = useParams();
   const messageData = useMessages(id);
   const { getRole, currentChannelUser } = messageData;
-  const userData = React.useContext(UserContext);
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
+  const { user } = React.useContext(UserContext);
 
   React.useLayoutEffect(() => {
     const cur: any = scrollEl?.current;
@@ -101,9 +101,9 @@ export function ChannelView() {
                     key={v.id}
                     channelId={id}
                     messages={v.messages}
+                    blocked={false}
                     user={v.userData}
-                    blocked={userData.user?.blocks?.includes(v.user)}
-                    tag={v.userTag}
+                    owner={v.userData.id === user.id ? true : false}
                   />
                 ))}
               </div>

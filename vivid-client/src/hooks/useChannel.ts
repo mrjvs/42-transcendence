@@ -34,8 +34,14 @@ export function useChannel() {
   return {
     fetchChannel,
     channel,
+    loading,
     error,
     done,
-    loading,
+    // updateChannel(obj: any) {
+    //   addChannel((v: any) => ({
+    //     ...v,
+    //     ...obj,
+    //   }));
+    // },
   };
 }
