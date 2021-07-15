@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { LoadingScreen } from './components/styled/LoadingScreen';
+import { ChannelsContext, useChannelsContext } from './hooks/useChannels';
 import { useMessageContext, MessageContext } from './hooks/useMessages';
 import { StatusContext, useStatusContext } from './hooks/useStatuses';
 import { UserContext, useUser } from './hooks/useUser';
@@ -20,11 +21,14 @@ function MessageStoreInit(props: { children: any }) {
 function StoreInit(props: { children: any }) {
   const usersData = useUsersContext();
   const statusData = useStatusContext();
+  const channelsData = useChannelsContext();
 
   return (
     <UsersContext.Provider value={usersData}>
       <StatusContext.Provider value={statusData}>
-        <MessageStoreInit>{props.children}</MessageStoreInit>
+        <ChannelsContext.Provider value={channelsData}>
+          <MessageStoreInit>{props.children}</MessageStoreInit>
+        </ChannelsContext.Provider>
       </StatusContext.Provider>
     </UsersContext.Provider>
   );

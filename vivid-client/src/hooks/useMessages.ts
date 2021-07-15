@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { ChannelsContext } from './useChannels';
 import { UserContext } from './useUser';
 import { UsersContext } from './useUsers';
 import { SocketContext } from './useWebsocket';
@@ -8,7 +9,7 @@ export const MessageContext = React.createContext<any>([]);
 MessageContext.displayName = 'MessageContext';
 
 export function useMessages(channel: string) {
-  const [channelInfo, setChannelInfo] = React.useState<any>(null);
+  const { addChannel, getChannel } = React.useContext(ChannelsContext);
   const [channelMessages, setMessages] = React.useState<any[]>([]);
   const { messages, setChannelMessages, getChannelMessages } =
     React.useContext(MessageContext);
@@ -20,6 +21,8 @@ export function useMessages(channel: string) {
     user: any;
     tag: any;
   }>({ user: null, tag: null });
+
+  const channelInfo = getChannel(channel);
 
   const [error, setError] = React.useState(false);
   const [isLoading, setLoading] = React.useState(true);
@@ -47,7 +50,7 @@ export function useMessages(channel: string) {
       })
       .then((res) => res.json())
       .then((info) => {
-        setChannelInfo(info);
+        addChannel(info);
         info.joined_users.forEach((join: any) => {
           addUser(join.user);
         });
@@ -64,7 +67,7 @@ export function useMessages(channel: string) {
   function getRole(userId: string) {
     if (!userId) return null;
     let tag = null;
-    const channelUser = channelInfo?.joined_users.find(
+    const channelUser = channelInfo?.joined_users?.find(
       (v: any) => v.user?.id === userId || v.user === userId,
     );
     if (channelUser && channelUser.is_mod) tag = 'mod';
@@ -130,7 +133,13 @@ export function useMessages(channel: string) {
 
   return {
     messages: channelMessages,
-    channelInfo,
+    channelInfo: getChannel(channel),
+    updateChannelInfo(obj: any) {
+      addChannel({
+        ...obj,
+        id: channel,
+      });
+    },
     getUser,
     users,
     currentChannelUser,

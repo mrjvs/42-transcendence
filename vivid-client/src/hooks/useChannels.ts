@@ -25,7 +25,7 @@ export function useChannelsContext() {
   function getChannel(channelId: string) {
     const found = channels.find((v) => v.id === channelId);
     if (!found) return false;
-    return found;
+    return found.data;
   }
 
   return {

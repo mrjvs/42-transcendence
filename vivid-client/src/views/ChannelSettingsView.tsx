@@ -2,27 +2,40 @@ import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Button } from '../components/styled/Button';
 import { Icon } from '../components/styled/Icon';
-import { ChannelContext } from '../hooks/useChannel';
 import './ChannelSettingsView.css';
 import { useFetch } from '../hooks/useFetch';
 import { TextInput } from '../components/styled/TextInput';
+import { ToggleButton } from '../components/styled/Toggle';
+import { Avatar } from '../components/styled/Avatar';
+import { useMessages } from '../hooks/useMessages';
 
 export function ChannelSettingsView() {
   const history = useHistory();
   const { id }: any = useParams();
-  const channelData = React.useContext<any>(ChannelContext);
+  const { channelInfo, messageState, getRole } = useMessages(id);
+  const channelProps = {
+    channel: channelInfo,
+    getRole,
+  };
+
+  if (messageState.loading) return <p>Loading...</p>;
+
+  if (messageState.error) return <p>Failed to load</p>;
 
   return (
-    <div className="channel-settings-view-wrapper">
+    <div className="channel-settings-view">
       <Button type="secondary" onclick={() => history.push(`/channel/${id}`)}>
         <Icon type="left_arrow" />
         Back to channel
       </Button>
       <h1>Channel settings</h1>
-      <ChannelSettingsCard channelData={channelData} />
-      <ChannelModeratorCard channelData={channelData} />
-      <ChannelPunishedMembersCard channelData={channelData} />
-      <ChannelMembersCard channelData={channelData} />
+      <ChannelSettingsCard channelData={channelProps} />
+      <h1>Channel moderators</h1>
+      <ChannelModeratorCard channelData={channelProps} />
+      <h1>Punished members</h1>
+      <ChannelPunishedMembersCard channelData={channelProps} />
+      <h1>All members</h1>
+      <ChannelMembersCard channelData={channelProps} />
     </div>
   );
 }
@@ -30,6 +43,17 @@ export function ChannelSettingsView() {
 function ChannelSettingsCard(props: { channelData: any }) {
   const [newestChannelName, setNewestChannelName] = React.useState('');
   const [channelName, setChannelName] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const updatePassword = useFetch({
+    url: '/api/v1/channels/',
+    method: 'PATCH',
+  });
+
+  const updateChannelFetch = useFetch({
+    url: '',
+    method: 'PATCH',
+  });
 
   React.useEffect(() => {
     if (
@@ -41,57 +65,92 @@ function ChannelSettingsCard(props: { channelData: any }) {
     }
   }, [newestChannelName, props.channelData]);
 
-  const updateChannelFetch = useFetch({
-    url: '',
-    method: 'PATCH',
-  });
+  React.useEffect(() => {
+    if (updatePassword.done) {
+      props.channelData?.addChannel({ password: password });
+      updatePassword.reset();
+    }
+  }, [updatePassword.done]);
 
   return (
-    <div>
-      <h2>test</h2>
-      <div className="text-wrapper">
-        <TextInput
-          value={channelName}
-          set={setChannelName}
-          placeholder="Best Channel Ever"
-          label="Channel name"
-          noPadding
-        />
+    <div className="channel-settings-wrapper card">
+      <div className="channel-settings-expand">
+        <h2>test</h2>
+        <div className="text-wrapper">
+          <TextInput
+            value={channelName}
+            set={setChannelName}
+            placeholder="Best Channel Ever"
+            label="Channel name"
+            noPadding
+          />
+        </div>
+        <div className="security-settings">
+          <h2>Security</h2>
+          <ToggleButton>Public channel</ToggleButton>
+          <ToggleButton>Password protected</ToggleButton>
+        </div>
+        <div className="text-wrapper">
+          <TextInput
+            value={password}
+            set={setPassword}
+            placeholder="Password is hidden"
+            label="Password"
+            noPadding
+          />
+          <Button
+            loading={updatePassword.loading}
+            type="secondary"
+            onclick={() => updatePassword.run()}
+          >
+            Change Password
+          </Button>
+        </div>
+        <Button
+          less_padding
+          loading={updateChannelFetch.loading}
+          onclick={() =>
+            updateChannelFetch.run(
+              channelName,
+              `/api/v1/channels/${props.channelData.channel.id}`,
+            )
+          }
+        >
+          Save settings
+        </Button>
+        {updateChannelFetch.error &&
+        updateChannelFetch.error?.data?.code === 'inuse' ? (
+          <p>That username is already in use</p>
+        ) : updateChannelFetch.error &&
+          updateChannelFetch.error?.res?.status === 400 ? (
+          <p>Username must be at least 1 character</p>
+        ) : updateChannelFetch.error ? (
+          <p>Something went wrong, try again later</p>
+        ) : null}
       </div>
-      <div className="security-settings">
-        <h2>Security settings</h2>
+      <div className="info-card">
+        <h2>test</h2>
+        <p>15 members</p>
+        <div>
+          <Icon type="check" />
+          Public channel
+        </div>
+        <div>
+          <Icon type="check" />
+          Password protected
+        </div>
       </div>
-      <Button
-        less_padding
-        loading={updateChannelFetch.loading}
-        onclick={() =>
-          updateChannelFetch.run(
-            channelName,
-            `/api/v1/channels/${props.channelData.channel.id}`,
-          )
-        }
-      >
-        Save settings
-      </Button>
-      {updateChannelFetch.error &&
-      updateChannelFetch.error?.data?.code === 'inuse' ? (
-        <p>That username is already in use</p>
-      ) : updateChannelFetch.error &&
-        updateChannelFetch.error?.res?.status === 400 ? (
-        <p>Username must be at least 1 character</p>
-      ) : updateChannelFetch.error ? (
-        <p>Something went wrong, try again later</p>
-      ) : null}
     </div>
   );
 }
 
 function ChannelModeratorCard(props: { channelData: any }) {
   return (
-    <div>
+    <div className="card">
       <ul>
-        {props.channelData?.channel.users.map((v: any) => (
-          <li key={v}>
+        {props.channelData?.channel.joined_users.map((v: any) => (
+          <li key={v.id}>
+            <Avatar noStatus small user={v} />
             {v.name}
             <Button type="danger" onclick={() => true}>
               Remove moderator
@@ -105,10 +164,11 @@ function ChannelModeratorCard(props: { channelData: any }) {
 
 function ChannelPunishedMembersCard(props: { channelData: any }) {
   return (
-    <div>
+    <div className="card">
       <ul>
-        {props.channelData?.channel.users.map((v: any) => (
-          <li key={v}>
+        {props.channelData?.channel.joined_users.map((v: any) => (
+          <li key={v.id}>
+            <Avatar noStatus small user={v} />
             {v.name}
             <Button type="secondary" onclick={() => true}>
               Unban
@@ -125,10 +185,11 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
 
 function ChannelMembersCard(props: { channelData: any }) {
   return (
-    <div>
+    <div className="card">
       <ul>
-        {props.channelData?.channel.users.map((v: any) => (
-          <li key={v}>
+        {props.channelData?.channel.joined_users.map((v: any) => (
+          <li key={v.id}>
+            <Avatar noStatus small user={v} />
             {v.name}
             <Button type="secondary" onclick={() => true}>
               Make mod

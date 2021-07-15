@@ -6,6 +6,15 @@ import { useMessages } from '../hooks/useMessages';
 import { MainLayout } from './layouts/MainLayout';
 import './ChannelView.css';
 import { UserContext } from '../hooks/useUser';
+import { Icon } from '../components/styled/Icon';
+
+function ChannelEditIcon(props: { onClick?: () => void }) {
+  return (
+    <span className="channelViewEdit" onClick={props.onClick}>
+      <Icon type="gear" />
+    </span>
+  );
+}
 
 export function ChannelView() {
   const scrollEl = React.useRef(null);
@@ -88,9 +97,9 @@ export function ChannelView() {
       }
       actions={
         ['owner', 'mod'].includes(currentChannelUser.tag) ? (
-          <span onClick={() => history.push(`/channel/${id}/settings`)}>
-            Edit
-          </span>
+          <ChannelEditIcon
+            onClick={() => history.push(`/channel/${id}/settings`)}
+          />
         ) : null
       }
     >

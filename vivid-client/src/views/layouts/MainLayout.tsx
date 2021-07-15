@@ -11,9 +11,10 @@ export function MainLayout(props: {
   return (
     <div className="contentContainer">
       <div className="contentHeader">
-        <Heading size="small">
-          {props.title} {props.actions ? <span>{props.actions}</span> : null}
-        </Heading>
+        <div className="items">
+          <Heading size="small">{props.title}</Heading>
+          {props.actions ? <span>{props.actions}</span> : null}
+        </div>
         <UserDropdown />
       </div>
       <div className="channelWrapper">{props.children}</div>

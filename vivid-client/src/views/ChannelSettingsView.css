@@ -1,4 +1,4 @@
-.channel-settings-view-wrapper {
+.channel-settings-view {
   color: white;
   display: block;
   width: 80rem;
@@ -9,9 +9,17 @@
   padding-top: 4rem;
 }
 
-.channel-settings-view-wrapper > .card {
-  background: #15192A;
+.channel-settings-view .card {
+  background: #15192a;
   border-radius: 10px;
   padding: 2rem 2rem 3rem 2rem;
   margin-bottom: 1rem;
+}
+
+.channel-settings-wrapper {
+  display: flex;
+}
+
+.channel-settings-expand {
+  flex: 1;
 }
