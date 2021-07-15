@@ -33,7 +33,7 @@ export function Message(props: {
     }
   }, [gameFetch.done]);
 
-  const { run } = useFetch({
+  const deleteMessage = useFetch({
     runOnLoad: false,
     url: '',
     method: 'DELETE',
@@ -45,7 +45,10 @@ export function Message(props: {
         small={true}
         type="secondary"
         onclick={() =>
-          run(null, `/api/v1/channels/${props.channelId}/messages/${msgId}`)
+          deleteMessage.run(
+            null,
+            `/api/v1/channels/${props.channelId}/messages/${msgId}`,
+          )
         }
       >
         ❌
@@ -87,7 +90,7 @@ export function Message(props: {
                   return (
                     <div key={v.id}>
                       <div className="messageInvite-wrapper">
-                        <div className="messageInvite-accent"/>
+                        <div className="messageInvite-accent" />
                         <div className="messageInvite-content">
                           <div className="messageInvite-user">
                             <Avatar user={props.user} small />
