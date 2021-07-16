@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,6 +21,7 @@ import {
 } from '@/joined_channels.entity';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+import { EventGateway } from '../websocket/event.gateway';
 
 export enum ChannelTypes {
   PUBLIC = 'public',
@@ -35,6 +37,7 @@ export class ChannelService {
     @InjectRepository(JoinedChannelEntity)
     private JoinedChannelRepository: Repository<JoinedChannelEntity>,
     private configService: ConfigService,
+    private readonly eventGateway: EventGateway,
   ) {}
 
   async add(channelInput: ChannelDto, userId: string): Promise<IChannel> {
@@ -59,7 +62,10 @@ export class ChannelService {
     return saveResult;
   }
 
-  async update(channelInput: ChannelDto, channelId: string): Promise<IChannel> {
+  async update(
+    channelInput: ChannelDto,
+    channelId: string,
+  ): Promise<ChannelEntity> {
     const input = {
       has_password: channelInput.hasPassword,
       is_public: channelInput.isPublic,
@@ -80,18 +86,29 @@ export class ChannelService {
       .returning('*')
       .execute()
       .then((response) => {
-        return <IChannel>response.raw[0];
+        return <ChannelEntity>response.raw[0];
       });
+    this.eventGateway.updateChannel(
+      updateResult.id,
+      updateResult.joined_users,
+      updateResult,
+    );
     return updateResult;
   }
 
   async remove(channel_id: string): Promise<{ id: string }> {
+    const channel = await this.ChannelRepository.findOne({
+      relations: ['joined_users'],
+      where: { id: channel_id },
+    });
+    if (!channel) throw new NotFoundException();
     await this.JoinedChannelRepository.createQueryBuilder()
       .delete()
       .where('channel = :id', { id: channel_id })
       .execute();
     const result = await this.ChannelRepository.delete(channel_id);
-    if (result.affected !== 1) throw new NotFoundException();
+    if (result.affected !== 1) throw new InternalServerErrorException();
+    this.eventGateway.removeChannel(channel_id, channel.joined_users);
     return { id: channel_id };
   }
 
@@ -144,14 +161,25 @@ export class ChannelService {
         id: alreadyJoined.id,
         is_joined: true,
       });
+      this.eventGateway.updateChannelUser(
+        joinedChannelInput.channel,
+        channel.joined_users,
+        newJoin,
+      );
       return newJoin;
     }
 
     // create new join
-    return await this.JoinedChannelRepository.save({
+    const newUser = await this.JoinedChannelRepository.save({
       channel: joinedChannelInput.channel,
       user: joinedChannelInput.user,
     });
+    this.eventGateway.updateChannelUser(
+      joinedChannelInput.channel,
+      channel.joined_users,
+      newUser,
+    );
+    return newUser;
   }
 
   async makeUserMod(
