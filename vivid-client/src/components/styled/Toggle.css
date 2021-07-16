@@ -1,0 +1,73 @@
+.toggleSwitch .toggleSwitchInput {
+  display: none;
+}
+
+.toggleSwitch {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  user-select: none;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.toggleSwitch .toggleContainer {
+  height: 1.2rem;
+  width: 2.3rem;
+  position: relative;
+  border-radius: 0.6rem;
+  background-color: #1e253d;
+  display: block;
+  margin-right: 0.5rem;
+}
+
+.toggleSwitch .toggleContainer::before {
+  content: '';
+  height: 0.8rem;
+  width: 0.8rem;
+  margin: 0.2rem;
+  margin-left: 0.25rem;
+  border-radius: 0.4rem;
+  background-color: #515d85;
+  transition: transform 100ms ease-in-out;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.toggleSwitch:hover .toggleContainer::before {
+  background-color: #ffffff;
+}
+
+.toggleSwitch:active .toggleContainer::before {
+  transform: translateX(0.1rem);
+}
+
+.toggleSwitch .toggleSwitchInput:checked + .toggleContainer::before {
+  transform: translateX(
+    1rem
+  ); /* toggleSwitchWidth - toggleSwitchCircleWidth - (toggleSwitchCircleMargin * 2) */
+}
+
+.toggleSwitch:active .toggleSwitchInput:checked + .toggleContainer::before {
+  transform: translateX(
+    0.9rem
+  ); /* toggleSwitchWidth - toggleSwitchCircleWidth - (toggleSwitchCircleMargin * 2) - 0.1rem */
+}
+
+.toggleSwitch:hover .toggleContainer {
+  background-color: #2c3554;
+}
+
+.toggleSwitchInput:checked + .toggleContainer {
+  background-color: #3a52b2;
+}
+
+.toggleSwitchInput:checked + .toggleContainer::before {
+  background-color: #fff;
+}
+
+.toggleSwitch:hover .toggleSwitchInput:checked + .toggleContainer {
+  background-color: #4b65ca;
+}

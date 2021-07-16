@@ -46,22 +46,24 @@ function ChannelSettingsCard(props: { channelData: any }) {
   const [password, setPassword] = React.useState('');
 
   const updatePassword = useFetch({
-    url: '/api/v1/channels/',
+    url: `/api/v1/channels/${props.channelData.channel.id}`,
     method: 'PATCH',
   });
 
   const updateChannelFetch = useFetch({
-    url: '',
+    url: `/api/v1/channels/${props.channelData.channel.id}`,
     method: 'PATCH',
   });
 
+  console.log(props.channelData.channel);
+
   React.useEffect(() => {
     if (
-      props.channelData?.channel?.name &&
-      props.channelData.channel.name !== newestChannelName
+      props.channelData?.channel?.title &&
+      props.channelData.channel.title !== newestChannelName
     ) {
-      setChannelName(props.channelData.channel.name);
-      setNewestChannelName(props.channelData.channel.name);
+      setChannelName(props.channelData.channel.title);
+      setNewestChannelName(props.channelData.channel.title);
     }
   }, [newestChannelName, props.channelData]);
 
@@ -75,7 +77,7 @@ function ChannelSettingsCard(props: { channelData: any }) {
   return (
     <div className="channel-settings-wrapper card">
       <div className="channel-settings-expand">
-        <h2>test</h2>
+        <h2>{props.channelData.channel.title}</h2>
         <div className="text-wrapper">
           <TextInput
             value={channelName}
@@ -90,22 +92,24 @@ function ChannelSettingsCard(props: { channelData: any }) {
           <ToggleButton>Public channel</ToggleButton>
           <ToggleButton>Password protected</ToggleButton>
         </div>
-        <div className="text-wrapper">
-          <TextInput
-            value={password}
-            set={setPassword}
-            placeholder="Password is hidden"
-            label="Password"
-            noPadding
-          />
-          <Button
-            loading={updatePassword.loading}
-            type="secondary"
-            onclick={() => updatePassword.run()}
-          >
-            Change Password
-          </Button>
-        </div>
+        {!props.channelData.channel.has_password /* TODO revert later */ ? (
+          <div className="text-wrapper password">
+            <TextInput
+              value={password}
+              set={setPassword}
+              placeholder="Password is hidden"
+              label="Password"
+              noPadding
+            />
+            <Button
+              loading={updatePassword.loading}
+              type="secondary"
+              onclick={() => updatePassword.run()}
+            >
+              Change Password
+            </Button>
+          </div>
+        ) : null}
         <Button
           less_padding
           loading={updateChannelFetch.loading}
@@ -129,15 +133,21 @@ function ChannelSettingsCard(props: { channelData: any }) {
         ) : null}
       </div>
       <div className="info-card">
-        <h2>test</h2>
-        <p>15 members</p>
-        <div>
-          <Icon type="check" />
-          Public channel
-        </div>
-        <div>
-          <Icon type="check" />
-          Password protected
+        <h2>{props.channelData.channel.title}</h2>
+        <p>{props.channelData.channel.joined_users.length} members</p>
+        <div style={{ color: '#7BDB94' }}>
+          <div>
+            <Icon type="checkmark" />
+            {props.channelData.channel.is_public
+              ? 'Public channel'
+              : 'Private channel'}
+          </div>
+          <div>
+            <Icon type="checkmark" />
+            {props.channelData.channel.has_password
+              ? 'Password protected'
+              : 'Free to join'}
+          </div>
         </div>
       </div>
     </div>
@@ -145,19 +155,11 @@ function ChannelSettingsCard(props: { channelData: any }) {
 }
 
 function ChannelModeratorCard(props: { channelData: any }) {
-  console.log(props.channelData.channel);
-  const [active, setActive] = React.useState(false);
-  const [selected, setSelected] = React.useState<any>(null);
-
   return (
     <div className="card">
       <ul>
         {props.channelData?.channel.joined_users.map((v: any) => (
-          <li
-            className={`${active ? 'active' : null}`}
-            key={v.id}
-            onClick={() => setActive(true)}
-          >
+          <li key={v.id}>
             <div className="user">
               <Avatar noStatus small user={v.user} />
               <span>
@@ -165,12 +167,10 @@ function ChannelModeratorCard(props: { channelData: any }) {
                 {v.is_mod ? <span className="tag">mod</span> : null}
               </span>
             </div>
-            <div>
-              {active ? (
-                <Button type="danger" onclick={() => true}>
-                  Remove moderator
-                </Button>
-              ) : null}
+            <div className="hideUnselected">
+              <Button more_padding type="danger" onclick={() => true}>
+                Remove moderator
+              </Button>
             </div>
           </li>
         ))}
@@ -189,11 +189,16 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
               <Avatar noStatus small user={v.user} />
               {v.user.name}
             </div>
-            <div>
-              <Button type="secondary" onclick={() => true}>
+            <div className="hideUnselected">
+              <Button
+                more_padding
+                type="secondary"
+                margin_right
+                onclick={() => true}
+              >
                 Unban
               </Button>
-              <Button type="danger" onclick={() => true}>
+              <Button more_padding type="danger" onclick={() => true}>
                 Unmute
               </Button>
             </div>
@@ -214,14 +219,24 @@ function ChannelMembersCard(props: { channelData: any }) {
               <Avatar noStatus small user={v.user} />
               {v.user.name}
             </div>
-            <div>
-              <Button type="secondary" onclick={() => true}>
+            <div className="hideUnselected">
+              <Button
+                type="secondary"
+                margin_right
+                more_padding
+                onclick={() => true}
+              >
                 Make mod
               </Button>
-              <Button type="danger" onclick={() => true}>
+              <Button
+                type="danger"
+                margin_right
+                more_padding
+                onclick={() => true}
+              >
                 Mute
               </Button>
-              <Button type="danger" onclick={() => true}>
+              <Button more_padding type="danger" onclick={() => true}>
                 Ban
               </Button>
             </div>

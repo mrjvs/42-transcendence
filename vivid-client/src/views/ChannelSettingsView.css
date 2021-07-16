@@ -1,7 +1,7 @@
 .channel-settings-view {
   color: white;
   display: block;
-  width: 80rem;
+  width: 60rem;
   max-width: 100%;
   margin: auto;
   justify-content: center;
@@ -12,7 +12,7 @@
 .channel-settings-view .card {
   background: #15192a;
   border-radius: 10px;
-  padding: 2rem 2rem 3rem 2rem;
+  padding: 2rem;
   margin-bottom: 1rem;
 }
 
@@ -24,8 +24,29 @@
   flex: 1;
 }
 
+.channel-settings-view .text-wrapper.password {
+  display: flex;
+  align-items: flex-end;
+}
+
+.channel-settings-view .text-wrapper.password Button {
+  height: 50%;
+  margin-left: 0.5rem;
+}
+
+.channel-settings-view .info-card {
+  background: #1e253d;
+  border-radius: 10px;
+  padding: 0.5rem 2rem;
+  height: 10rem;
+  width: 15rem;
+  margin-left: 6rem;
+  margin-right: 2rem;
+}
+
 .channel-settings-view .card ul {
   list-style: none;
+  padding: 0;
 }
 
 .channel-settings-view .card ul > li {
@@ -33,15 +54,19 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.channel-settings-view .card ul > li .hideUnselected {
+  display: none;
+}
+
+.channel-settings-view .card ul > li:hover .hideUnselected {
+  display: block;
 }
 
 .channel-settings-view .card ul > li:hover {
-  background: #23273B;
-  border-radius: 10px;
-}
-
-.channel-settings-view .card ul > li.active {
-  background: #23273B;
+  background: #23273b;
   border-radius: 10px;
 }
 
