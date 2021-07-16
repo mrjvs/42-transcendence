@@ -145,16 +145,33 @@ function ChannelSettingsCard(props: { channelData: any }) {
 }
 
 function ChannelModeratorCard(props: { channelData: any }) {
+  console.log(props.channelData.channel);
+  const [active, setActive] = React.useState(false);
+  const [selected, setSelected] = React.useState<any>(null);
+
   return (
     <div className="card">
       <ul>
         {props.channelData?.channel.joined_users.map((v: any) => (
-          <li key={v.id}>
-            <Avatar noStatus small user={v} />
-            {v.name}
-            <Button type="danger" onclick={() => true}>
-              Remove moderator
-            </Button>
+          <li
+            className={`${active ? 'active' : null}`}
+            key={v.id}
+            onClick={() => setActive(true)}
+          >
+            <div className="user">
+              <Avatar noStatus small user={v.user} />
+              <span>
+                {v.user.name}
+                {v.is_mod ? <span className="tag">mod</span> : null}
+              </span>
+            </div>
+            <div>
+              {active ? (
+                <Button type="danger" onclick={() => true}>
+                  Remove moderator
+                </Button>
+              ) : null}
+            </div>
           </li>
         ))}
       </ul>
@@ -168,14 +185,18 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
       <ul>
         {props.channelData?.channel.joined_users.map((v: any) => (
           <li key={v.id}>
-            <Avatar noStatus small user={v} />
-            {v.name}
-            <Button type="secondary" onclick={() => true}>
-              Unban
-            </Button>
-            <Button type="danger" onclick={() => true}>
-              Unmute
-            </Button>
+            <div className="user">
+              <Avatar noStatus small user={v.user} />
+              {v.user.name}
+            </div>
+            <div>
+              <Button type="secondary" onclick={() => true}>
+                Unban
+              </Button>
+              <Button type="danger" onclick={() => true}>
+                Unmute
+              </Button>
+            </div>
           </li>
         ))}
       </ul>
@@ -189,17 +210,21 @@ function ChannelMembersCard(props: { channelData: any }) {
       <ul>
         {props.channelData?.channel.joined_users.map((v: any) => (
           <li key={v.id}>
-            <Avatar noStatus small user={v} />
-            {v.name}
-            <Button type="secondary" onclick={() => true}>
-              Make mod
-            </Button>
-            <Button type="danger" onclick={() => true}>
-              Mute
-            </Button>
-            <Button type="danger" onclick={() => true}>
-              Ban
-            </Button>
+            <div className="user">
+              <Avatar noStatus small user={v.user} />
+              {v.user.name}
+            </div>
+            <div>
+              <Button type="secondary" onclick={() => true}>
+                Make mod
+              </Button>
+              <Button type="danger" onclick={() => true}>
+                Mute
+              </Button>
+              <Button type="danger" onclick={() => true}>
+                Ban
+              </Button>
+            </div>
           </li>
         ))}
       </ul>
