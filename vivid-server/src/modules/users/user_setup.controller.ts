@@ -34,6 +34,7 @@ export class UserSetupController {
   ): Promise<any> {
     if (!usr.isSelf && !user.isSiteAdmin()) throw new ForbiddenException();
     const userRet = await this.userService.findUser(usr.id);
+    console.log(userRet);
     return formatObject(FullDetailsUser, userRet);
   }
 

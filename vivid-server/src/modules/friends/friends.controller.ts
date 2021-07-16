@@ -44,12 +44,7 @@ export class FriendsController {
     // checking if friend is the logged in user
     if (user.id === friend.id) throw new BadRequestException();
 
-    return this.friendsService.sendFriendRequest(
-      user.id,
-      friend.id,
-      user.id,
-      friend.id,
-    );
+    return this.friendsService.sendFriendRequest(user, friend, user, friend);
   }
 
   // Find all pending friend requests
@@ -59,21 +54,21 @@ export class FriendsController {
   }
 
   // Accept pending friend request
-  @Patch('accept/:friendrequest_id')
+  @Patch('accept/:friend_id')
   async acceptRequest(
-    @Param('friendrequest_id') friendRequestId: string,
+    @Param('friend_id') friendId: string,
     @User() user: UserEntity,
   ): Promise<UpdateResult> {
-    return this.friendsService.acceptFriendRequest(user.id, friendRequestId);
+    return this.friendsService.acceptFriendRequest(user.id, friendId);
   }
 
   // Unfriend existing friend
-  @Delete('unfriend/:friendrequest_id')
+  @Delete('unfriend/:friend_id')
   async unfriend(
-    @Param('friendrequest_id') friendRequestId: string,
+    @Param('friend_id') friendId: string,
     @User() user: UserEntity,
   ): Promise<DeleteResult> {
-    return this.friendsService.deleteFriendship(user.id, friendRequestId);
+    return this.friendsService.deleteFriendship(user.id, friendId);
   }
 
   // Get full friendlist

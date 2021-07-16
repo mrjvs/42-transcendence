@@ -60,6 +60,8 @@ export class UserService {
       'guild',
       'guild.users',
       'blocks',
+      'friends',
+      'friends_inverse',
     ],
   ): Promise<UserEntity> {
     return await this.userRepository

@@ -8,12 +8,14 @@ import {
   ManyToOne,
   JoinColumn,
   BaseEntity,
+  ManyToMany,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { MatchesEntity } from './matches.entity';
 import { BlocksEntity } from '@/blocks.entity';
+import { FriendsEntity } from './friends.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -56,6 +58,12 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => BlocksEntity, (blocks) => blocks.user_id)
   blocks: BlocksEntity[];
+
+  @OneToMany(() => FriendsEntity, (friends) => friends.user_1)
+  friends: FriendsEntity[];
+
+  @OneToMany(() => FriendsEntity, (friends) => friends.user_2)
+  friends_inverse: FriendsEntity[];
 
   //   onDelete: 'SET NULL',
   // })
@@ -120,8 +128,30 @@ export class RelatedUser extends UnrelatedUser {
   joined_channels: string[] | string;
 }
 
+function friendTransform(arr, otherField) {
+  return arr.map((v) =>
+    v.constructor === String
+      ? v
+      : {
+          userId: v[otherField],
+          accepted: v.accepted,
+          requested_by: v.requested_by,
+        },
+  );
+}
+
 @Exclude()
 export class FullDetailsUser extends RelatedUser {
+  @Expose()
+  @Transform(
+    ({ obj }) => [
+      ...friendTransform(obj.friends, 'user_2'),
+      ...friendTransform(obj.friends_inverse, 'user_1'),
+    ],
+    { toClassOnly: true },
+  )
+  friends: any;
+
   @Expose()
   @Transform(({ obj }) => obj.joined_channels, { toClassOnly: true })
   joined_channels: any;

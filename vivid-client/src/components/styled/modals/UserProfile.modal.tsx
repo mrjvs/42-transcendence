@@ -21,6 +21,7 @@ export function UserProfileModal(props: {
       <div className="user-profile-card">
         <h2>{props.user.name}</h2>
         <BlockAction userData={userData} userId={props.user.id} />
+        <FriendAction userData={userData} friendId={props.user.id} />
       </div>
     </ModalBase>
   );
@@ -75,6 +76,118 @@ function BlockAction(props: { userData: any; userId: string }) {
     >
       {buttonText}
     </Button>
+  );
+}
+
+function FriendAction(props: { userData: any; friendId: string }) {
+  const friendUser = useFetch({
+    url: `/api/v1/friends/add/${props.friendId}`,
+    method: 'POST',
+  });
+
+  const unFriend = useFetch({
+    url: `/api/v1/friends/unfriend/${props.friendId}`,
+    method: 'DELETE',
+  });
+
+  const acceptFriend = useFetch({
+    url: `/api/v1/friends/accept/${props.friendId}`,
+    method: 'PATCH',
+  });
+
+  React.useEffect(() => {
+    if (friendUser.done) {
+      const friendship = friendUser.data.data.raw;
+      friendUser.reset();
+      props.userData?.updateUser({
+        friends: [
+          ...props.userData.user.friends,
+          {
+            accepted: friendship.accepted,
+            requested_by: props.userData.user.id,
+            userId: props.friendId,
+          },
+        ],
+      });
+    }
+    if (unFriend.done) {
+      unFriend.reset();
+      props.userData?.updateUser({
+        friends: props.userData.user.friends.filter(
+          (v: any) => v != friendship,
+        ),
+      });
+    }
+    if (acceptFriend.done) {
+      acceptFriend.reset();
+      props.userData?.updateUser({
+        friends: [
+          ...props.userData.user.friends,
+          {
+            accepted: friendship.accepted,
+            requested_by: props.userData.user.id,
+            userId: props.friendId,
+          },
+        ],
+      });
+    }
+  }, [friendUser.done, unFriend.done, props.userData, acceptFriend.done]);
+
+  if (props.userData?.user?.id === props.friendId) {
+    return null;
+  }
+
+  const friendship = props.userData?.user?.friends?.find(
+    (v: any) => v.userId === props.friendId,
+  );
+
+  let method: any;
+  let buttonText;
+  let buttonType;
+  let twoButtons = false;
+
+  if (!friendship) {
+    method = friendUser;
+    buttonText = 'Send Friend Request';
+    buttonType = 'secondary';
+  } else {
+    if (friendship.accepted) {
+      method = unFriend;
+      buttonText = 'Unfriend User';
+      buttonType = 'danger';
+    } else {
+      if (friendship.requested_by === props.friendId) {
+        method = acceptFriend;
+        buttonText = 'Accept Friend Request';
+        buttonType = 'secondary';
+        twoButtons = true;
+      } else {
+        method = unFriend;
+        buttonText = 'Cancel Friend Request';
+        buttonType = 'danger';
+      }
+    }
+  }
+
+  return (
+    <>
+      <Button
+        loading={method.loading}
+        type={buttonType === 'danger' ? 'danger' : 'secondary'}
+        onclick={() => method.run()}
+      >
+        {buttonText}
+      </Button>
+      {twoButtons ? (
+        <Button
+          loading={unFriend.loading}
+          type={'danger'}
+          onclick={() => unFriend.run()}
+        >
+          Decline Friend Request
+        </Button>
+      ) : null}
+    </>
   );
 }
 

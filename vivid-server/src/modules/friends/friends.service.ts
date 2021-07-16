@@ -28,10 +28,10 @@ export class FriendsService {
 
   // Add FriendEntity to database (=> send friend request)
   async sendFriendRequest(
-    user_1: string,
-    user_2: string,
-    requested_by: string,
-    requested_to: string,
+    user_1: UserEntity,
+    user_2: UserEntity,
+    requested_by: UserEntity,
+    requested_to: UserEntity,
   ): Promise<InsertResult> {
     //putting the lower id in first column to be able to check unique combination
     if (user_2 < user_1) {
@@ -43,10 +43,10 @@ export class FriendsService {
       .createQueryBuilder()
       .insert()
       .values({
-        user_1: user_1,
-        user_2: user_2,
-        requested_by: requested_by,
-        requested_to: requested_to,
+        user_1: user_1.id,
+        user_2: user_2.id,
+        requested_by: requested_by.id,
+        requested_to: requested_to.id,
       })
       .execute()
       .catch((error) => {
@@ -90,14 +90,14 @@ export class FriendsService {
   // Update FriendsEntity to be accepted
   async acceptFriendRequest(
     userId: string,
-    friendRequestId: string,
+    friendId: string,
   ): Promise<UpdateResult> {
     return await this.friendsRepository
       .createQueryBuilder()
       .update()
       .set({ accepted: true })
-      .where('id = :id', { id: friendRequestId })
-      .andWhere('requested_to = :r', { r: userId })
+      .where('requested_by = :f', { f: friendId })
+      .andWhere('requested_to = :u', { u: userId })
       .execute()
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
@@ -108,15 +108,18 @@ export class FriendsService {
   // deleting the friendship or decline friendrequest
   async deleteFriendship(
     userId: string,
-    friendRequestId: string,
+    friendId: string,
   ): Promise<DeleteResult> {
     return await this.friendsRepository
       .createQueryBuilder()
       .delete()
-      .where('id = :id', { id: friendRequestId })
-      .andWhere('user_1 = :u1 OR user_2 = :u2', {
+      .where('user_1 = :u1 AND user_2 = :u2', {
         u1: userId,
-        u2: userId,
+        u2: friendId,
+      })
+      .orWhere('user_1 = :u3 AND user_2 = :u4', {
+        u3: friendId,
+        u4: userId,
       })
       .execute()
       .catch((error) => {
