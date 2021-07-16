@@ -45,6 +45,8 @@ function ChannelSettingsCard(props: { channelData: any }) {
   const [channelName, setChannelName] = React.useState('');
   const [password, setPassword] = React.useState('');
 
+  const [active, setActive] = React.useState(false);
+
   const updatePassword = useFetch({
     url: `/api/v1/channels/${props.channelData.channel.id}`,
     method: 'PATCH',
@@ -54,8 +56,6 @@ function ChannelSettingsCard(props: { channelData: any }) {
     url: `/api/v1/channels/${props.channelData.channel.id}`,
     method: 'PATCH',
   });
-
-  console.log(props.channelData.channel);
 
   React.useEffect(() => {
     if (
@@ -92,22 +92,29 @@ function ChannelSettingsCard(props: { channelData: any }) {
           <ToggleButton>Public channel</ToggleButton>
           <ToggleButton>Password protected</ToggleButton>
         </div>
-        {!props.channelData.channel.has_password /* TODO revert later */ ? (
-          <div className="text-wrapper password">
-            <TextInput
-              value={password}
-              set={setPassword}
-              placeholder="Password is hidden"
-              label="Password"
-              noPadding
-            />
-            <Button
-              loading={updatePassword.loading}
-              type="secondary"
-              onclick={() => updatePassword.run()}
-            >
-              Change Password
-            </Button>
+        {!props.channelData.channel.has_password ? (
+          <div className="password">
+            <div className="text-wrapper" onClick={() => setActive(true)}>
+              <TextInput
+                value={password}
+                set={setPassword}
+                placeholder="Password is hidden"
+                label="Password"
+                noPadding
+              />
+            </div>
+            {active ? (
+              <Button
+                loading={updatePassword.loading}
+                type="secondary"
+                onclick={() => {
+                  updatePassword.run();
+                  setActive(false); // TODO set to false also when clicked outside the input
+                }}
+              >
+                Change Password
+              </Button>
+            ) : null}
           </div>
         ) : null}
         <Button
@@ -134,7 +141,12 @@ function ChannelSettingsCard(props: { channelData: any }) {
       </div>
       <div className="info-card">
         <h2>{props.channelData.channel.title}</h2>
-        <p>{props.channelData.channel.joined_users.length} members</p>
+        <p style={{ color: '#9DA6C4' }}>
+          {props.channelData.channel.joined_users.length}
+          {props.channelData.channel.joined_users.length === 1
+            ? ' member'
+            : ' members'}
+        </p>
         <div style={{ color: '#7BDB94' }}>
           <div>
             <Icon type="checkmark" />
@@ -183,27 +195,33 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
   return (
     <div className="card">
       <ul>
-        {props.channelData?.channel.joined_users.map((v: any) => (
-          <li key={v.id}>
-            <div className="user">
-              <Avatar noStatus small user={v.user} />
-              {v.user.name}
-            </div>
-            <div className="hideUnselected">
-              <Button
-                more_padding
-                type="secondary"
-                margin_right
-                onclick={() => true}
-              >
-                Unban
-              </Button>
-              <Button more_padding type="danger" onclick={() => true}>
-                Unmute
-              </Button>
-            </div>
-          </li>
-        ))}
+        {props.channelData?.channel.joined_users.map((v: any) =>
+          v.user.is_banned || v.user.is_muted ? (
+            <li key={v.id}>
+              <div className="user">
+                <Avatar noStatus small user={v.user} />
+                {v.user.name}
+              </div>
+              <div className="hideUnselected">
+                {v.user.is_banned ? (
+                  <Button
+                    more_padding
+                    type="secondary"
+                    margin_right
+                    onclick={() => true}
+                  >
+                    Unban
+                  </Button>
+                ) : null}
+                {v.user.is_muted ? (
+                  <Button more_padding type="danger" onclick={() => true}>
+                    Unmute
+                  </Button>
+                ) : null}
+              </div>
+            </li>
+          ) : null,
+        )}
       </ul>
     </div>
   );
@@ -220,25 +238,31 @@ function ChannelMembersCard(props: { channelData: any }) {
               {v.user.name}
             </div>
             <div className="hideUnselected">
-              <Button
-                type="secondary"
-                margin_right
-                more_padding
-                onclick={() => true}
-              >
-                Make mod
-              </Button>
-              <Button
-                type="danger"
-                margin_right
-                more_padding
-                onclick={() => true}
-              >
-                Mute
-              </Button>
-              <Button more_padding type="danger" onclick={() => true}>
-                Ban
-              </Button>
+              {!v.user.is_mod ? (
+                <Button
+                  type="secondary"
+                  margin_right
+                  more_padding
+                  onclick={() => true}
+                >
+                  Make mod
+                </Button>
+              ) : null}
+              {!v.user.is_muted ? (
+                <Button
+                  type="danger"
+                  margin_right
+                  more_padding
+                  onclick={() => true}
+                >
+                  Mute
+                </Button>
+              ) : null}
+              {!v.user.is_banned ? (
+                <Button more_padding type="danger" onclick={() => true}>
+                  Ban
+                </Button>
+              ) : null}
             </div>
           </li>
         ))}

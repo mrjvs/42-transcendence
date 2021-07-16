@@ -24,14 +24,31 @@
   flex: 1;
 }
 
-.channel-settings-view .text-wrapper.password {
+.channel-settings-expand Button {
+  margin-top: 5rem;
+}
+
+.channel-settings-view .password {
   display: flex;
   align-items: flex-end;
 }
 
-.channel-settings-view .text-wrapper.password Button {
-  height: 50%;
+.channel-settings-view .password .text-wrapper {
+  flex: 1;
+}
+
+.channel-settings-view .password Button.hidden {
+  display: none;
+}
+
+.channel-settings-view .password input:focus Button.hidden {
+  display: flex;
+}
+
+.channel-settings-view .password Button {
+  padding: 1rem;
   margin-left: 0.5rem;
+  margin-top: 0;
 }
 
 .channel-settings-view .info-card {
@@ -42,6 +59,7 @@
   width: 15rem;
   margin-left: 6rem;
   margin-right: 2rem;
+  margin-top: 1rem;
 }
 
 .channel-settings-view .card ul {
