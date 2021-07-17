@@ -114,21 +114,20 @@ function FriendAction(props: { userData: any; friendId: string }) {
       unFriend.reset();
       props.userData?.updateUser({
         friends: props.userData.user.friends.filter(
-          (v: any) => v != friendship,
+          (v: any) => v !== friendship,
         ),
       });
     }
     if (acceptFriend.done) {
+      const friendship = acceptFriend.data;
+      console.log(friendship);
       acceptFriend.reset();
       props.userData?.updateUser({
-        friends: [
-          ...props.userData.user.friends,
-          {
-            accepted: friendship.accepted,
-            requested_by: props.userData.user.id,
-            userId: props.friendId,
-          },
-        ],
+        friends: props.userData.user.friends.filter((v: any) => {
+          console.log(v);
+          if (v === friendship) v.accepted = true;
+          return v;
+        }),
       });
     }
   }, [friendUser.done, unFriend.done, props.userData, acceptFriend.done]);
@@ -141,39 +140,43 @@ function FriendAction(props: { userData: any; friendId: string }) {
     (v: any) => v.userId === props.friendId,
   );
 
-  let method: any;
-  let buttonText;
-  let buttonType;
-  let twoButtons = false;
+  // let method: any;
+  // let buttonText;
+  // let buttonType;
+  // let twoButtons = false;
 
-  if (!friendship) {
-    method = friendUser;
-    buttonText = 'Send Friend Request';
-    buttonType = 'secondary';
-  } else {
-    if (friendship.accepted) {
-      method = unFriend;
-      buttonText = 'Unfriend User';
-      buttonType = 'danger';
-    } else {
-      if (friendship.requested_by === props.friendId) {
-        method = acceptFriend;
-        buttonText = 'Accept Friend Request';
-        buttonType = 'secondary';
-        twoButtons = true;
-      } else {
-        method = unFriend;
-        buttonText = 'Cancel Friend Request';
-        buttonType = 'danger';
-      }
-    }
-  }
-
+  // if (!friendship) {
+  //   method = friendUser;
+  //   buttonText = 'Send Friend Request';
+  //   buttonType = 'secondary';
+  // } else {
+  //   if (friendship.accepted) {
+  //     method = unFriend;
+  //     buttonText = 'Unfriend User';
+  //     buttonType = 'danger';
+  //   } else {
+  //     if (friendship.requested_by === props.friendId) {
+  //       method = acceptFriend;
+  //       buttonText = 'Accept Friend Request';
+  //       buttonType = 'secondary';
+  //       twoButtons = true;
+  //     } else {
+  //       method = unFriend;
+  //       buttonText = 'Cancel Friend Request';
+  //       buttonType = 'danger';
+  //     }
+  //   }
+  // }
+  const method = acceptFriend;
+  const buttonText = 'Accept Friend Request';
+  const buttonType = 'secondary';
+  const twoButtons = true;
   return (
     <>
       <Button
         loading={method.loading}
-        type={buttonType === 'danger' ? 'danger' : 'secondary'}
+        // type={buttonType === 'danger' ? 'danger' : 'secondary'}
+        type="secondary"
         onclick={() => method.run()}
       >
         {buttonText}
