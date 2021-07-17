@@ -47,10 +47,8 @@ function ChannelSettingsCard(props: { channelData: any }) {
 
   const [active, setActive] = React.useState(false);
 
-  const updatePassword = useFetch({
-    url: `/api/v1/channels/${props.channelData.channel.id}`,
-    method: 'PATCH',
-  });
+  const [hasPassword, setHasPassword] = React.useState(false);
+  const [isPublic, setIsPublic] = React.useState(false);
 
   const updateChannelFetch = useFetch({
     url: `/api/v1/channels/${props.channelData.channel.id}`,
@@ -68,11 +66,11 @@ function ChannelSettingsCard(props: { channelData: any }) {
   }, [newestChannelName, props.channelData]);
 
   React.useEffect(() => {
-    if (updatePassword.done) {
+    if (updateChannelFetch.done) {
       props.channelData?.addChannel({ password: password });
-      updatePassword.reset();
+      updateChannelFetch.reset();
     }
-  }, [updatePassword.done]);
+  }, [updateChannelFetch.done]);
 
   return (
     <div className="channel-settings-wrapper card">
@@ -90,7 +88,9 @@ function ChannelSettingsCard(props: { channelData: any }) {
         <div className="security-settings">
           <h2>Security</h2>
           <ToggleButton>Public channel</ToggleButton>
+          {/* TODO set setPublic based on switch state*/}
           <ToggleButton>Password protected</ToggleButton>
+          {/* TODO set setHasPassword based on switch state*/}
         </div>
         {!props.channelData.channel.has_password ? (
           <div className="password">
@@ -105,10 +105,14 @@ function ChannelSettingsCard(props: { channelData: any }) {
             </div>
             {active ? (
               <Button
-                loading={updatePassword.loading}
+                loading={updateChannelFetch.loading}
                 type="secondary"
                 onclick={() => {
-                  updatePassword.run();
+                  // TODO make a backend service just for password change
+                  updateChannelFetch.run({
+                    hasPassword: true,
+                    password: password,
+                  });
                   setActive(false); // TODO set to false also when clicked outside the input
                 }}
               >
@@ -121,10 +125,12 @@ function ChannelSettingsCard(props: { channelData: any }) {
           less_padding
           loading={updateChannelFetch.loading}
           onclick={() =>
-            updateChannelFetch.run(
-              channelName,
-              `/api/v1/channels/${props.channelData.channel.id}`,
-            )
+            updateChannelFetch.run({
+              title: channelName,
+              isPublic: isPublic,
+              hasPassword: hasPassword,
+              password: password,
+            })
           }
         >
           Save settings
@@ -148,17 +154,17 @@ function ChannelSettingsCard(props: { channelData: any }) {
             : ' members'}
         </p>
         <div style={{ color: '#7BDB94' }}>
-          <div>
+          <div className="info-line">
             <Icon type="checkmark" />
             {props.channelData.channel.is_public
-              ? 'Public channel'
-              : 'Private channel'}
+              ? ' Public channel'
+              : ' Private channel'}
           </div>
-          <div>
+          <div className="info-line">
             <Icon type="checkmark" />
             {props.channelData.channel.has_password
-              ? 'Password protected'
-              : 'Free to join'}
+              ? ' Password protected'
+              : ' Free to join'}
           </div>
         </div>
       </div>
@@ -167,6 +173,15 @@ function ChannelSettingsCard(props: { channelData: any }) {
 }
 
 function ChannelModeratorCard(props: { channelData: any }) {
+  const makeMod = useFetch({
+    url: '',
+    method: 'PATCH',
+  });
+
+  React.useEffect(() => {
+    if (makeMod.done) makeMod.reset();
+  }, [makeMod.done]);
+
   return (
     <div className="card">
       <ul>
@@ -180,7 +195,16 @@ function ChannelModeratorCard(props: { channelData: any }) {
               </span>
             </div>
             <div className="hideUnselected">
-              <Button more_padding type="danger" onclick={() => true}>
+              <Button
+                more_padding
+                type="danger"
+                onclick={() =>
+                  makeMod.run(
+                    { isMod: false },
+                    `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}/permissions`,
+                  )
+                }
+              >
                 Remove moderator
               </Button>
             </div>
@@ -192,6 +216,15 @@ function ChannelModeratorCard(props: { channelData: any }) {
 }
 
 function ChannelPunishedMembersCard(props: { channelData: any }) {
+  const updatePermissions = useFetch({
+    url: '',
+    method: 'PATCH',
+  });
+
+  React.useEffect(() => {
+    if (updatePermissions.done) updatePermissions.reset();
+  }, [updatePermissions.done]);
+
   return (
     <div className="card">
       <ul>
@@ -208,13 +241,27 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
                     more_padding
                     type="secondary"
                     margin_right
-                    onclick={() => true}
+                    onclick={() =>
+                      updatePermissions.run(
+                        { isBanned: false, banExpiry: null },
+                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}`,
+                      )
+                    }
                   >
                     Unban
                   </Button>
                 ) : null}
                 {v.user.is_muted ? (
-                  <Button more_padding type="danger" onclick={() => true}>
+                  <Button
+                    more_padding
+                    type="danger"
+                    onclick={() =>
+                      updatePermissions.run(
+                        { isMuted: false, muteExpiry: null },
+                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}`,
+                      )
+                    }
+                  >
                     Unmute
                   </Button>
                 ) : null}
@@ -228,6 +275,21 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
 }
 
 function ChannelMembersCard(props: { channelData: any }) {
+  const makeMod = useFetch({
+    url: '',
+    method: 'PATCH',
+  });
+
+  const updatePermissions = useFetch({
+    url: '',
+    method: 'PATCH',
+  });
+
+  React.useEffect(() => {
+    if (makeMod.done) makeMod.reset();
+    if (updatePermissions.done) updatePermissions.reset();
+  }, [makeMod.done, updatePermissions.done]);
+
   return (
     <div className="card">
       <ul>
@@ -243,7 +305,12 @@ function ChannelMembersCard(props: { channelData: any }) {
                   type="secondary"
                   margin_right
                   more_padding
-                  onclick={() => true}
+                  onclick={() =>
+                    makeMod.run(
+                      { isMod: true },
+                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}/permissions`,
+                    )
+                  }
                 >
                   Make mod
                 </Button>
@@ -253,13 +320,27 @@ function ChannelMembersCard(props: { channelData: any }) {
                   type="danger"
                   margin_right
                   more_padding
-                  onclick={() => true}
+                  onclick={() =>
+                    updatePermissions.run(
+                      { isMuted: true /* TODO add mute expiry prompt*/ },
+                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}`,
+                    )
+                  }
                 >
                   Mute
                 </Button>
               ) : null}
               {!v.user.is_banned ? (
-                <Button more_padding type="danger" onclick={() => true}>
+                <Button
+                  more_padding
+                  type="danger"
+                  onclick={() =>
+                    updatePermissions.run(
+                      { isBanned: true /* TODO add ban expiry prompt*/ },
+                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}`,
+                    )
+                  }
+                >
                   Ban
                 </Button>
               ) : null}
