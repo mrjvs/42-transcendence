@@ -97,32 +97,38 @@ function FriendAction(props: { userData: any; friendId: string }) {
 
   React.useEffect(() => {
     if (friendUser.done) {
-      const friendship = friendUser.data.data.raw;
+      const friendship = friendUser.data.data;
       friendUser.reset();
+
       props.userData?.updateUser({
         friends: [
           ...props.userData.user.friends,
           {
+            id: friendship.id,
+            userId: props.userData.user.id,
+            friendId: props.friendId,
+            requested_by: friendship.requested_by,
+            requested_to: friendship.requested_to,
             accepted: friendship.accepted,
-            requested_by: props.userData.user.id,
-            userId: props.friendId,
           },
         ],
       });
     }
     if (unFriend.done) {
+      const friendship = unFriend.data.data;
       unFriend.reset();
       props.userData?.updateUser({
         friends: props.userData.user.friends.filter(
-          (v: any) => v !== friendship,
+          (v: any) => v.id !== friendship.id,
         ),
       });
     }
     if (acceptFriend.done) {
+      const friendship = acceptFriend.data.data;
       acceptFriend.reset();
       props.userData?.updateUser({
         friends: props.userData.user.friends.filter((v: any) => {
-          if (v.requested_by === props.friendId) v.accepted = true;
+          if (v.id === friendship.id) v.accepted = true;
           return v;
         }),
       });
@@ -134,7 +140,7 @@ function FriendAction(props: { userData: any; friendId: string }) {
   }
 
   const friendship = props.userData?.user?.friends?.find(
-    (v: any) => v.userId === props.friendId,
+    (v: any) => v.friendId === props.friendId,
   );
 
   let method: any;

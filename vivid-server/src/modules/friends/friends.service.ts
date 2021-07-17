@@ -4,13 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DeleteResult,
-  getConnection,
-  InsertResult,
-  Repository,
-  UpdateResult,
-} from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { FriendsEntity } from '@/friends.entity';
 import { UserEntity } from '@/user.entity';
 
@@ -26,20 +20,42 @@ export class FriendsService {
     return this.friendsRepository.find();
   }
 
+  async findFriendship(u1: string, u2: string): Promise<FriendsEntity> {
+    let user_1: string;
+    let user_2: string;
+
+    if (u1 < u2) {
+      user_1 = u1;
+      user_2 = u2;
+    } else {
+      user_1 = u2;
+      user_2 = u1;
+    }
+
+    return this.friendsRepository
+      .createQueryBuilder()
+      .select()
+      .where('user_1 = :u1 AND user_2 = :u2', {
+        u1: user_1,
+        u2: user_2,
+      })
+      .getOne();
+  }
+
   // Add FriendEntity to database (=> send friend request)
   async sendFriendRequest(
     user_1: string,
     user_2: string,
     requested_by: string,
     requested_to: string,
-  ): Promise<InsertResult> {
+  ): Promise<FriendsEntity> {
     //putting the lower id in first column to be able to check unique combination
     if (user_2 < user_1) {
       const tmp = user_1;
       user_1 = user_2;
       user_2 = tmp;
     }
-    return this.friendsRepository
+    await this.friendsRepository
       .createQueryBuilder()
       .insert()
       .values({
@@ -53,6 +69,7 @@ export class FriendsService {
         if (error.code === '23505') throw new BadRequestException();
         throw error;
       });
+    return await this.findFriendship(user_1, user_2);
   }
 
   // Find user's pending friend requests (FriendsEntity's that aren't accepted)
@@ -91,40 +108,37 @@ export class FriendsService {
   async acceptFriendRequest(
     userId: string,
     friendId: string,
-  ): Promise<UpdateResult> {
-    return await this.friendsRepository
+  ): Promise<FriendsEntity> {
+    const friendship = await this.findFriendship(userId, friendId);
+    await this.friendsRepository
       .createQueryBuilder()
       .update()
       .set({ accepted: true })
-      .where('requested_by = :f', { f: friendId })
-      .andWhere('requested_to = :u', { u: userId })
+      .where('id = :id', { id: friendship.id })
       .execute()
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
         throw error;
       });
+    return friendship;
   }
 
   // deleting the friendship or decline friendrequest
   async deleteFriendship(
     userId: string,
     friendId: string,
-  ): Promise<DeleteResult> {
-    return await this.friendsRepository
+  ): Promise<FriendsEntity> {
+    const friendship = await this.findFriendship(userId, friendId);
+
+    await this.friendsRepository
       .createQueryBuilder()
       .delete()
-      .where('user_1 = :u1 AND user_2 = :u2', {
-        u1: userId,
-        u2: friendId,
-      })
-      .orWhere('user_1 = :u3 AND user_2 = :u4', {
-        u3: friendId,
-        u4: userId,
-      })
+      .where('id = :id', { id: friendship.id })
       .execute()
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
         throw error;
       });
+    return friendship;
   }
 }
