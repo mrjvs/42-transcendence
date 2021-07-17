@@ -86,6 +86,12 @@ export class EventGateway implements OnGatewayConnection {
     this.pongService.readyEvent(client);
   }
 
+  @SubscribeMessage('pauseGame')
+  pauseEvent(@ConnectedSocket() client: Socket) {
+    if (!client.auth) return;
+    this.pongService.pauseGame(client);
+  }
+
   @SubscribeMessage('keydown')
   handleKeydown(
     @ConnectedSocket() client: Socket,

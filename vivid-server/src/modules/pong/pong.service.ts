@@ -14,11 +14,16 @@ interface IStates {
   [gameId: string]: IGameState; // [gameId] = GameState
 }
 
+interface IInterval {
+  [gameId: string]: NodeJS.Timeout; // [gameId] = intervalId
+}
+
 enum playerNb {
   ONE,
   TWO,
 }
 
+const intervals: IInterval = {};
 const states: IStates = {};
 const clientRooms: IRoom = {};
 
@@ -27,15 +32,14 @@ export class PongService {
   constructor(private matchService: MatchesService) {}
 
   createGame() {
-    // const gameId: string = uuid();
-    const gameId = '93b66d54-e096-4a1b-8535-213111b772f2';
+    const gameId: string = uuid();
     states[gameId] = createGameState(gameId);
     return gameId;
   }
 
   joinGame(userId: string, gameId: string): { gameId: string } {
     // Return if client is already in existing game
-    // if (clientRooms[userId] != null) return;
+    if (clientRooms[userId] != null) return;
 
     if (!states[gameId]) return;
 
@@ -70,8 +74,6 @@ export class PongService {
     player.ready = true;
     client.emit('init');
 
-    game.players[0].ready = true;
-    if (game.players[1].userId != '') game.players[1].ready = true;
     // Check if both players are ready and start game
     const readyPlayers: IPlayer[] = game.players.filter((v) => {
       if (v.ready) return v;
@@ -85,30 +87,49 @@ export class PongService {
   }
 
   startGameInterval(clients: Socket, gameId: string) {
-    const intervalId = setInterval(async () => {
+    if (intervals[gameId]) return;
+
+    intervals[gameId] = setInterval(async () => {
       const game: IGameState = states[gameId];
-      const winner: IPlayer | null = gameLoop(game);
 
-      if (!winner) {
-        clients.emit('drawGame', game);
-      } else {
-        clients.emit('gameOver', winner.userId);
-        clearInterval(intervalId);
+      if (
+        game.players[playerNb.ONE].ready &&
+        game.players[playerNb.TWO].ready
+      ) {
+        const winner: IPlayer | null = gameLoop(game);
 
-        this.matchService.createGame({
-          user_id_req: game.players[playerNb.ONE].userId,
-          points_req: game.players[playerNb.ONE].score,
-          user_id_acpt: game.players[playerNb.TWO].userId,
-          points_acpt: game.players[playerNb.TWO].score,
-          winner_id: winner.userId,
-          game_type: '',
-        });
+        if (!winner) {
+          clients.emit('drawGame', game);
+        } else {
+          clients.emit('gameOver', winner.userId);
 
-        delete clientRooms[game.players[playerNb.ONE].userId];
-        delete clientRooms[game.players[playerNb.TWO].userId];
-        delete states[gameId];
+          clearInterval(intervals[gameId]);
+          delete intervals[gameId];
+          delete clientRooms[game.players[playerNb.ONE].userId];
+          delete clientRooms[game.players[playerNb.TWO].userId];
+          delete states[gameId];
+
+          this.matchService.createGame({
+            user_id_req: game.players[playerNb.ONE].userId,
+            points_req: game.players[playerNb.ONE].score,
+            user_id_acpt: game.players[playerNb.TWO].userId,
+            points_acpt: game.players[playerNb.TWO].score,
+            winner_id: winner.userId,
+            game_type: '',
+          });
+        }
       }
     }, 1000 / 50);
+  }
+
+  pauseGame(client: Socket) {
+    const gameId: string = clientRooms[client.auth];
+    if (!gameId) return;
+
+    const game: IGameState = states[gameId];
+    if (!game) return;
+    const player = game.players.find((v) => v.userId === client.auth);
+    player.ready = false;
   }
 
   handleKeydown(client: Socket, move: number) {
