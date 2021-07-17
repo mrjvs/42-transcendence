@@ -44,7 +44,12 @@ export class FriendsController {
     // checking if friend is the logged in user
     if (user.id === friend.id) throw new BadRequestException();
 
-    return this.friendsService.sendFriendRequest(user, friend, user, friend);
+    return this.friendsService.sendFriendRequest(
+      user.id,
+      friend.id,
+      user.id,
+      friend.id,
+    );
   }
 
   // Find all pending friend requests

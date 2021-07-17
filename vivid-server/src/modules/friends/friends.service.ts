@@ -28,10 +28,10 @@ export class FriendsService {
 
   // Add FriendEntity to database (=> send friend request)
   async sendFriendRequest(
-    user_1: UserEntity,
-    user_2: UserEntity,
-    requested_by: UserEntity,
-    requested_to: UserEntity,
+    user_1: string,
+    user_2: string,
+    requested_by: string,
+    requested_to: string,
   ): Promise<InsertResult> {
     //putting the lower id in first column to be able to check unique combination
     if (user_2 < user_1) {
@@ -43,10 +43,10 @@ export class FriendsService {
       .createQueryBuilder()
       .insert()
       .values({
-        user_1: user_1.id,
-        user_2: user_2.id,
-        requested_by: requested_by.id,
-        requested_to: requested_to.id,
+        user_1: user_1,
+        user_2: user_2,
+        requested_by: requested_by,
+        requested_to: requested_to,
       })
       .execute()
       .catch((error) => {
