@@ -15,7 +15,6 @@ import {
 import { AccountNotSetupGuard } from '~/middleware/guards/auth.guards';
 import {
   FullDetailsUser,
-  IUser,
   UserEntity,
   UsernameChangeDto,
 } from '~/models/user.entity';
@@ -39,11 +38,15 @@ export class UserSetupController {
   }
 
   @Patch('/:id/name')
-  changeName(
+  async changeName(
     @UserParam('id') user: IUserParam,
     @Body() newName: UsernameChangeDto,
-  ): Promise<IUser> {
-    return this.userService.updateName(user.id, newName.username);
+  ): Promise<any> {
+    const res = await this.userService.updateName(user.id, newName.username);
+    return {
+      id: res.id,
+      name: res.name,
+    };
   }
 
   @Delete(':id')

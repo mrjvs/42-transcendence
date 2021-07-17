@@ -1,0 +1,74 @@
+.settings-view-wrapper {
+  color: white;
+  display: block;
+  width: 50rem;
+  max-width: 100%;
+  margin: auto;
+  justify-content: center;
+  align-items: center;
+  padding-top: 4rem;
+}
+
+.settings-view-wrapper > .card {
+  background: #15192A;
+  border-radius: 10px;
+  padding: 2rem 2rem 3rem 2rem;
+  margin-bottom: 1rem;
+}
+
+.user-profile-columns {
+  display: flex;
+}
+
+.user-profile-columns .userAvatar {
+  width: 6rem;
+  height: 6rem;
+  margin-top: 2rem;
+  margin-right: 2rem;
+}
+
+.user-profile-expand {
+  flex: 1;
+}
+
+.user-name .text-wrapper {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 24rem;
+}
+
+.twofa-wrapper {
+  padding-bottom: 2rem;
+}
+
+.twofa-wrapper .green p,
+.twofa-wrapper .red p {
+  display: flex;
+}
+
+.twofa-wrapper .red {
+  color: #D46074;
+}
+
+.twofa-wrapper .twofa-icon {
+  margin-right: 0.5rem;
+}
+
+.twofa-wrapper .red h2 {
+  color: white;
+}
+
+.twofa-wrapper .green {
+  color: #7BDB94;
+}
+
+.twofa-wrapper .green h2 {
+  color: white;
+}
+
+.dangerZone-wrapper p {
+  color: #8892B2;
+  width: 22rem;
+  line-height: 1.5rem;
+  margin-bottom: 2rem;
+}
