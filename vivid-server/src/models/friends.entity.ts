@@ -6,7 +6,6 @@ import {
   Unique,
   Check,
   ManyToOne,
-  JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 
@@ -18,12 +17,10 @@ export class FriendsEntity {
   id: string;
 
   @ManyToOne(() => UserEntity, (user) => user.friends)
-  // @JoinColumn({ name: 'user_1' })
   @Column()
   user_1: string;
 
   @ManyToOne(() => UserEntity, (user) => user.friends_inverse)
-  // @JoinColumn({ name: 'user_2' })
   @Column()
   user_2: string;
 

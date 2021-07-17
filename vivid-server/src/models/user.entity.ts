@@ -8,7 +8,6 @@ import {
   ManyToOne,
   JoinColumn,
   BaseEntity,
-  ManyToMany,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
 import { IsNotEmpty, IsString } from 'class-validator';

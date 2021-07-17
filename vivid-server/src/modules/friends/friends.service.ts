@@ -96,10 +96,8 @@ export class FriendsService {
       .createQueryBuilder()
       .update()
       .set({ accepted: true })
-      // .where('requested_by = :f', { f: friendId })
-      // .andWhere('requested_to = :u', { u: userId })
-      .where('requested_by = :f', { f: userId })
-      .andWhere('requested_to = :u', { u: friendId })
+      .where('requested_by = :f', { f: friendId })
+      .andWhere('requested_to = :u', { u: userId })
       .execute()
       .catch((error) => {
         if (error.code === '22P02') throw new NotFoundException();
