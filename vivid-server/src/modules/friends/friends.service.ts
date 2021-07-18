@@ -20,16 +20,11 @@ export class FriendsService {
     return this.friendsRepository.find();
   }
 
-  async findFriendship(u1: string, u2: string): Promise<FriendsEntity> {
-    let user_1: string;
-    let user_2: string;
-
-    if (u1 < u2) {
-      user_1 = u1;
-      user_2 = u2;
-    } else {
-      user_1 = u2;
-      user_2 = u1;
+  async findFriendship(user_1: string, user_2: string): Promise<FriendsEntity> {
+    if (user_2 < user_1) {
+      const tmp = user_1;
+      user_1 = user_2;
+      user_2 = tmp;
     }
 
     return this.friendsRepository
