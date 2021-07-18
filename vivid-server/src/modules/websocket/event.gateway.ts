@@ -78,7 +78,8 @@ export class EventGateway implements OnGatewayConnection {
   _sendToChannelMembers(event: string, data: any, members: IJoinedChannel[]) {
     const sockets = this.server.sockets.connected;
     const mappedJoins = members.reduce((a, v: IJoinedChannel) => {
-      a[v.user as string] = true;
+      if (v.user.constructor === String) a[v.user as string] = true;
+      else a[(v.user as any).id] = true;
       return a;
     }, {});
     for (const socketId in sockets) {
@@ -118,7 +119,10 @@ export class EventGateway implements OnGatewayConnection {
       'channel_user_update',
       {
         channelId,
-        id: newUser.id,
+        id:
+          newUser.user.constructor === String
+            ? newUser.user
+            : (newUser.user as any).id,
         muted: newUser.is_muted,
         mod: newUser.is_mod,
         banned: newUser.is_banned,

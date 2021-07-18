@@ -5,7 +5,6 @@ export const UsersContext = React.createContext<any>([]);
 UsersContext.displayName = 'UsersContext';
 
 export function useUsersContext() {
-  // const { client } = React.useContext(SocketContext);
   const [users, setUsers] = React.useState<any[]>([]);
 
   function addUser(user: any) {

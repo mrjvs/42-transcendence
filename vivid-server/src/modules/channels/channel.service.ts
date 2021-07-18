@@ -183,14 +183,17 @@ export class ChannelService {
   }
 
   async makeUserMod(
-    channel: string,
+    channelId: string,
     user: string,
     isMod = true,
   ): Promise<IJoinedChannel> {
-    return await this.JoinedChannelRepository.createQueryBuilder()
+    const channel = await this.findChannel(channelId);
+    if (!channel) throw new NotFoundException();
+
+    const res = await this.JoinedChannelRepository.createQueryBuilder()
       .update()
       .where({
-        channel,
+        channel: channelId,
         user,
         is_joined: true,
       })
@@ -198,22 +201,28 @@ export class ChannelService {
       .returning('*')
       .execute()
       .then((response) => {
-        return <IJoinedChannel>response.raw[0];
+        return <JoinedChannelEntity>response.raw[0];
       });
+
+    this.eventGateway.updateChannelUser(channelId, channel.joined_users, res);
+    return res;
   }
 
   async updateUserPunishments(
-    channel: string,
+    channelId: string,
     user: string,
     isMuted?: boolean,
     isBanned?: boolean,
     muteExpiry?: number,
     banExpiry?: number,
   ): Promise<IJoinedChannel> {
+    const channel = await this.findChannel(channelId);
+    if (!channel) throw new NotFoundException();
+
     let builder: any = this.JoinedChannelRepository.createQueryBuilder()
       .update()
       .where({
-        channel,
+        channel: channelId,
         user,
       });
     let hasChanges = false;
@@ -231,9 +240,12 @@ export class ChannelService {
     }
     if (!hasChanges) throw new BadRequestException();
     builder = builder.returning('*');
-    return builder.execute().then((response) => {
-      return <IJoinedChannel>response.raw[0];
+    const res = await builder.execute().then((response) => {
+      return <JoinedChannelEntity>response.raw[0];
     });
+
+    this.eventGateway.updateChannelUser(channelId, channel.joined_users, res);
+    return res;
   }
 
   async removeUser(
@@ -258,10 +270,20 @@ export class ChannelService {
       await this.JoinedChannelRepository.update(alreadyRemoved, {
         is_joined: false,
       });
+      this.eventGateway.leaveChannelUser(
+        joinedChannelInput.channel,
+        channel.joined_users,
+        joinedChannelInput.user,
+      );
       return { id: joinedChannelInput.user };
     }
 
     await this.JoinedChannelRepository.delete(alreadyRemoved);
+    this.eventGateway.leaveChannelUser(
+      joinedChannelInput.channel,
+      channel.joined_users,
+      joinedChannelInput.user,
+    );
     return { id: joinedChannelInput.user };
   }
 

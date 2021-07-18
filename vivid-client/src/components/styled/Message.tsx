@@ -66,11 +66,13 @@ export function Message(props: {
             <span>
               {props.user.name}
               {props.tags
-                ? props.tags.map((v) => (
-                    <span key={v} className={`tag tag-${v.toLowerCase()}`}>
-                      {v.toLowerCase()}
-                    </span>
-                  ))
+                ? props.tags
+                    .filter((v) => v)
+                    .map((v) => (
+                      <span key={v} className={`tag tag-${v.toLowerCase()}`}>
+                        {v.toLowerCase()}
+                      </span>
+                    ))
                 : null}
             </span>
           )}

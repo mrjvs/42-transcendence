@@ -11,6 +11,7 @@ import { RootNavigation } from './navigation/Root';
 
 function MessageStoreInit(props: { children: any }) {
   const messageData = useMessageContext();
+
   return (
     <MessageContext.Provider value={messageData}>
       {props.children}
@@ -18,17 +19,24 @@ function MessageStoreInit(props: { children: any }) {
   );
 }
 
+function ChannelStoreInit(props: { children: any }) {
+  const channelsData = useChannelsContext();
+
+  return (
+    <ChannelsContext.Provider value={channelsData}>
+      <MessageStoreInit>{props.children}</MessageStoreInit>
+    </ChannelsContext.Provider>
+  );
+}
+
 function StoreInit(props: { children: any }) {
   const usersData = useUsersContext();
   const statusData = useStatusContext();
-  const channelsData = useChannelsContext();
 
   return (
     <UsersContext.Provider value={usersData}>
       <StatusContext.Provider value={statusData}>
-        <ChannelsContext.Provider value={channelsData}>
-          <MessageStoreInit>{props.children}</MessageStoreInit>
-        </ChannelsContext.Provider>
+        <ChannelStoreInit>{props.children}</ChannelStoreInit>
       </StatusContext.Provider>
     </UsersContext.Provider>
   );

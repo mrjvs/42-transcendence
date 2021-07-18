@@ -8,6 +8,7 @@ import { TextInput } from '../components/styled/TextInput';
 import { ToggleButton } from '../components/styled/Toggle';
 import { Avatar } from '../components/styled/Avatar';
 import { useMessages } from '../hooks/useMessages';
+import { UsersContext } from '../hooks/useUsers';
 
 export function ChannelSettingsView() {
   const history = useHistory();
@@ -173,6 +174,7 @@ function ChannelSettingsCard(props: { channelData: any }) {
 }
 
 function ChannelModeratorCard(props: { channelData: any }) {
+  const { getUser } = React.useContext(UsersContext);
   const makeMod = useFetch({
     url: '',
     method: 'PATCH',
@@ -186,11 +188,11 @@ function ChannelModeratorCard(props: { channelData: any }) {
     <div className="card">
       <ul>
         {props.channelData?.channel.joined_users.map((v: any) => (
-          <li key={v.id}>
+          <li key={v.user}>
             <div className="user">
-              <Avatar noStatus small user={v.user} />
+              <Avatar noStatus small user={getUser(v.user)?.data} />
               <span>
-                {v.user.name}
+                {getUser(v.user)?.data.name}
                 {v.is_mod ? <span className="tag">mod</span> : null}
               </span>
             </div>
@@ -201,7 +203,7 @@ function ChannelModeratorCard(props: { channelData: any }) {
                 onclick={() =>
                   makeMod.run(
                     { isMod: false },
-                    `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}/permissions`,
+                    `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}/permissions`,
                   )
                 }
               >
@@ -216,6 +218,7 @@ function ChannelModeratorCard(props: { channelData: any }) {
 }
 
 function ChannelPunishedMembersCard(props: { channelData: any }) {
+  const { getUser } = React.useContext(UsersContext);
   const updatePermissions = useFetch({
     url: '',
     method: 'PATCH',
@@ -229,14 +232,14 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
     <div className="card">
       <ul>
         {props.channelData?.channel.joined_users.map((v: any) =>
-          v.user.is_banned || v.user.is_muted ? (
-            <li key={v.id}>
+          v.is_banned || v.is_muted ? (
+            <li key={v.user}>
               <div className="user">
-                <Avatar noStatus small user={v.user} />
-                {v.user.name}
+                <Avatar noStatus small user={getUser(v.user)?.data} />
+                {getUser(v.user)?.data.name}
               </div>
               <div className="hideUnselected">
-                {v.user.is_banned ? (
+                {v.is_banned ? (
                   <Button
                     more_padding
                     type="secondary"
@@ -244,21 +247,21 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
                     onclick={() =>
                       updatePermissions.run(
                         { isBanned: false, banExpiry: null },
-                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}`,
+                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
                       )
                     }
                   >
                     Unban
                   </Button>
                 ) : null}
-                {v.user.is_muted ? (
+                {v.is_muted ? (
                   <Button
                     more_padding
                     type="danger"
                     onclick={() =>
                       updatePermissions.run(
                         { isMuted: false, muteExpiry: null },
-                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}`,
+                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
                       )
                     }
                   >
@@ -275,6 +278,7 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
 }
 
 function ChannelMembersCard(props: { channelData: any }) {
+  const { getUser } = React.useContext(UsersContext);
   const makeMod = useFetch({
     url: '',
     method: 'PATCH',
@@ -294,13 +298,13 @@ function ChannelMembersCard(props: { channelData: any }) {
     <div className="card">
       <ul>
         {props.channelData?.channel.joined_users.map((v: any) => (
-          <li key={v.id}>
+          <li key={v.user}>
             <div className="user">
-              <Avatar noStatus small user={v.user} />
-              {v.user.name}
+              <Avatar noStatus small user={getUser(v.user)?.data} />
+              {getUser(v.user)?.data.name}
             </div>
             <div className="hideUnselected">
-              {!v.user.is_mod ? (
+              {!v.is_mod ? (
                 <Button
                   type="secondary"
                   margin_right
@@ -308,14 +312,14 @@ function ChannelMembersCard(props: { channelData: any }) {
                   onclick={() =>
                     makeMod.run(
                       { isMod: true },
-                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}/permissions`,
+                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}/permissions`,
                     )
                   }
                 >
                   Make mod
                 </Button>
               ) : null}
-              {!v.user.is_muted ? (
+              {!v.is_muted ? (
                 <Button
                   type="danger"
                   margin_right
@@ -323,21 +327,21 @@ function ChannelMembersCard(props: { channelData: any }) {
                   onclick={() =>
                     updatePermissions.run(
                       { isMuted: true /* TODO add mute expiry prompt*/ },
-                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}`,
+                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
                     )
                   }
                 >
                   Mute
                 </Button>
               ) : null}
-              {!v.user.is_banned ? (
+              {!v.is_banned ? (
                 <Button
                   more_padding
                   type="danger"
                   onclick={() =>
                     updatePermissions.run(
                       { isBanned: true /* TODO add ban expiry prompt*/ },
-                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user.id}`,
+                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
                     )
                   }
                 >

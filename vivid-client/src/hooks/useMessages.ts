@@ -14,7 +14,7 @@ export function useMessages(channel: string) {
   const { messages, setChannelMessages, getChannelMessages } =
     React.useContext(MessageContext);
   const history = useHistory();
-  const { addUser, getUser, users } = React.useContext(UsersContext);
+  const { getUser, users } = React.useContext(UsersContext);
 
   const userData = React.useContext(UserContext);
   const [currentChannelUser, setCurrentChannelUser] = React.useState<{
@@ -51,9 +51,6 @@ export function useMessages(channel: string) {
       .then((res) => res.json())
       .then((info) => {
         addChannel(info);
-        info.joined_users.forEach((join: any) => {
-          addUser(join.user);
-        });
         setLoading(false);
         setDone(true);
       })
@@ -68,7 +65,7 @@ export function useMessages(channel: string) {
     if (!userId) return null;
     let tag = null;
     const channelUser = channelInfo?.joined_users?.find(
-      (v: any) => v.user?.id === userId || v.user === userId,
+      (v: any) => v.user === userId,
     );
     if (channelUser && channelUser.is_mod) tag = 'mod';
     if (userId === channelInfo?.owner) tag = 'owner';
@@ -82,8 +79,7 @@ export function useMessages(channel: string) {
     }
     const n = {
       user: channelInfo?.joined_users?.find(
-        (v: any) =>
-          v.user?.id === userData.user?.id || v.user === userData.user?.id,
+        (v: any) => v.user === userData.user?.id,
       ),
       tag: getRole(userData.user?.id),
     };
@@ -177,13 +173,18 @@ export function useMessageContext() {
     });
   }
 
-  function deleteMessage(channelId: string, messageId: string) {
+  function deleteMessage({ channelId, messageId }: any) {
     setMessages((prev) => {
-      const channel = prev.find((v) => v.id === channelId);
-      const list = channel.messages.filter((v: any) => {
-        if (v.id !== messageId) return v;
-      });
-      setChannelMessages(channelId, list);
+      const list = [...prev];
+      let found = list.find((v) => v.id === channelId);
+      if (!found) {
+        found = {
+          id: channelId,
+          messages: [],
+        };
+        list.push(found);
+      }
+      found.messages = found.messages.filter((v: any) => v.id !== messageId);
       return list;
     });
   }
