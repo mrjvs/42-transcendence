@@ -24,6 +24,7 @@
     "@nestjs/platform-express": "^7.6.17",
     "@nestjs/platform-socket.io": "^7.6.18",
     "@nestjs/schedule": "^0.4.3",
+    "@nestjs/serve-static": "^2.2.2",
     "@nestjs/websockets": "^7.6.18",
     "@types/cookie": "^0.4.0",
     "@types/cookie-parser": "^1.4.2",

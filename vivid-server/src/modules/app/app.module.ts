@@ -16,6 +16,8 @@ import { GuildsModule } from '$/guilds/guilds.module';
 import { GuildrequestModule } from '$/guildrequest/guildrequest.module';
 import { MatchesModule } from '../matches/matches.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -53,6 +55,12 @@ const config = ConfigModule.forRoot({
     WarsModule,
     GuildrequestModule,
     MatchesModule,
+
+    // static
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', '..', 'uploads'),
+      serveRoot: '/cdn/avatars',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

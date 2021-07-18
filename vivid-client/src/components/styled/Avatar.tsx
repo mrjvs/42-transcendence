@@ -21,7 +21,7 @@ export function Avatar(props: {
   if (!props.user.avatar)
     background = `linear-gradient(to right, ${props.user?.avatar_colors?.[0]}, ${props.user?.avatar_colors?.[1]})`;
   else
-    background = `url(${window._env_.VIVID_BASE_URL}/api/v1/users/avatar/${props.user.avatar})`;
+    background = `url(${window._env_.VIVID_BASE_URL}/cdn/avatars/${props.user.avatar})`;
 
   const [state, setState] = React.useState(false);
 
