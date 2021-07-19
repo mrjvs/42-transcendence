@@ -1,7 +1,11 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { LoadingScreen } from './components/styled/LoadingScreen';
-import { ChannelsContext, useChannelsContext } from './hooks/useChannels';
+import {
+  ChannelClientListener,
+  ChannelsContext,
+  useChannelsContext,
+} from './hooks/useChannels';
 import { useMessageContext, MessageContext } from './hooks/useMessages';
 import { StatusContext, useStatusContext } from './hooks/useStatuses';
 import { UserContext, useUser } from './hooks/useUser';
@@ -13,9 +17,21 @@ function MessageStoreInit(props: { children: any }) {
   const messageData = useMessageContext();
 
   return (
-    <MessageContext.Provider value={messageData}>
-      {props.children}
-    </MessageContext.Provider>
+    <ChannelClientListener>
+      <MessageContext.Provider value={messageData}>
+        {props.children}
+      </MessageContext.Provider>
+    </ChannelClientListener>
+  );
+}
+
+function StoreInit(props: { children: any }) {
+  const statusData = useStatusContext();
+
+  return (
+    <StatusContext.Provider value={statusData}>
+      <MessageStoreInit>{props.children}</MessageStoreInit>
+    </StatusContext.Provider>
   );
 }
 
@@ -24,25 +40,22 @@ function ChannelStoreInit(props: { children: any }) {
 
   return (
     <ChannelsContext.Provider value={channelsData}>
-      <MessageStoreInit>{props.children}</MessageStoreInit>
+      <ClientStoreInit>{props.children}</ClientStoreInit>
     </ChannelsContext.Provider>
   );
 }
 
-function StoreInit(props: { children: any }) {
+function PureStoreInit(props: { children: any }) {
   const usersData = useUsersContext();
-  const statusData = useStatusContext();
 
   return (
     <UsersContext.Provider value={usersData}>
-      <StatusContext.Provider value={statusData}>
-        <ChannelStoreInit>{props.children}</ChannelStoreInit>
-      </StatusContext.Provider>
+      <ChannelStoreInit>{props.children}</ChannelStoreInit>
     </UsersContext.Provider>
   );
 }
 
-function App() {
+function ClientStoreInit(props: { children: any }) {
   const userData = useUser();
   const socketData = useWebsocket();
 
@@ -51,13 +64,19 @@ function App() {
       <SocketContext.Provider value={socketData}>
         <StoreInit>
           <BrowserRouter>
-            <LoadingScreen userData={userData}>
-              <RootNavigation />
-            </LoadingScreen>
+            <LoadingScreen userData={userData}>{props.children}</LoadingScreen>
           </BrowserRouter>
         </StoreInit>
       </SocketContext.Provider>
     </UserContext.Provider>
+  );
+}
+
+function App() {
+  return (
+    <PureStoreInit>
+      <RootNavigation />
+    </PureStoreInit>
   );
 }
 

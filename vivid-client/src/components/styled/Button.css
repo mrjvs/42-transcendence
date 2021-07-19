@@ -60,6 +60,16 @@
   font-size: 1.4rem;
 }
 
+.button-new.button-small-box {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.button-new.button-small-box > *:first-child {
+  margin-right: 0;
+}
+
 .button-new.button-duel:hover {
   background: #2a3453;
   color: white;

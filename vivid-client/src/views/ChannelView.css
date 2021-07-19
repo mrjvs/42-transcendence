@@ -35,3 +35,7 @@
   color: white;
   transform: scale(1.2);
 }
+
+.channelViewEdit.red {
+  color: #e67e87;
+}

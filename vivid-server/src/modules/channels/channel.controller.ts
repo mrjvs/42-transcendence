@@ -13,7 +13,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ChannelService, ChannelTypes } from './channel.service';
-import { ChannelDto, IChannel, PasswordDto } from '@/channel.entity';
+import { ChannelDto, IChannel } from '@/channel.entity';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
@@ -45,6 +45,10 @@ export class ChannelController {
   }
 
   @Get('/:id')
+  @ChannelRoleAuth({
+    channelParam: 'id',
+    role: ChannelRoles.USER,
+  })
   getChannel(@Param('id') channelId: string): Promise<IChannel> {
     return this.channelService.findChannel(channelId);
   }
@@ -80,18 +84,6 @@ export class ChannelController {
     @Param('id') id: string,
   ): Promise<IChannel> {
     return this.channelService.update(requestBody, id);
-  }
-
-  @Patch('/:id/password')
-  @ChannelRoleAuth({
-    channelParam: 'id',
-    role: ChannelRoles.OWNER,
-  })
-  updateChannelPassword(
-    @Body() requestBody: PasswordDto,
-    @Param('id') id: string,
-  ): Promise<IChannel> {
-    return this.channelService.updatePassword(requestBody, id);
   }
 
   @Delete('/:id')

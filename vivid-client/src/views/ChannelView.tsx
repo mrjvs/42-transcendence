@@ -7,6 +7,22 @@ import { MainLayout } from './layouts/MainLayout';
 import './ChannelView.css';
 import { UserContext } from '../hooks/useUser';
 import { Icon } from '../components/styled/Icon';
+import { UnusableTextInput } from '../components/styled/TextInput';
+import { useFetch } from '../hooks/useFetch';
+import { NotFoundView } from './NotFoundView';
+
+function ChannelViewLoading(props: { loading: boolean }) {
+  if (props.loading) return <p>Loading...</p>;
+  else return <NotFoundView>Couldn&apos;t find this channel</NotFoundView>;
+}
+
+function ChannelLeaveIcon(props: { onClick?: () => void }) {
+  return (
+    <span className="channelViewEdit red" onClick={props.onClick}>
+      <Icon type="leave" />
+    </span>
+  );
+}
 
 function ChannelEditIcon(props: { onClick?: () => void }) {
   return (
@@ -24,6 +40,11 @@ export function ChannelView() {
   const { getRole, currentChannelUser } = messageData;
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
   const { user } = React.useContext(UserContext);
+
+  const leaveChannelFetch = useFetch({
+    url: '',
+    method: 'DELETE',
+  });
 
   React.useLayoutEffect(() => {
     const cur: any = scrollEl?.current;
@@ -88,7 +109,25 @@ export function ChannelView() {
         return acc;
       }, []),
     );
-  }, [messageData.channelInfo, messageData.messages, messageData.users]);
+  }, [
+    messageData.channelInfo,
+    messageData.messages,
+    messageData.users,
+    messageData.channels,
+  ]);
+
+  React.useEffect(() => {
+    if (leaveChannelFetch.done) {
+      // TODO update joined channel list
+      leaveChannelFetch.reset();
+    }
+  }, [leaveChannelFetch.done]);
+
+  if (messageData.messageState.error || messageData.messageState.loading)
+    return <ChannelViewLoading loading={!!messageData.messageState.loading} />;
+
+  if (!messageData?.currentChannelUser?.user?.is_joined)
+    return <ChannelViewLoading loading={false} />;
 
   return (
     <MainLayout
@@ -96,11 +135,21 @@ export function ChannelView() {
         (messageData.messageState.done && messageData.channelInfo.title) || '‎'
       }
       actions={
-        ['owner', 'mod'].includes(currentChannelUser.tag) ? (
-          <ChannelEditIcon
-            onClick={() => history.push(`/channel/${id}/settings`)}
+        <div>
+          {['owner', 'mod'].includes(currentChannelUser.tag) ? (
+            <ChannelEditIcon
+              onClick={() => history.push(`/channel/${id}/settings`)}
+            />
+          ) : null}
+          <ChannelLeaveIcon
+            onClick={() =>
+              leaveChannelFetch.run(
+                null,
+                `/api/v1/channels/${id}/users/${currentChannelUser.user.user}`,
+              )
+            }
           />
-        ) : null
+        </div>
       }
     >
       <div className="channelScrollWrapper">
@@ -117,7 +166,7 @@ export function ChannelView() {
                     blocked={user?.blocks?.includes(v.user)}
                     user={v.userData}
                     tags={[v.userTag]}
-                    owner={v.userTag === 'owner'}
+                    owner={v.user === currentChannelUser.user.user}
                   />
                 ))}
               </div>
@@ -127,13 +176,17 @@ export function ChannelView() {
         </div>
       </div>
       <div className="channelBottomWrapper">
-        <MessageBox
-          placeholder="Type your message here..."
-          disabled={!messageData.messageState.done}
-          onSend={(obj: { text: string; type: boolean }) =>
-            messageData.sendMessage(obj.text, obj.type)
-          }
-        />
+        {!currentChannelUser?.user?.is_muted ? (
+          <MessageBox
+            placeholder="Type your message here..."
+            disabled={!messageData.messageState.done}
+            onSend={(obj: { text: string; type: boolean }) =>
+              messageData.sendMessage(obj.text, obj.type)
+            }
+          />
+        ) : (
+          <UnusableTextInput text="You are muted" />
+        )}
       </div>
     </MainLayout>
   );

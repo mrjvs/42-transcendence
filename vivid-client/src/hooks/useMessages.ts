@@ -9,7 +9,8 @@ export const MessageContext = React.createContext<any>([]);
 MessageContext.displayName = 'MessageContext';
 
 export function useMessages(channel: string) {
-  const { addChannel, getChannel } = React.useContext(ChannelsContext);
+  const { addChannel, getChannel, channels } =
+    React.useContext(ChannelsContext);
   const [channelMessages, setMessages] = React.useState<any[]>([]);
   const { messages, setChannelMessages, getChannelMessages } =
     React.useContext(MessageContext);
@@ -38,9 +39,10 @@ export function useMessages(channel: string) {
         credentials: 'include',
       },
     )
-      .then((res) => res.json())
+      .then(async (res) => ({ res: res, data: await res.json() }))
       .then((result) => {
-        setChannelMessages(channel, result);
+        if (result.res.status >= 400) throw new Error('failed to fetch');
+        setChannelMessages(channel, result.data);
         return fetch(
           `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}`,
           {
@@ -48,13 +50,15 @@ export function useMessages(channel: string) {
           },
         );
       })
-      .then((res) => res.json())
+      .then(async (res) => ({ res: res, data: await res.json() }))
       .then((info) => {
-        addChannel(info);
+        if (info.res.status >= 400) throw new Error('failed to fetch');
+        addChannel(info.data);
         setLoading(false);
         setDone(true);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         setLoading(false);
         setError(true);
         setDone(true);
@@ -84,7 +88,7 @@ export function useMessages(channel: string) {
       tag: getRole(userData.user?.id),
     };
     setCurrentChannelUser(n);
-  }, [channelInfo, userData]);
+  }, [channels, channelInfo, userData]);
 
   React.useEffect(() => {
     requestMessages();
@@ -128,6 +132,7 @@ export function useMessages(channel: string) {
   }
 
   return {
+    channels,
     messages: channelMessages,
     channelInfo: getChannel(channel),
     updateChannelInfo(obj: any) {

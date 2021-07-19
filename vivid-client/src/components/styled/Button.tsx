@@ -11,7 +11,7 @@ export function Button(props: {
   more_padding?: boolean;
   margin_right?: boolean;
   no_button?: boolean;
-  type?: 'primary' | 'secondary' | 'duel' | 'danger';
+  type?: 'primary' | 'secondary' | 'duel' | 'danger' | 'small-box';
 }) {
   const type = props.type || 'primary';
   const button_props = {

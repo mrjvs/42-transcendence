@@ -13,7 +13,6 @@ import {
   IChannel,
   ChannelDto,
   IChannelInput,
-  PasswordDto,
 } from '@/channel.entity';
 import {
   JoinedChannelEntity,
@@ -67,50 +66,32 @@ export class ChannelService {
     channelInput: ChannelDto,
     channelId: string,
   ): Promise<ChannelEntity> {
-    const input = {
+    const channel = await this.findChannel(channelId, false);
+    if (!channel) throw new NotFoundException();
+
+    if (
+      !channel.password &&
+      channelInput.hasPassword &&
+      !channelInput.password
+    ) {
+      throw new BadRequestException(
+        'password needs to be set if hasPassword is true and no password is set yet',
+      );
+    }
+
+    const input: any = {
       has_password: channelInput.hasPassword,
       is_public: channelInput.isPublic,
-      password: '',
       title: channelInput.title,
     };
 
-    if (input.has_password) {
+    if (input.has_password && channelInput.password) {
       input.password = await bcrypt.hash(
         channelInput.password,
         this.configService.get('saltRounds'),
       );
-    }
-    const updateResult = await this.ChannelRepository.createQueryBuilder()
-      .update()
-      .set(input)
-      .where('id = :id', { id: channelId })
-      .returning('*')
-      .execute()
-      .then((response) => {
-        return <ChannelEntity>response.raw[0];
-      });
-    this.eventGateway.updateChannel(
-      updateResult.id,
-      updateResult.joined_users,
-      updateResult,
-    );
-    return updateResult;
-  }
-
-  async updatePassword(
-    channelInput: PasswordDto,
-    channelId: string,
-  ): Promise<ChannelEntity> {
-    const input = {
-      has_password: channelInput.hasPassword,
-      password: '',
-    };
-
-    if (input.has_password) {
-      input.password = await bcrypt.hash(
-        channelInput.password,
-        this.configService.get('saltRounds'),
-      );
+    } else if (input.has_password) {
+      input.password = channel.password;
     }
 
     const updateResult = await this.ChannelRepository.createQueryBuilder()
@@ -124,7 +105,7 @@ export class ChannelService {
       });
     this.eventGateway.updateChannel(
       updateResult.id,
-      updateResult.joined_users,
+      channel.joined_users,
       updateResult,
     );
     return updateResult;
@@ -191,16 +172,17 @@ export class ChannelService {
     if (alreadyJoined) {
       if (alreadyJoined.is_joined)
         throw new ConflictException(null, 'User is already joined');
-      const newJoin = await this.JoinedChannelRepository.save({
+      await this.JoinedChannelRepository.save({
         id: alreadyJoined.id,
         is_joined: true,
       });
+      alreadyJoined.is_joined = true;
       this.eventGateway.updateChannelUser(
         joinedChannelInput.channel,
         channel.joined_users,
-        newJoin,
+        alreadyJoined,
       );
-      return newJoin;
+      return alreadyJoined;
     }
 
     // create new join
@@ -260,17 +242,27 @@ export class ChannelService {
         user,
       });
     let hasChanges = false;
-    if (isMuted !== null) {
+    if (isMuted !== undefined) {
       hasChanges = true;
       let expiry: any = muteExpiry;
-      if (expiry !== null) expiry = new Date(Date.now() + expiry * 1000);
-      builder = builder.set({ is_muted: isMuted, muted_expiry: expiry });
+      if (expiry) expiry = new Date(Date.now() + expiry * 1000);
+      else expiry = null;
+      builder = builder.set({
+        is_muted: isMuted,
+        muted_expiry: expiry,
+      });
     }
-    if (isBanned !== null) {
+    if (isBanned !== undefined) {
       hasChanges = true;
       let expiry: any = banExpiry;
-      if (expiry !== null) expiry = new Date(Date.now() + expiry * 1000);
-      builder = builder.set({ is_banned: isBanned, ban_expiry: expiry });
+      if (expiry) expiry = new Date(Date.now() + expiry * 1000);
+      else expiry = null;
+      const obj: any = {
+        is_banned: isBanned,
+        ban_expiry: expiry,
+      };
+      if (isBanned) obj.is_joined = false;
+      builder = builder.set(obj);
     }
     if (!hasChanges) throw new BadRequestException();
     builder = builder.returning('*');

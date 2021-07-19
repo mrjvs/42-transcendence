@@ -56,7 +56,7 @@ export class IChannelInput {
 export class PasswordCheck implements ValidatorConstraintInterface {
   validate(text: string, args: ValidationArguments) {
     if (!(args.object as any).hasPassword) return true; // no password, allow passing
-    return text !== null && text !== undefined && text.length > 0;
+    return text === null || text === undefined || text.length > 0;
   }
 }
 
@@ -74,14 +74,4 @@ export class ChannelDto {
 
   @IsNotEmpty()
   title: string;
-}
-
-export class PasswordDto {
-  @IsNotEmpty()
-  hasPassword: boolean;
-
-  @Validate(PasswordCheck, [], {
-    message: 'password cannot be empty if hasPassword is set',
-  })
-  password: string;
 }

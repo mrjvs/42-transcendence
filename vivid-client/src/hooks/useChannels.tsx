@@ -6,7 +6,6 @@ export const ChannelsContext = React.createContext<any>([]);
 ChannelsContext.displayName = 'ChannelsContext';
 
 export function useChannelsContext() {
-  const { client } = React.useContext(SocketContext);
   const { addUser } = React.useContext(UsersContext);
   const [channels, setChannels] = React.useState<any[]>([]);
 
@@ -46,7 +45,7 @@ export function useChannelsContext() {
       let found = list.find((v) => v.id === channelId);
       if (!found) {
         found = {
-          data: null,
+          data: {},
           id: channelId,
         };
         list.push(found);
@@ -80,9 +79,22 @@ export function useChannelsContext() {
     return found.data;
   }
 
+  return {
+    channels,
+    addChannel,
+    getChannel,
+    updateChannel,
+    removeChannel,
+  };
+}
+
+export function ChannelClientListener(props: { children: any }) {
+  const { updateChannel, removeChannel } = React.useContext(ChannelsContext);
+  const { client } = React.useContext(SocketContext);
+
   // events
   function updateUser(userData: any) {
-    updateChannel(userData.channelId, (channel) => {
+    updateChannel(userData.channelId, (channel: any) => {
       if (!channel.joined_users) channel.joined_users = [];
       let foundUser = channel.joined_users.find(
         (v: any) => v.user === userData.id,
@@ -96,14 +108,14 @@ export function useChannelsContext() {
         is_muted: userData.muted,
         is_mod: userData.mod,
         is_banned: userData.banned,
-        is_joined: userData.is_joined,
+        is_joined: userData.joined,
       });
       return channel;
     });
   }
 
   function updateChan(channelData: any) {
-    updateChannel(channelData.channelId, (channel) => {
+    updateChannel(channelData.channelId, (channel: any) => {
       return {
         ...channel,
         ...channelData.channel,
@@ -130,10 +142,5 @@ export function useChannelsContext() {
     };
   }, [client]);
 
-  return {
-    channels,
-    addChannel,
-    getChannel,
-    updateChannel,
-  };
+  return props.children;
 }

@@ -1,9 +1,11 @@
 import React from 'react';
 import { Avatar } from './Avatar';
 import './Message.css';
+import './Tags.css';
 import { Button } from './Button';
 import { useHistory } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { Icon } from './Icon';
 
 export function Message(props: {
   channelId: string;
@@ -40,25 +42,30 @@ export function Message(props: {
     method: 'DELETE',
   });
 
-  const deleteButton = (msgId: string) =>
-    props.owner ? ( // TODO moderator/admin
-      <Button
-        small={true}
-        type="secondary"
-        onclick={() =>
-          run(null, `/api/v1/channels/${props.channelId}/messages/${msgId}`)
-        }
-      >
-        ❌
-      </Button>
-    ) : null;
+  function DeleteButton({ msgId }: { msgId: string }) {
+    if (!props.owner) return null;
+    // TODO moderator/admin
+    return (
+      <div className="message-delete-button">
+        <Button
+          type="small-box"
+          onclick={() => {
+            console.log('DELETING', msgId);
+            run(null, `/api/v1/channels/${props.channelId}/messages/${msgId}`);
+          }}
+        >
+          <Icon className="red-icon" type="trashcan" />
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className={`messageWrapper ${props.blocked ? 'blocked' : ''}`}>
       <div>
         <Avatar isClickable user={props.user} blocked={props.blocked} />
       </div>
-      <div>
+      <div style={{ flex: 1 }}>
         <p className="messageUserName">
           {props.blocked ? (
             'Redacted'
@@ -69,7 +76,10 @@ export function Message(props: {
                 ? props.tags
                     .filter((v) => v)
                     .map((v) => (
-                      <span key={v} className={`tag tag-${v.toLowerCase()}`}>
+                      <span
+                        key={v}
+                        className={`user-tag tag-${v.toLowerCase()}`}
+                      >
                         {v.toLowerCase()}
                       </span>
                     ))
@@ -84,8 +94,10 @@ export function Message(props: {
                 if (v.type == 0)
                   return (
                     <p key={v.id} className="messageMessage">
+                      <span className="bg-underlay">
+                        <DeleteButton msgId={v.id} />
+                      </span>
                       {v.content}
-                      {deleteButton(v.id)}
                     </p>
                   );
                 else if (v.type == 1)
@@ -116,14 +128,14 @@ export function Message(props: {
                           <div className="dark-cube"></div>
                         </div>
                       </div>
-                      {deleteButton(v.id)}
+                      <DeleteButton msgId={v.id} />
                     </div>
                   );
                 else
                   return (
                     <p key={v.id} className="messageMessage">
                       Unknown message type
-                      {deleteButton(v.id)}
+                      <DeleteButton msgId={v.id} />
                     </p>
                   );
               })}

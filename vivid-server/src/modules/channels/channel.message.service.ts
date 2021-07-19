@@ -81,11 +81,11 @@ export class ChannelMessageService {
     let builder: any = this.MessageRepository.createQueryBuilder();
     builder = builder
       .delete()
-      .where('channel = :channelId', { id: channelId })
-      .where('id = :messageId', { messageId: messageId });
+      .where('channel = :channelId', { channelId: channelId })
+      .andWhere('id = :messageId', { messageId: messageId });
 
     if (userId) {
-      builder = builder.where('user = :owner', { owner: userId });
+      builder = builder.andWhere('user = :owner', { owner: userId });
     }
 
     const result: DeleteResult = await builder.execute();

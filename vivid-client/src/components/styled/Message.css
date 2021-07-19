@@ -27,6 +27,9 @@
 .messageWrapper {
   display: flex;
   margin-bottom: 1.5rem;
+  position: relative;
+  align-items: flex-start;
+  z-index: 55;
 }
 
 .messageWrapper p {
@@ -34,21 +37,6 @@
   padding: 0;
   color: white;
   margin-bottom: 0.8rem;
-}
-
-.messageWrapper p .tag {
-  background-color: #6b3aab;
-  color: white;
-  padding: 0.1rem 0.6rem;
-  border-radius: 4px;
-  margin-left: 0.5rem;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.messageWrapper p .tag.tag-owner {
-  background-color: #345fd5;
 }
 
 .messageWrapper .messageUsernameWrap {
@@ -152,4 +140,47 @@
   width: 7rem;
   right: -2.5rem;
   top: 4rem;
+}
+
+.messageMessageContainer {
+  width: 100%;
+}
+
+.messageMessage {
+  position: relative;
+}
+
+.message-delete-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.message-delete-button .red-icon {
+  color: red;
+}
+
+.messageWrapper .messageMessage:hover .bg-underlay,
+.messageWrapper
+  .messageUserName:hover
+  + .messageMessageContainer
+  .messageMessage:first-child
+  .bg-underlay {
+  opacity: 1;
+}
+
+.messageWrapper .messageMessage:first-child .bg-underlay {
+  margin-top: -1.8rem;
+}
+
+.messageWrapper .bg-underlay {
+  opacity: 0;
+  position: absolute;
+  left: -5.5rem;
+  right: -1.5rem;
+  background-color: #181b2c;
+  top: 0;
+  bottom: 0;
+  margin: -0.1rem 0 -0.7rem 0;
+  z-index: -15;
 }
