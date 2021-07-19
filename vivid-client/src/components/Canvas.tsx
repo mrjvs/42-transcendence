@@ -63,11 +63,13 @@ export function Canvas({ width, height }: CanvasProps) {
       if (event.key === 'w') client.emit('keydown', -0.01);
       else if (event.key === 's') client.emit('keydown', 0.01);
       else if (event.key === ' ') client.emit('addons', 1);
+      else if (event.key === 'd') client.emit('shoot', 1);
     }
 
     function keyup(event: KeyboardEvent) {
       if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
       else if (event.key === ' ') client.emit('addons', 0);
+      else if (event.key === 'd') client.emit('shoot', 0);
     }
 
     function mouseMove(event: MouseEvent) {

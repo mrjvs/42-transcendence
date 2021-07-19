@@ -109,7 +109,6 @@ export class GuildsService {
   }
 
   async findGuild(guildAnagram: string): Promise<GuildsEntity> {
-    console.log(guildAnagram);
     const guild = await this.guildsRepository.findOne({
       relations: ['owner'],
       where: { anagram: guildAnagram },

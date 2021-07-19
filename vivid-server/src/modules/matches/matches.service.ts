@@ -22,13 +22,10 @@ export class MatchesService {
       gamestats.points_acpt > gamestats.points_req
         ? gamestats.user_id_acpt
         : gamestats.user_id_req;
-    // console.log('stats', gamestats);
     const user_req = await this.userService.findUser(gamestats.user_id_req);
     const user_acpt = await this.userService.findUser(gamestats.user_id_acpt);
     if (!user_req || !user_acpt) return;
     const war = await this.userService.getWarId(gamestats);
-    // console.log('user_req', user_req);
-    // console.log('user_acpt', user_acpt);
     return await this.matchesRepository
       .createQueryBuilder()
       .insert()

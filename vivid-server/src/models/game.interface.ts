@@ -6,8 +6,9 @@ export interface IPlayer {
   score: number;
   move: number;
   spacebar: number;
+  shoot: number;
   addOnPoints: number;
-  trampoline: boolean;
+  special: boolean;
   ready: boolean;
 }
 
