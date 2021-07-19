@@ -75,3 +75,13 @@ export class ChannelDto {
   @IsNotEmpty()
   title: string;
 }
+
+export class PasswordDto {
+  @IsNotEmpty()
+  hasPassword: boolean;
+
+  @Validate(PasswordCheck, [], {
+    message: 'password cannot be empty if hasPassword is set',
+  })
+  password: string;
+}

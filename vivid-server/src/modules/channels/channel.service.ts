@@ -13,6 +13,7 @@ import {
   IChannel,
   ChannelDto,
   IChannelInput,
+  PasswordDto,
 } from '@/channel.entity';
 import {
   JoinedChannelEntity,
@@ -21,7 +22,7 @@ import {
 } from '@/joined_channels.entity';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { EventGateway } from '../websocket/event.gateway';
+import { EventGateway } from '$/websocket/event.gateway';
 
 export enum ChannelTypes {
   PUBLIC = 'public',
@@ -79,6 +80,39 @@ export class ChannelService {
         this.configService.get('saltRounds'),
       );
     }
+    const updateResult = await this.ChannelRepository.createQueryBuilder()
+      .update()
+      .set(input)
+      .where('id = :id', { id: channelId })
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return <ChannelEntity>response.raw[0];
+      });
+    this.eventGateway.updateChannel(
+      updateResult.id,
+      updateResult.joined_users,
+      updateResult,
+    );
+    return updateResult;
+  }
+
+  async updatePassword(
+    channelInput: PasswordDto,
+    channelId: string,
+  ): Promise<ChannelEntity> {
+    const input = {
+      has_password: channelInput.hasPassword,
+      password: '',
+    };
+
+    if (input.has_password) {
+      input.password = await bcrypt.hash(
+        channelInput.password,
+        this.configService.get('saltRounds'),
+      );
+    }
+
     const updateResult = await this.ChannelRepository.createQueryBuilder()
       .update()
       .set(input)

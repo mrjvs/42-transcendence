@@ -56,6 +56,11 @@ function ChannelSettingsCard(props: { channelData: any }) {
     method: 'PATCH',
   });
 
+  const updatePasswordFetch = useFetch({
+    url: `/api/v1/channels/${props.channelData.channel.id}/password`,
+    method: 'PATCH',
+  });
+
   React.useEffect(() => {
     if (
       props.channelData?.channel?.title &&
@@ -68,8 +73,15 @@ function ChannelSettingsCard(props: { channelData: any }) {
 
   React.useEffect(() => {
     if (updateChannelFetch.done) {
-      props.channelData?.addChannel({ password: password });
+      props.channelData?.addChannel(props.channelData.data); // TODO not sure .data is alright
       updateChannelFetch.reset();
+    }
+    if (updatePasswordFetch.done) {
+      props.channelData?.addChannel({
+        password: password,
+        hasPassword: hasPassword,
+      });
+      updatePasswordFetch.reset();
     }
   }, [updateChannelFetch.done]);
 
@@ -109,12 +121,12 @@ function ChannelSettingsCard(props: { channelData: any }) {
                 loading={updateChannelFetch.loading}
                 type="secondary"
                 onclick={() => {
-                  // TODO make a backend service just for password change
-                  updateChannelFetch.run({
-                    hasPassword: true,
+                  setHasPassword(true);
+                  updatePasswordFetch.run({
+                    hasPassword: hasPassword,
                     password: password,
                   });
-                  setActive(false); // TODO set to false also when clicked outside the input
+                  setActive(false);
                 }}
               >
                 Change Password
