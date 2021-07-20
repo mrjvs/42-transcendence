@@ -10,7 +10,6 @@ import { ToggleButton } from '../components/styled/Toggle';
 import { Avatar } from '../components/styled/Avatar';
 import { useMessages } from '../hooks/useMessages';
 import { UsersContext } from '../hooks/useUsers';
-import { NotFoundView } from './NotFoundView';
 import { PunishmentModal } from '../components/styled/modals/Punishment.modal';
 
 export function ChannelSettingsView() {
