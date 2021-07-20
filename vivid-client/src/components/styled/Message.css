@@ -29,23 +29,26 @@
   margin-bottom: 1.5rem;
 }
 
-.messageWrapper .messageUserAvatar {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 100%;
-  background: linear-gradient(to bottom right, #29419f, #a34fec);
-  margin-right: 1rem;
-}
-
-.messageWrapper:nth-child(2n) .messageUserAvatar {
-  background: linear-gradient(to bottom right, #e45655, #a13754);
-}
-
 .messageWrapper p {
   margin: 0;
   padding: 0;
   color: white;
   margin-bottom: 0.8rem;
+}
+
+.messageWrapper p .tag {
+  background-color: #6b3aab;
+  color: white;
+  padding: 0.1rem 0.6rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.messageWrapper p .tag.tag-owner {
+  background-color: #345fd5;
 }
 
 .messageWrapper .messageUsernameWrap {
@@ -65,6 +68,88 @@
   color: #7c849f;
 }
 
-.messageWrapper.blocked .messageUserAvatar {
+.messageWrapper.blocked .userAvatar {
   background: #272c43;
+}
+
+.messageInvite-wrapper {
+  background: #121727;
+  max-width: 100%;
+  width: 500px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  display: flex;
+  margin-bottom: 0.8rem;
+}
+
+.messageInvite-wrapper .userAvatar .status-bubble {
+  border-color: #121727;
+}
+
+.messageInvite-accent {
+  background: #35e2a2;
+  width: 4px;
+}
+
+.messageInvite-content {
+  position: relative;
+  width: 100%;
+  padding: 1rem 0 1rem 2rem;
+}
+
+.messageInvite-user {
+  font-size: 16px;
+  color: white;
+  padding-bottom: 1rem;
+}
+
+.messageInvite-user .userAvatar {
+  width: 2rem;
+  height: 2rem;
+  margin-right: 1rem;
+}
+
+.messageInvite-content .text {
+  font-weight: bold;
+  width: 35%;
+  padding-bottom: 0.5rem;
+}
+
+.messageInvite-content .error {
+  padding-top: 1rem;
+  color: #d46074;
+}
+
+.messageInvite-user {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+}
+
+.messageInvite-content .red-cube,
+.messageInvite-content .dark-cube {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 5rem;
+  width: 5rem;
+  transform: rotate(30deg);
+}
+
+.messageInvite-content .red-cube {
+  background: linear-gradient(to bottom, #e45655, #a13754);
+  height: 8rem;
+  width: 8rem;
+  right: -1.5rem;
+  top: -2rem;
+}
+
+.messageInvite-content .dark-cube {
+  background: #262b41;
+  height: 7rem;
+  width: 7rem;
+  right: -2.5rem;
+  top: 4rem;
 }

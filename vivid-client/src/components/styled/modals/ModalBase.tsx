@@ -60,13 +60,17 @@ export function ModalBase(props: {
         props.hasDecorations ? 'deco' : ''
       }`}
     >
-      <div
-        className="overlay"
-        onClick={() => props.onBackPress && props.onBackPress()}
-      ></div>
+      <div className="overlay"></div>
       <div className="modal-wrapper">
         <div className="modal">
-          <div className="card">
+          <div
+            className="card"
+            onClick={function (e) {
+              if (e.target !== e.currentTarget) return;
+              console.log(props.onBackPress);
+              props.onBackPress && props.onBackPress();
+            }}
+          >
             <div className="content-wrapper">
               <div
                 className="content"

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { MessageBox } from '../components/base/MessageBox';
-import { Heading } from '../components/styled/Heading';
 import { Message, NoMessage } from '../components/styled/Message';
 import { useMessages } from '../hooks/useMessages';
+import { MainLayout } from './layouts/MainLayout';
 import './ChannelView.css';
 import { UserContext } from '../hooks/useUser';
 
@@ -11,16 +11,17 @@ export function ChannelView() {
   const scrollEl = React.useRef(null);
   const { id }: any = useParams();
   const messageData = useMessages(id);
+  const { getRole, currentChannelUser } = messageData;
   const [reducedMessages, setReducedMessages] = React.useState<any[]>([]);
   const { user } = React.useContext(UserContext);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const cur: any = scrollEl?.current;
     if (!cur) return;
     setTimeout(() => {
       cur.scrollIntoView();
     }, 1);
-  }, [reducedMessages]);
+  }, [reducedMessages, scrollEl]);
 
   React.useEffect(() => {
     if (!messageData.messages) setReducedMessages([]);
@@ -31,8 +32,17 @@ export function ChannelView() {
         userData: messageData.getUser(msg.user)?.data || {
           name: 'Unknown user',
           avatar_colors: ['', ''],
+          id: msg.user,
         },
-        messages: [msg.content],
+        userTag: getRole(msg.user),
+        messages: [
+          {
+            content: msg.content,
+            aux_content: msg.aux_content,
+            type: msg.message_type,
+            id: msg.id,
+          },
+        ],
         createdAt: new Date(msg.created_at),
       });
     }
@@ -59,51 +69,58 @@ export function ChannelView() {
         }
 
         // append to previous message collection
-        prev.messages.push(msg.content);
+        prev.messages.push({
+          content: msg.content,
+          aux_content: msg.aux_content,
+          type: msg.message_type,
+          id: msg.id,
+        });
         return acc;
       }, []),
     );
   }, [messageData.channelInfo, messageData.messages, messageData.users]);
 
   return (
-    <div className="contentContainer">
-      <div className="contentHeader">
-        <Heading size="small">
-          {messageData.messageState.done ? messageData.channelInfo.title : '‎'}
-        </Heading>
-      </div>
-      <div className="channelWrapper">
-        <div className="channelScrollWrapper">
-          <div className="channelContent">
-            {messageData.messageState.done ? (
-              <>
-                <NoMessage />
-                <div>
-                  {reducedMessages.map((v: any) => (
-                    <Message
-                      key={v.id}
-                      messageId={v.id}
-                      messages={v.messages}
-                      username={v.userData.name}
-                      blocked={false}
-                      userColors={v.userData.avatar_colors}
-                      owner={v.userData.id === user.id ? true : false}
-                    />
-                  ))}
-                </div>
-              </>
-            ) : null}
-            <div ref={scrollEl} />
-          </div>
-        </div>
-        <div className="channelBottomWrapper">
-          <MessageBox
-            placeholder="Type your message here..."
-            disabled={!messageData.messageState.done}
-            onSend={(text: string) => messageData.sendMessage(text)}
-          />
+    <MainLayout
+      title={
+        (messageData.messageState.done ? messageData.channelInfo.title : '‎') +
+        (currentChannelUser.tag &&
+        ['owner', 'mod'].includes(currentChannelUser.tag)
+          ? 'Edit channel'
+          : '')
+      }
+    >
+      <div className="channelScrollWrapper">
+        <div className="channelContent">
+          {messageData.messageState.done ? (
+            <>
+              <NoMessage />
+              <div>
+                {reducedMessages.map((v: any) => (
+                  <Message
+                    key={v.id}
+                    channelId={id}
+                    messages={v.messages}
+                    blocked={false}
+                    user={v.userData}
+                    owner={v.userData.id === user.id ? true : false}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
+          <div ref={scrollEl} />
         </div>
       </div>
-    </div>
+      <div className="channelBottomWrapper">
+        <MessageBox
+          placeholder="Type your message here..."
+          disabled={!messageData.messageState.done}
+          onSend={(obj: { text: string; type: boolean }) =>
+            messageData.sendMessage(obj.text, obj.type)
+          }
+        />
+      </div>
+    </MainLayout>
   );
 }

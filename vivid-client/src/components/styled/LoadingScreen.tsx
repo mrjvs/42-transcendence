@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { SocketContext } from '../../hooks/useWebsocket';
 import { Button } from './Button';
 import './LoadingScreen.css';
@@ -20,6 +21,10 @@ export function LoadingScreen(props: any) {
   const [loading, setLoading] = React.useState(true);
   const [line, setLine] = React.useState('');
   const [tokenInput, setTokenInput] = React.useState('');
+  const history = useHistory();
+
+  const [loadingButton, setLoadingButton] = React.useState(false);
+
   // show random loading text
   React.useEffect(() => {
     setLine(lines[Math.floor(Math.random() * lines.length)]);
@@ -27,6 +32,8 @@ export function LoadingScreen(props: any) {
 
   // connect to socket once user has been requested and is logged in
   React.useEffect(() => {
+    if (props.userData.userState.done && !props.userData.user.name)
+      history.push('/');
     if (props.userData.userState.done && props.userData.isLoggedIn && !client) {
       connect();
     }
@@ -71,9 +78,17 @@ export function LoadingScreen(props: any) {
               placeholder="Code here..."
             />
           </div>
-          <Button onclick={() => props.userData.sendToken(tokenInput)}>
+          <Button
+            loading={props.userData.tokenState.loading}
+            onclick={() => props.userData.sendToken(tokenInput)}
+          >
             Submit
           </Button>
+          {props.userData.tokenState.invalidToken ? (
+            <p>Token is invalid, try again with a different token</p>
+          ) : props.userData.tokenState.error ? (
+            <p>Something went wrong, try again later</p>
+          ) : null}
         </div>
       </div>
     );
@@ -90,12 +105,15 @@ export function LoadingScreen(props: any) {
           <p className="text">
             Click the button below to continue to the login page
           </p>
-          <a
-            href={`${window._env_.VIVID_BASE_URL}/api/v1/auth/login`}
-            className="button"
+          <Button
+            loading={loadingButton}
+            onclick={() => {
+              window.location.href = `${window._env_.VIVID_BASE_URL}/api/v1/auth/login`;
+              setLoadingButton(true);
+            }}
           >
             Log in
-          </a>
+          </Button>
         </div>
       </div>
     );

@@ -18,3 +18,13 @@
 .messageBox > input::placeholder {
   color: #7f86a3;
 }
+
+.messageRow {
+    display: flex;
+    width: 100%;
+    height: auto;
+}
+
+.messageBox {
+    flex: 1;
+}
