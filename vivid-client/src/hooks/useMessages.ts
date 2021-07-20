@@ -91,7 +91,7 @@ export function useMessages(channel: string) {
   }, [channels, channelInfo, userData]);
 
   React.useEffect(() => {
-    requestMessages();
+    if (channel) requestMessages();
   }, [channel]);
 
   React.useEffect(() => {

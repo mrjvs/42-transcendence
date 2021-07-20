@@ -19,13 +19,14 @@ export function UnusableTextInput(props: {
 }
 
 export function TextInput(props: {
-  value: string;
+  value: any;
   set: (text: string) => void;
   label?: string;
   noPadding?: boolean;
   placeholder: string;
   className?: string;
   lighter?: boolean;
+  type?: string;
 }) {
   return (
     <div className="styled-input">
@@ -36,7 +37,7 @@ export function TextInput(props: {
           </span>
         ) : null}
         <input
-          type="text"
+          type={`${props.type ? props.type : 'text'}`}
           value={props.value}
           onChange={(e) => props.set(e.target.value)}
           className={

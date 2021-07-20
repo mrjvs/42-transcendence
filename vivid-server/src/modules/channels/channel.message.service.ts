@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
@@ -11,6 +15,8 @@ import {
 import { EventGateway } from '$/websocket/event.gateway';
 import { ChannelService } from './channel.service';
 import { UserEntity } from '@/user.entity';
+import { ChannelTypes } from '~/models/channel.entity';
+import { FriendsService } from '../friends/friends.service';
 
 @Injectable()
 export class ChannelMessageService {
@@ -19,6 +25,7 @@ export class ChannelMessageService {
     private MessageRepository: Repository<MessageEntity>,
     private readonly eventGateway: EventGateway,
     private readonly channelService: ChannelService,
+    private readonly friendService: FriendsService,
   ) {}
 
   async postMessage(
@@ -28,8 +35,17 @@ export class ChannelMessageService {
     const channel = await this.channelService.findChannel(
       messageInput.channel,
       false,
+      null,
     );
     if (!channel) throw new NotFoundException();
+
+    // if dm channel, check if actual friends, throw forbidden if not
+    if (channel.type == ChannelTypes.DM) {
+      const friendId = channel.dmId.split('=').find((v) => v != user.id);
+      const friendship = await this.friendService.getFriend(user.id, friendId);
+      if (!friendship || !friendship.accepted) throw new ForbiddenException();
+    }
+
     const result = await this.MessageRepository.save(messageInput);
     this.eventGateway.sendChannelMessage(result, channel.joined_users, user);
     return result;

@@ -18,6 +18,7 @@ import { MatchesModule } from '../matches/matches.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { DmModule } from '$/dm/dm.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -55,6 +56,7 @@ const config = ConfigModule.forRoot({
     WarsModule,
     GuildrequestModule,
     MatchesModule,
+    DmModule,
 
     // static
     ServeStaticModule.forRoot({

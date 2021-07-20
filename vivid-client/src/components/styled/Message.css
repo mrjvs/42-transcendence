@@ -152,12 +152,15 @@
 
 .message-delete-button {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 50%;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  margin-top: -1rem;
 }
 
 .message-delete-button .red-icon {
-  color: red;
+  color: #d46074;
 }
 
 .messageWrapper .messageMessage:hover .bg-underlay,

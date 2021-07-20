@@ -8,12 +8,29 @@ import {
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IJoinedChannel, JoinedChannelEntity } from './joined_channels.entity';
 
+export enum ChannelTypes {
+  TEXT = 0,
+  DM = 1,
+}
+
+export enum ChannelVisibility {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  ALL = 'private',
+}
+
 @Entity('channels')
 export class ChannelEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ default: ChannelTypes.TEXT })
+  type: ChannelTypes;
+
+  @Column({ nullable: true })
+  dmId?: string;
+
+  @Column({ type: 'uuid', nullable: true })
   owner: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -50,6 +67,8 @@ export class IChannelInput {
   password?: string;
   title: string;
   owner: string;
+  type: ChannelTypes;
+  dmId?: string;
 }
 
 @ValidatorConstraint()

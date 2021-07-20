@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserModule } from '$/users/user.module';
 import { EventModule } from '../websocket/event.module';
 import { PongModule } from '../pong/pong.module';
+import { FriendsModule } from '../friends/friends.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PongModule } from '../pong/pong.module';
     UserModule,
     EventModule,
     PongModule,
+    FriendsModule,
   ],
   providers: [ChannelService, ChannelMessageService, ConfigService],
   controllers: [
@@ -30,5 +32,6 @@ import { PongModule } from '../pong/pong.module';
     ChannelUserController,
     ChannelMessageController,
   ],
+  exports: [ChannelService],
 })
 export class ChannelModule {}

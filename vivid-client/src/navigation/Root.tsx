@@ -16,6 +16,7 @@ import { GameView } from '../views/GameView';
 import { ChannelSettingsView } from '../views/ChannelSettingsView';
 import { ChannelsContext } from '../hooks/useChannels';
 import { NotFoundView } from '../views/NotFoundView';
+import { DmChannelView } from '../views/DmChannelView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
@@ -27,6 +28,7 @@ function SideBarRouter() {
         return userData?.user?.id && u.user === userData.user.id && u.is_joined;
       });
     })
+    .filter((v: any) => !v?.data?.dmId)
     .map((v: any) => v?.data);
 
   return (
@@ -76,6 +78,9 @@ function SideBarRouter() {
           </Route>
           <Route exact path="/channel/:id">
             <ChannelView />
+          </Route>
+          <Route exact path="/dm/:id">
+            <DmChannelView />
           </Route>
           <Route exact path="/pong">
             <p>pong</p>

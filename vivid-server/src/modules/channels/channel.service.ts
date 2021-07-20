@@ -13,6 +13,8 @@ import {
   IChannel,
   ChannelDto,
   IChannelInput,
+  ChannelTypes,
+  ChannelVisibility,
 } from '@/channel.entity';
 import {
   JoinedChannelEntity,
@@ -22,12 +24,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { EventGateway } from '$/websocket/event.gateway';
-
-export enum ChannelTypes {
-  PUBLIC = 'public',
-  PRIVATE = 'private',
-  ALL = 'private',
-}
+import { NIL } from 'uuid';
 
 @Injectable()
 export class ChannelService {
@@ -47,6 +44,7 @@ export class ChannelService {
       password: '',
       title: channelInput.title,
       owner: userId,
+      type: ChannelTypes.TEXT,
     };
     if (input.has_password) {
       input.password = await bcrypt.hash(
@@ -58,6 +56,30 @@ export class ChannelService {
     await this.JoinedChannelRepository.save({
       channel: saveResult.id,
       user: saveResult.owner,
+    });
+    return saveResult;
+  }
+
+  async addDmChannel(user1: string, user2: string): Promise<ChannelEntity> {
+    const input: IChannelInput = {
+      has_password: false,
+      is_public: false,
+      password: '',
+      title: '',
+      owner: null,
+      type: ChannelTypes.DM,
+      dmId: (user1 > user2 ? [user2, user1] : [user1, user2]).join('='),
+    };
+    const saveResult = await this.ChannelRepository.save(input);
+    await this.JoinedChannelRepository.save({
+      channel: saveResult.id,
+      user: user1,
+      is_joined: true,
+    });
+    await this.JoinedChannelRepository.save({
+      channel: saveResult.id,
+      user: user2,
+      is_joined: true,
     });
     return saveResult;
   }
@@ -114,7 +136,7 @@ export class ChannelService {
   async remove(channel_id: string): Promise<{ id: string }> {
     const channel = await this.ChannelRepository.findOne({
       relations: ['joined_users'],
-      where: { id: channel_id },
+      where: { id: channel_id, type: ChannelTypes.TEXT },
     });
     if (!channel) throw new NotFoundException();
     await this.JoinedChannelRepository.createQueryBuilder()
@@ -127,23 +149,43 @@ export class ChannelService {
     return { id: channel_id };
   }
 
-  async findChannel(id: string, resolveUsers = true): Promise<IChannel> {
+  async findChannel(
+    id: string,
+    resolveUsers = true,
+    type: ChannelTypes | null = ChannelTypes.TEXT,
+  ): Promise<ChannelEntity> {
+    let query: any = {
+      id,
+    };
+    if (type !== null) query.type = type;
     const relations = ['joined_users'];
     if (resolveUsers) relations.push('joined_users.user');
     return await this.ChannelRepository.findOne({
       relations,
+      where: query,
+    });
+  }
+
+  async findDmChannel(user1: string, user2: string): Promise<ChannelEntity> {
+    const dmId = (user1 > user2 ? [user2, user1] : [user1, user2]).join('=');
+    return await this.ChannelRepository.findOne({
+      relations: ['joined_users'],
       where: {
-        id,
+        dmId,
+        type: ChannelTypes.DM,
       },
     });
   }
 
-  findAllOfType(type: ChannelTypes): Promise<IChannel[]> {
-    const query = {
-      where: {},
+  findAllOfType(type: ChannelVisibility): Promise<IChannel[]> {
+    const query: any = {
+      where: {
+        type: ChannelTypes.TEXT,
+      },
     };
-    if (type === 'public') query.where = { is_public: true };
-    else if (type === 'private') query.where = { is_public: false };
+    if (type === 'public') query.where = { ...query.where, is_public: true };
+    else if (type === 'private')
+      query.where = { ...query.where, is_public: false };
     return this.ChannelRepository.find(query);
   }
 
@@ -314,8 +356,6 @@ export class ChannelService {
   }
 
   async listUsers(channelId: string): Promise<JoinedChannelEntity[]> {
-    if (!(await this.ChannelRepository.findOne(channelId)))
-      throw new NotFoundException();
     return await this.JoinedChannelRepository.find({
       where: {
         is_joined: true,
