@@ -11,10 +11,11 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
-import { UserEntity } from '@/user.entity';
+import { RelatedUser, UserEntity } from '@/user.entity';
 import { UserService } from '$/users/user.service';
 import { FriendsService } from './friends.service';
 import { FriendsEntity } from '@/friends.entity';
+import { formatObject } from '~/utils/format';
 
 @Controller('friends')
 @UseGuards(AuthenticatedGuard)
@@ -78,6 +79,6 @@ export class FriendsController {
   // Get full friendlist
   @Get('friendlist')
   async getFriendlist(@User() user: UserEntity): Promise<UserEntity[]> {
-    return this.friendsService.getFriendList(user.id);
+    return await this.friendsService.getFriendList(user.id);
   }
 }

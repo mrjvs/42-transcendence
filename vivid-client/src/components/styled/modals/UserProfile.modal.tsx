@@ -100,13 +100,18 @@ function FriendAction(props: { userData: any; friendId: string }) {
       const friendship = friendUser.data.data;
       friendUser.reset();
 
+      const friend =
+        friendship.user_1 === props.friendId
+          ? friendship.user_1
+          : friendship.user_2;
+
       props.userData?.updateUser({
         friends: [
           ...props.userData.user.friends,
           {
             id: friendship.id,
             userId: props.userData.user.id,
-            friendId: props.friendId,
+            friend,
             requested_by: friendship.requested_by,
             requested_to: friendship.requested_to,
             accepted: friendship.accepted,
@@ -114,6 +119,7 @@ function FriendAction(props: { userData: any; friendId: string }) {
         ],
       });
     }
+
     if (unFriend.done) {
       const friendship = unFriend.data.data;
       unFriend.reset();
@@ -140,7 +146,7 @@ function FriendAction(props: { userData: any; friendId: string }) {
   }
 
   const friendship = props.userData?.user?.friends?.find(
-    (v: any) => v.friendId === props.friendId,
+    (v: any) => v.friend?.id === props.friendId,
   );
 
   let method: any;

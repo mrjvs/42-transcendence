@@ -27,14 +27,13 @@ export class FriendsService {
       user_2 = tmp;
     }
 
-    return this.friendsRepository
-      .createQueryBuilder()
-      .select()
-      .where('user_1 = :u1 AND user_2 = :u2', {
-        u1: user_1,
-        u2: user_2,
-      })
-      .getOne();
+    return await this.friendsRepository.findOne({
+      relations: ['user_1', 'user_2'],
+      where: {
+        user_1,
+        user_2,
+      },
+    });
   }
 
   // Add FriendEntity to database (=> send friend request)
@@ -78,6 +77,7 @@ export class FriendsService {
   }
 
   // find all friends of the user
+  // TODO also filters when accepted = false
   async getFriendList(userId: string): Promise<UserEntity[]> {
     return await getConnection()
       .createQueryBuilder()
@@ -86,16 +86,16 @@ export class FriendsService {
         return el
           .select(
             `CASE WHEN user_1 = :u THEN user_2 
-        			WHEN user_2 = :u THEN user_1 
-        			END`,
+						WHEN user_2 = :u THEN user_1 
+						END`,
             'friends',
           )
           .setParameter('u', userId)
           .from(FriendsEntity, 'f')
-          .where('user_1 = :u OR user_2 = :u', { u: userId })
+          .where('user_1 = :u OR user_2 = :u', { u: userId }) // andWhere?
           .andWhere('accepted = :a', { a: true });
       }, 'f')
-      .leftJoinAndSelect('users', 'users', 'users.id = f.friends::uuid')
+      .leftJoinAndSelect('', 'users', 'users.id = f.friends::uuid')
       .execute();
   }
 

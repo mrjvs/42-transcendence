@@ -127,14 +127,14 @@ export class RelatedUser extends UnrelatedUser {
   joined_channels: string[] | string;
 }
 
-function friendTransform(arr, otherField, friendField) {
+function friendTransform(arr, userField, friendField) {
   return arr.map((v) =>
     v.constructor === String
       ? v
       : {
           id: v.id,
-          userId: v[otherField],
-          friendId: v[friendField],
+          userId: v[userField],
+          friend: v[friendField],
           requested_by: v.requested_by,
           requested_to: v.requested_to,
           accepted: v.accepted,
@@ -147,8 +147,8 @@ export class FullDetailsUser extends RelatedUser {
   @Expose()
   @Transform(
     ({ obj }) => [
-      ...friendTransform(obj.friends, 'user_2', 'user_1'),
-      ...friendTransform(obj.friends_inverse, 'user_1', 'user_2'),
+      ...friendTransform(obj.friends, 'user_1', 'user_2'),
+      ...friendTransform(obj.friends_inverse, 'user_2', 'user_1'),
     ],
     { toClassOnly: true },
   )

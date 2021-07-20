@@ -13,9 +13,12 @@ import { AccountSetupModal } from '../components/styled/modals/AccountSetup.moda
 import { PongView } from '../views/PongView';
 import { SettingsView } from '../views/SettingsView';
 import { GameView } from '../views/GameView';
+import { Friends } from '../components/styled/sidebar/Friends';
+import { FriendsModal } from '../components/styled/sidebar/FriendsModal';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
+  const [state, setState] = React.useState(false);
 
   return (
     <div className="wrapper">
@@ -56,6 +59,24 @@ function SideBarRouter() {
             {v.channel.title}
           </SidebarLink>
         ))}
+
+        <ActionRow label="friends">
+          <Button
+            badge={1}
+            small={true}
+            type="secondary"
+            onclick={() => setState(true)}
+          >
+            Friends
+          </Button>
+          <FriendsModal
+            open={state}
+            user={userData}
+            close={() => setState(false)}
+          />
+          <Icon type="plus" />
+        </ActionRow>
+        <Friends userId={userData.id} />
       </nav>
       <div className="content">
         <Switch>
