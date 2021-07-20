@@ -56,7 +56,7 @@ export class FriendsService {
   }
 
   async getFriend(user1: string, user2: string): Promise<FriendsEntity> {
-    let tmp = user1;
+    const tmp = user1;
     if (user1 > user2) {
       user1 = user2;
       user2 = tmp;

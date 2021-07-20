@@ -24,7 +24,6 @@ import {
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { EventGateway } from '$/websocket/event.gateway';
-import { NIL } from 'uuid';
 
 @Injectable()
 export class ChannelService {
@@ -154,7 +153,7 @@ export class ChannelService {
     resolveUsers = true,
     type: ChannelTypes | null = ChannelTypes.TEXT,
   ): Promise<ChannelEntity> {
-    let query: any = {
+    const query: any = {
       id,
     };
     if (type !== null) query.type = type;

@@ -10,7 +10,6 @@ import {
   UnauthorizedException,
   UseInterceptors,
   UploadedFile,
-  Res,
   Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';

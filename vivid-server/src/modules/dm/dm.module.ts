@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChannelEntity } from '@/channel.entity';
 import { JoinedChannelEntity } from '@/joined_channels.entity';
 import { ConfigService } from '@nestjs/config';
 import { DmService } from './dm.service';
