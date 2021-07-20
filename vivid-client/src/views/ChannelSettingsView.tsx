@@ -10,6 +10,8 @@ import { ToggleButton } from '../components/styled/Toggle';
 import { Avatar } from '../components/styled/Avatar';
 import { useMessages } from '../hooks/useMessages';
 import { UsersContext } from '../hooks/useUsers';
+import { NotFoundView } from './NotFoundView';
+import { PunishmentModal } from '../components/styled/modals/Punishment.modal';
 
 export function ChannelSettingsView() {
   const history = useHistory();
@@ -30,9 +32,38 @@ export function ChannelSettingsView() {
     isOwner,
   };
 
-  if (messageState.loading) return <p>Loading...</p>;
+  const deleteChannelFetch = useFetch({
+    url: `/api/v1/channels/${channelInfo.id}`,
+    method: 'DELETE',
+  });
 
-  if (messageState.error) return <p>Failed to load</p>;
+  React.useEffect(() => {
+    if (deleteChannelFetch.done) {
+      deleteChannelFetch.reset();
+      history.push('/');
+    }
+  }, [deleteChannelFetch.done]);
+
+  if (messageState.loading)
+    return (
+      <ChannelSettingsError id={id} history={history}>
+        Loading...
+      </ChannelSettingsError>
+    );
+
+  if (messageState.error)
+    return (
+      <ChannelSettingsError id={id} history={history}>
+        Failed to load
+      </ChannelSettingsError>
+    );
+
+  if (!channelInfo)
+    return (
+      <ChannelSettingsError history={history}>
+        Channel not found
+      </ChannelSettingsError>
+    );
 
   return (
     <div className="channel-settings-view">
@@ -43,7 +74,10 @@ export function ChannelSettingsView() {
       {isOwner ? (
         <div>
           <h1>Channel settings</h1>
-          <ChannelSettingsCard channelData={channelProps} />
+          <ChannelSettingsCard
+            channelData={channelProps}
+            deleteChannelFetch={deleteChannelFetch}
+          />
         </div>
       ) : null}
       <h1>Channel moderators</h1>
@@ -56,7 +90,35 @@ export function ChannelSettingsView() {
   );
 }
 
-function ChannelSettingsCard(props: { channelData: any }) {
+function ChannelSettingsError(props: {
+  id?: string;
+  children: any;
+  history: any;
+}) {
+  return (
+    <div className="channel-settings-view">
+      <Button
+        type="secondary"
+        onclick={() => {
+          props.id
+            ? props.history.push(`/channel/${props.id}`)
+            : props.history.push('/');
+        }}
+      >
+        <Icon type="left_arrow" />
+        {props.id ? 'Back to channel' : 'Back Home'}
+      </Button>
+      <div className="card">
+        <h2>{props.children}</h2>
+      </div>
+    </div>
+  );
+}
+
+function ChannelSettingsCard(props: {
+  channelData: any;
+  deleteChannelFetch: any;
+}) {
   const [channelName, setChannelName] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -145,20 +207,24 @@ function ChannelSettingsCard(props: { channelData: any }) {
         ) : null}
         <Button
           less_padding
+          margin_right
           loading={updateChannelFetch.loading}
           onclick={() => {
             const passObj: any = {};
             if (hasPassword && active) passObj.password = password;
-            updateChannelFetch.run({
-              title: channelName,
-              isPublic: isPublic,
-              hasPassword: hasPassword,
-              ...passObj,
-            });
+
             setActive(false);
           }}
         >
           Save settings
+        </Button>
+        <Button
+          less_padding
+          type="danger"
+          loading={props.deleteChannelFetch?.loading}
+          onclick={() => props.deleteChannelFetch?.run()}
+        >
+          Delete channel
         </Button>
         {updateChannelFetch.error &&
         updateChannelFetch.error?.data?.code === 'inuse' ? (
@@ -166,7 +232,7 @@ function ChannelSettingsCard(props: { channelData: any }) {
         ) : updateChannelFetch.error &&
           updateChannelFetch.error?.res?.status === 400 ? (
           <p>Username must be at least 1 character</p>
-        ) : updateChannelFetch.error ? (
+        ) : updateChannelFetch.error || props.deleteChannelFetch?.error ? (
           <p>Something went wrong, try again later</p>
         ) : null}
       </div>
@@ -299,6 +365,8 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
 }
 
 function ChannelMembersCard(props: { channelData: any }) {
+  const [openModal, setOpenModal] = React.useState(false);
+
   const makeMod = useFetch({
     url: '',
     method: 'PATCH',
@@ -311,8 +379,18 @@ function ChannelMembersCard(props: { channelData: any }) {
 
   React.useEffect(() => {
     if (makeMod.done) makeMod.reset();
-    if (updatePermissions.done) updatePermissions.reset();
+    if (updatePermissions.done) {
+      setOpenModal(false);
+      updatePermissions.reset();
+    }
   }, [makeMod.done, updatePermissions.done]);
+
+  function update(v: any) {
+    updatePermissions.run(
+      { isMuted: true, muteExpiry: null },
+      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
+    );
+  }
 
   return (
     <div className="card">
@@ -346,12 +424,7 @@ function ChannelMembersCard(props: { channelData: any }) {
                     type="danger"
                     margin_right
                     more_padding
-                    onclick={() =>
-                      updatePermissions.run(
-                        { isMuted: true },
-                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
-                      )
-                    }
+                    onclick={() => setOpenModal(true)}
                   >
                     Mute
                   </Button>
@@ -360,17 +433,13 @@ function ChannelMembersCard(props: { channelData: any }) {
                   <Button
                     more_padding
                     type="danger"
-                    onclick={() =>
-                      updatePermissions.run(
-                        { isBanned: true },
-                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
-                      )
-                    }
+                    onclick={() => setOpenModal(true)}
                   >
                     Ban
                   </Button>
                 ) : null}
               </div>
+              <PunishmentModal open={openModal} onSubmit={() => update(v)} />
             </li>
           ))}
       </ul>
