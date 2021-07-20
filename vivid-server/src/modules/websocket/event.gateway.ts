@@ -101,6 +101,21 @@ export class EventGateway implements OnGatewayConnection {
     this.pongService.handleKeydown(client, move);
   }
 
+  @SubscribeMessage('addons')
+  handleAddOns(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() spacebar: number,
+  ) {
+    if (!client.auth) return;
+    this.pongService.handleAddOns(client, spacebar);
+  }
+
+  @SubscribeMessage('shoot')
+  handleShoot(@ConnectedSocket() client: Socket, @MessageBody() shoot: number) {
+    if (!client.auth) return;
+    this.pongService.handleShoot(client, shoot);
+  }
+
   @SubscribeMessage('start')
   startGameInterval(@MessageBody() roomName: string) {
     const clients = this.server.sockets.in(roomName);
