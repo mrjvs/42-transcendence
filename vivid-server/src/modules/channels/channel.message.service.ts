@@ -107,7 +107,11 @@ export class ChannelMessageService {
     const result: DeleteResult = await builder.execute();
     if (result.affected !== 1) throw new NotFoundException();
 
-    const channel = await this.channelService.findChannel(channelId, false);
+    const channel = await this.channelService.findChannel(
+      channelId,
+      false,
+      null,
+    );
     if (!channel) throw new NotFoundException();
 
     this.eventGateway.deleteChannelMessage(

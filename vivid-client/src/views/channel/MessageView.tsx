@@ -45,9 +45,8 @@ export function MessageView(props: { channelId: string; messageData: any }) {
     }
 
     setReducedMessages(() => {
-      const data = messageData.messages.reduce((acc: any[], msg: any) => {
+      return messageData.messages.reduce((acc: any[], msg: any) => {
         // if not from this channel, ignore
-        console.log(props.channelId, msg.channel);
         if (msg.channel !== props.channelId) return acc;
 
         // if no messages yet or previous message collection is not the same user. add new message collection
@@ -75,8 +74,6 @@ export function MessageView(props: { channelId: string; messageData: any }) {
         });
         return acc;
       }, []);
-      console.log(data, messageData.messages);
-      return data;
     });
   }, [
     messageData.channelInfo,

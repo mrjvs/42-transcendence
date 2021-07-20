@@ -50,7 +50,10 @@ export function ChannelView() {
   if (messageData.messageState.error || messageData.messageState.loading)
     return <ChannelViewLoading loading={!!messageData.messageState.loading} />;
 
-  if (!messageData?.currentChannelUser?.user?.is_joined)
+  if (
+    !messageData?.currentChannelUser?.user?.is_joined ||
+    messageData.channelInfo.dmId
+  )
     return <ChannelViewLoading loading={false} />;
 
   return (

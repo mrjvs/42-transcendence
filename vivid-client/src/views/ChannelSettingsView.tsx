@@ -154,7 +154,7 @@ function ChannelSettingsCard(props: {
   }, [updateChannelFetch.done]);
 
   return (
-    <div className="channel-settings-wrapper card">
+    <div className="channel-settings-wrapper channel-settings-view-card card">
       <div className="channel-settings-expand">
         <h2>{channelName}</h2>
         <div className="text-wrapper">
@@ -191,7 +191,6 @@ function ChannelSettingsCard(props: {
               <>
                 <UnusableTextInput label="password" text="Password is hidden" />
                 <Button
-                  loading={updateChannelFetch.loading}
                   type="secondary"
                   onclick={() => {
                     setPassword('');
@@ -211,7 +210,12 @@ function ChannelSettingsCard(props: {
           onclick={() => {
             const passObj: any = {};
             if (hasPassword && active) passObj.password = password;
-
+            updateChannelFetch.run({
+              title: channelName,
+              isPublic: isPublic,
+              hasPassword: hasPassword,
+              ...passObj,
+            });
             setActive(false);
           }}
         >
@@ -365,6 +369,10 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
 
 function ChannelMembersCard(props: { channelData: any }) {
   const [openModal, setOpenModal] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<any>({
+    userId: null,
+    type: '',
+  });
 
   const makeMod = useFetch({
     url: '',
@@ -376,23 +384,48 @@ function ChannelMembersCard(props: { channelData: any }) {
     method: 'PATCH',
   });
 
+  function open(userId: any, type: string) {
+    setSelectedUser({ userId, type });
+    setOpenModal(true);
+  }
+
+  function close() {
+    setSelectedUser({ userId: null, type: '' });
+    setOpenModal(false);
+  }
+
   React.useEffect(() => {
     if (makeMod.done) makeMod.reset();
     if (updatePermissions.done) {
-      setOpenModal(false);
+      close();
       updatePermissions.reset();
     }
   }, [makeMod.done, updatePermissions.done]);
 
-  function update(v: any) {
+  function update(expiry: number) {
+    const muteUpdate = {
+      isMuted: true,
+      muteExpiry: expiry,
+    };
+
+    const banUpdate = {
+      isBanned: true,
+      banExpiry: expiry,
+    };
+
     updatePermissions.run(
-      { isMuted: true, muteExpiry: null },
-      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
+      selectedUser.type === 'mute' ? muteUpdate : banUpdate,
+      `/api/v1/channels/${props.channelData.channel.id}/users/${selectedUser.userId}`,
     );
   }
 
   return (
     <div className="card">
+      <PunishmentModal
+        open={openModal}
+        onSubmit={(v: number) => update(v)}
+        close={close}
+      />
       <ul>
         {props.channelData?.channel.joined_users
           .filter((v: any) => v.is_joined)
@@ -423,7 +456,7 @@ function ChannelMembersCard(props: { channelData: any }) {
                     type="danger"
                     margin_right
                     more_padding
-                    onclick={() => setOpenModal(true)}
+                    onclick={() => open(v.user, 'mute')}
                   >
                     Mute
                   </Button>
@@ -432,13 +465,12 @@ function ChannelMembersCard(props: { channelData: any }) {
                   <Button
                     more_padding
                     type="danger"
-                    onclick={() => setOpenModal(true)}
+                    onclick={() => open(v.user, 'ban')}
                   >
                     Ban
                   </Button>
                 ) : null}
               </div>
-              <PunishmentModal open={openModal} onSubmit={() => update(v)} />
             </li>
           ))}
       </ul>

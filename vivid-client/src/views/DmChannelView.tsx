@@ -22,6 +22,8 @@ export function DmChannelView() {
   const channelId = dmChannelFetch.done ? dmChannelFetch.data.data.id : null;
   const messageData = useMessages(channelId);
 
+  const friendUser = messageData.getUser(id);
+
   if (
     messageData.messageState.error ||
     messageData.messageState.loading ||
@@ -40,7 +42,7 @@ export function DmChannelView() {
     return <ChannelViewLoading loading={false} />;
 
   return (
-    <MainLayout title="DM channel" actions={null}>
+    <MainLayout title={friendUser?.data?.name || 'DM channel'} actions={null}>
       <MessageView channelId={channelId} messageData={messageData} />
     </MainLayout>
   );
