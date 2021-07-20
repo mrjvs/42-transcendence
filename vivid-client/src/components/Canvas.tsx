@@ -28,6 +28,7 @@ export function Canvas({ width, height }: CanvasProps) {
     document.addEventListener('keydown', keydown);
     document.addEventListener('keyup', keyup);
     document.addEventListener('mousemove', mouseMove);
+    window.addEventListener('beforeunload', pauseGame);
   }
 
   function draw(gameState: IGameState) {
@@ -58,6 +59,10 @@ export function Canvas({ width, height }: CanvasProps) {
     client?.emit('mouseMove', event.clientY / canvas.height);
   }
 
+  function pauseGame() {
+    client?.emit('pauseGame');
+  }
+
   React.useEffect(() => {
     if (client) {
       ready();
@@ -77,6 +82,7 @@ export function Canvas({ width, height }: CanvasProps) {
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('keyup', keyup);
       document.removeEventListener('mousemove', mouseMove);
+      window.removeEventListener('beforeunload', pauseGame);
     };
   }, [client]);
 
