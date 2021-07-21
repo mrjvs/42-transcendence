@@ -3,6 +3,7 @@ export default () => {
   const required = [
     'POSTGRES_PASSWORD',
     'SESSION_SECRET',
+    'USER_ENCRYPTION_SECRET',
     'OAUTH_INTRA_CLIENT_ID',
     'OAUTH_INTRA_CLIENT_SECRET',
     'OAUTH_REDIRECT',
@@ -31,6 +32,7 @@ export default () => {
     },
     secrets: {
       session: process.env.SESSION_SECRET,
+      user: process.env.USER_ENCRYPTION_SECRET,
     },
     oauth: {
       intra: {

@@ -1,25 +1,3 @@
-.contentContainer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.contentHeader {
-  background-color: #121727;
-  padding: 0 1.5rem;
-  color: white;
-  height: 4.5rem;
-  display: flex;
-  align-items: center;
-}
-
-.channelWrapper {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-}
-
 .channelScrollWrapper {
   flex: 1;
   min-height: 0;

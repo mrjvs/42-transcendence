@@ -15,10 +15,11 @@ import * as cookieParser from 'cookie-parser';
 import { GuildsService } from '$/guilds/guilds.service';
 import { IGame } from '~/models/match.interface';
 import { WarEntity } from '~/models/war.entity';
-import { WarsService } from '../wars/wars.service';
+import { WarsService } from '$/wars/wars.service';
 import { authenticator } from 'otplib';
 import * as cryptoRandomString from 'secure-random-string';
 import { TypeORMSession } from '~/models/session.entity';
+import { encryptUserData } from './userEncrypt';
 
 const colors = [
   '#29419F',
@@ -58,6 +59,7 @@ export class UserService {
       'joined_channels.channel',
       'guild',
       'guild.users',
+      'blocks',
     ],
   ): Promise<UserEntity> {
     return await this.userRepository
@@ -119,17 +121,30 @@ export class UserService {
     id: string,
     options: { except: string[] } = { except: [] },
   ): Promise<void> {
-    await getRepository(TypeORMSession)
+    let deleteBuilder: any = getRepository(TypeORMSession)
       .createQueryBuilder()
-      .delete()
-      .where(
+      .delete();
+
+    // if has exceptions, run with NOT statement
+    if (options.except.length > 0) {
+      deleteBuilder = deleteBuilder.where(
         `regexp_replace(trim(both '"' from json::text), '\\\\"', '"', 'g')::json->'passport'->>'user' = :id AND NOT id IN (:...ids)`,
         {
           id,
           ids: options.except,
         },
-      )
-      .execute();
+      );
+    }
+    // else, run without session exceptions
+    else {
+      deleteBuilder = deleteBuilder.where(
+        `regexp_replace(trim(both '"' from json::text), '\\\\"', '"', 'g')::json->'passport'->>'user' = :id`,
+        {
+          id,
+        },
+      );
+    }
+    return await deleteBuilder.execute();
   }
 
   // find by intra id
@@ -187,18 +202,28 @@ export class UserService {
   async enableTwoFactor(id: string, session?: any): Promise<any> {
     const data = {
       secret: authenticator.generateSecret(20), // 160 bytes, recommened totp length
-      backupCodes: Array(10)
+      backupCodes: Array(12)
         .fill(0)
-        .map(() => cryptoRandomString({ length: 6 })),
+        .map(() =>
+          cryptoRandomString({
+            length: 6,
+            alphanumeric: true,
+          }).toUpperCase(),
+        )
+        .map((v) => `${v.slice(0, 3)}-${v.slice(3)}`),
     };
+    const encryptedData = encryptUserData(
+      id,
+      this.configService.get('secrets.user'),
+      data,
+    );
     const result = await this.userRepository.update(id, {
-      twofactor: data,
+      twofactor: encryptedData,
     });
     if (result.affected != 1) throw new NotFoundException();
     const exceptArray = [];
-    if (session) exceptArray.push(session.id);
+    if (session && session.id) exceptArray.push(session.id);
     this.killSessions(id, { except: exceptArray });
-    // TODO encrypt secret and backup codes
     return data;
   }
 
@@ -210,8 +235,13 @@ export class UserService {
   }
 
   async setTwoFactorData(id: string, data: any): Promise<void> {
+    const encryptedData = encryptUserData(
+      id,
+      this.configService.get('secrets.user'),
+      data,
+    );
     const result = await this.userRepository.update(id, {
-      twofactor: data,
+      twofactor: encryptedData,
     });
     if (result.affected != 1) throw new NotFoundException();
   }
@@ -225,7 +255,7 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async updateName(userId: string, newName: string): Promise<UserEntity> {
+  async updateName(userId: string, newName: string): Promise<any> {
     return await this.userRepository
       .save({
         id: userId,
@@ -252,8 +282,6 @@ export class UserService {
         id: gamestats.user_id_req,
       },
     });
-    // console.log('user_acpt: \n', user_acpt);
-    // console.log('user_req: \n', user_req);
     if (
       user_acpt.guild &&
       user_acpt.guild.current_war &&
@@ -264,7 +292,6 @@ export class UserService {
         user_acpt.guild.current_war.id === user_req.guild.current_war.id &&
         user_acpt.guild.id !== user_req.guild.id
       ) {
-        // console.log('found mutual war');
         if (gamestats.winner_id === user_req.id)
           await this.warsService.updateWarWinReq(
             user_acpt.guild.current_war.id,
@@ -284,20 +311,34 @@ export class UserService {
   // return null;
 
   async updateAvatarName(userId: string, filename: string): Promise<any> {
-    return await this.userRepository
+    const res = await this.userRepository
       .createQueryBuilder()
       .update()
       .set({ avatar: filename })
       .where({ id: userId })
-      .execute();
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return <UserEntity>response.raw[0];
+      });
+    return {
+      avatar: res.avatar,
+    };
   }
 
   async deleteAvatar(userId: string): Promise<any> {
-    return await this.userRepository
+    const res = await this.userRepository
       .createQueryBuilder()
       .update()
       .set({ avatar: null })
       .where({ id: userId })
-      .execute();
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return <UserEntity>response.raw[0];
+      });
+    return {
+      avatar: res.avatar,
+    };
   }
 }

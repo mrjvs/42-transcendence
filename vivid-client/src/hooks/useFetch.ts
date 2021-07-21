@@ -16,18 +16,31 @@ export function useFetch(options: {
   const [loading, setLoading] = React.useState(false);
   const [done, setDone] = React.useState(false);
 
-  function run(body?: any) {
+  function run(body?: any, overwriteUrl?: string) {
     setLoading(true);
     setError(null);
-    fetch(`${window._env_.VIVID_BASE_URL}${options.url}`, {
+    let u = options.url;
+    if (overwriteUrl) u = overwriteUrl;
+    let b = undefined;
+    let isJson = true;
+    if (body && body.constructor === FormData) {
+      b = body;
+      isJson = false;
+    } else if (body) b = JSON.stringify(body);
+    fetch(`${window._env_.VIVID_BASE_URL}${u}`, {
       credentials: 'include',
       method: options.method,
-      body: body ? JSON.stringify(body) : undefined,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      body: b,
+      headers: isJson ? { 'Content-Type': 'application/json' } : {},
     })
       .then((res) => {
+        if (
+          !res.headers.has('content-length') ||
+          res.headers.get('content-length') === '0'
+        )
+          return new Promise<any>((resolve) => {
+            resolve({});
+          }).then((data) => ({ data, res }));
         return res.json().then((data) => ({ data, res }));
       })
       .then((data) => {

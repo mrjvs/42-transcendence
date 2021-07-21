@@ -10,6 +10,7 @@ import {
   BadRequestException,
   Param,
   Body,
+  Put,
 } from '@nestjs/common';
 import { ChannelService, ChannelTypes } from './channel.service';
 import { ChannelDto, IChannel } from '@/channel.entity';
@@ -18,12 +19,30 @@ import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { ChannelRoles } from '~/middleware/guards/channel.guards';
+import { PongService } from '$/pong/pong.service';
 
 // TODO only show sensitive info if joined (like other users or passwords)
 @Controller('channels')
 @UseGuards(AuthenticatedGuard)
 export class ChannelController {
-  constructor(private channelService: ChannelService) {}
+  constructor(
+    private channelService: ChannelService,
+    private pongService: PongService,
+  ) {}
+
+  @Put('/game/:game_id')
+  joinGame(
+    @User() user: UserEntity,
+    @Param('game_id') gameId: string,
+  ): { gameId: string } {
+    return this.pongService.joinGame(user.id, gameId);
+  }
+
+  @Post('/game')
+  createGame(@User() user: UserEntity): { gameId: string } {
+    const gameId = this.pongService.createGame();
+    return this.pongService.joinGame(user.id, gameId);
+  }
 
   @Get('/:id')
   getChannel(@Param('id') channelId: string): Promise<IChannel> {

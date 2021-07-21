@@ -11,6 +11,7 @@ import { MessageEntity } from '@/messages.entity';
 import { ConfigService } from '@nestjs/config';
 import { UserModule } from '$/users/user.module';
 import { EventModule } from '../websocket/event.module';
+import { PongModule } from '../pong/pong.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EventModule } from '../websocket/event.module';
     ]),
     UserModule,
     EventModule,
+    PongModule,
   ],
   providers: [ChannelService, ChannelMessageService, ConfigService],
   controllers: [

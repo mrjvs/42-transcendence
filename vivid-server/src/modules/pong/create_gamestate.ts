@@ -1,6 +1,6 @@
 export function createGameState(gameId: string) {
   return {
-    gameId: gameId,
+    gameId,
     settings: {
       controls: 'keys',
       multiPlayer: false,

@@ -5,6 +5,7 @@ export function TextInput(props: {
   value: string;
   set: (text: string) => void;
   label?: string;
+  noPadding?: boolean;
   placeholder: string;
   className?: string;
   lighter?: boolean;
@@ -12,7 +13,11 @@ export function TextInput(props: {
   return (
     <div className="styled-input">
       <label>
-        {props.label ? <span className="text">{props.label}</span> : null}
+        {props.label ? (
+          <span className={`${props.noPadding ? 'no-padding' : 'text'}`}>
+            {props.label}
+          </span>
+        ) : null}
         <input
           type="text"
           value={props.value}

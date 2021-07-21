@@ -73,7 +73,6 @@ export class WarsService {
     war.requesting_guild = requestingGuild;
     war.war_time = war_time;
 
-    // console.log(requestingGuild);
     // Save war in database
     return war.save().catch((error) => {
       if (error.code === '23514') throw new BadRequestException();
@@ -167,19 +166,15 @@ export class WarsService {
   async checkWars(now: string): Promise<UpdateResult> {
     // const war = await this.findWar(warId);
     // if (!war) throw new NotFoundException();
-    // console.log(now);
     // return this.guildsService.startWar(war);
 
-    // const wars =
-    await this.warsRepository
+    return await this.warsRepository
       .createQueryBuilder()
       .select()
       .where(`accepted = ${true}`)
       .andWhere(`start_date <= '${now}'`)
       .andWhere(`end_date >= '${now}'`)
       .execute();
-    // console.log(wars);
-    return;
   }
 
   async endWar(warId: string): Promise<GuildsEntity[]> {

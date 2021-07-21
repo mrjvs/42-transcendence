@@ -1,7 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
-import socketIOClient from 'socket.io-client';
+import React from 'react';
 import { drawGame } from '../views/game/Draw';
 import { IGameState } from '../views/game/Constants';
+import { SocketContext } from '../hooks/useWebsocket';
 
 interface CanvasProps {
   width: number;
@@ -9,97 +9,88 @@ interface CanvasProps {
 }
 
 export function Canvas({ width, height }: CanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [client2, setClient] = useState<any>(null);
-  const [clientState, setClientState] = useState('CONNECTING');
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const { client } = React.useContext(SocketContext);
 
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
 
-  useEffect(() => {
-    const client = socketIOClient(window._env_.VIVID_BASE_URL, {
-      withCredentials: true,
-      path: '/api/v1/events',
+  function ready() {
+    client?.emit('ready');
+  }
+
+  function init() {
+    if (!canvasRef.current) return;
+
+    canvas = canvasRef.current;
+    context = canvas.getContext('2d');
+
+    document.addEventListener('keydown', keydown);
+    document.addEventListener('keyup', keyup);
+    document.addEventListener('mousemove', mouseMove);
+    window.addEventListener('beforeunload', pauseGame);
+  }
+
+  function draw(gameState: IGameState) {
+    if (context === null) return;
+    requestAnimationFrame(() => {
+      drawGame(gameState, canvas, context);
     });
+  }
 
-    setClient(client);
+  function gameOver(winner: string) {
+    alert(`User: "${winner}" won the game`);
+  }
 
-    client.on('connect', () => {
-      console.log('connected');
-      setClientState('CONNECTED');
-      clientState;
-    });
+  function start(gameId: string) {
+    client?.emit('start', gameId);
+  }
 
-    client.on('init', () => {
-      if (!canvasRef.current) return;
+  function mouseMove(event: MouseEvent) {
+    client?.emit('mouseMove', event.clientY / canvas.height);
+  }
 
-      canvas = canvasRef.current;
-      context = canvas.getContext('2d');
+  function pauseGame() {
+    client?.emit('pauseGame');
+  }
+  function keydown(event: KeyboardEvent) {
+    if (event.key === 'w') client.emit('keydown', -0.01);
+    else if (event.key === 's') client.emit('keydown', 0.01);
+    else if (event.key === ' ') client.emit('addons', 1);
+    else if (event.key === 'd') client.emit('shoot', 1);
+  }
 
-      document.addEventListener('keydown', keydown);
-      document.addEventListener('keyup', keyup);
-      document.addEventListener('mousemove', mouseMove);
-    });
+  function keyup(event: KeyboardEvent) {
+    if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
+    else if (event.key === ' ') client.emit('addons', 0);
+    else if (event.key === 'd') client.emit('shoot', 0);
+  }
 
-    client.on('drawGame', (gameState: IGameState) => {
-      if (context === null) return;
-      requestAnimationFrame(() => {
-        drawGame(gameState, canvas, context);
-      });
-    });
-
-    client.on('disconnect', () => {
-      console.log('disconnected');
-      setClientState('DISCONNECTED');
-    });
-
-    client.on('gameOver', (winner: string) => {
-      alert(`User: "${winner}" won the game`);
-    });
-
-    client.on('start', (roomName: string) => client.emit('start', roomName));
-
-    function keydown(event: KeyboardEvent) {
-      if (event.key === 'w') client.emit('keydown', -0.01);
-      else if (event.key === 's') client.emit('keydown', 0.01);
-      else if (event.key === ' ') client.emit('addons', 1);
-      else if (event.key === 'd') client.emit('shoot', 1);
-    }
-
-    function keyup(event: KeyboardEvent) {
-      if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
-      else if (event.key === ' ') client.emit('addons', 0);
-      else if (event.key === 'd') client.emit('shoot', 0);
-    }
-
-    function mouseMove(event: MouseEvent) {
-      client.emit('mouseMove', event.clientY / canvas.height);
+  React.useEffect(() => {
+    if (client) {
+      ready();
+      client.on('init', init);
+      client.on('start', start);
+      client.on('drawGame', draw);
+      client.on('gameOver', gameOver);
     }
 
     return () => {
-      client.destroy();
+      if (client) {
+        client.off('init', init);
+        client.off('start', start);
+        client.off('drawGame', draw);
+        client.off('gameOver', gameOver);
+      }
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('keyup', keyup);
+      document.removeEventListener('mousemove', mouseMove);
+      window.removeEventListener('beforeunload', pauseGame);
     };
-  }, []);
-
-  function newGame() {
-    client2.emit('newGame');
-  }
-
-  function joinGame() {
-    client2.emit('joinGame', 'e372e47c-3649-44c9-9455-c48f84e3d80d'); // TODO remove hardcoded
-  }
-
-  function ready() {
-    client2.emit('ready', 'e372e47c-3649-44c9-9455-c48f84e3d80d'); // TODO remove hardcoded
-  }
+  }, [client]);
 
   return (
     <>
-      <button onClick={newGame}>New Game</button>
-      <button onClick={joinGame}>Join Game</button>
-      <button onClick={ready}>Ready</button>
       <canvas ref={canvasRef} height={height} width={width} />
     </>
   );
