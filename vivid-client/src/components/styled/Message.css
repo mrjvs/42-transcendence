@@ -29,7 +29,6 @@
   margin-bottom: 1.5rem;
   position: relative;
   align-items: flex-start;
-  z-index: 55;
 }
 
 .messageWrapper p {
@@ -202,7 +201,7 @@
 
 .messageWrapper .bg-underlay {
   background-color: #181b2c;
-  z-index: -15;
+  z-index: -6;
 }
 
 .messageMessage .bg-overlay {

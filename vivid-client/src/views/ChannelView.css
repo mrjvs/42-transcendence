@@ -13,6 +13,8 @@
   padding-bottom: 0;
   box-sizing: border-box;
   color: #a6aaba;
+  z-index: 1;
+  position: relative;
 }
 
 .channelBottomWrapper {
