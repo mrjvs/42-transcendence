@@ -59,19 +59,13 @@ function SideBarRouter() {
             {v.channel.title}
           </SidebarLink>
         ))}
-
         <ActionRow label="friends">
-          <Button
-            badge={1}
-            small={true}
-            type="secondary"
-            onclick={() => setState(true)}
-          >
+          <Button small={true} type="secondary" onclick={() => setState(true)}>
             Friends
           </Button>
           <FriendsModal
             open={state}
-            user={userData}
+            userData={userData}
             close={() => setState(false)}
           />
           <Icon type="plus" />

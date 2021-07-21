@@ -11,11 +11,10 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
-import { RelatedUser, UserEntity } from '@/user.entity';
+import { UserEntity } from '@/user.entity';
 import { UserService } from '$/users/user.service';
 import { FriendsService } from './friends.service';
 import { FriendsEntity } from '@/friends.entity';
-import { formatObject } from '~/utils/format';
 
 @Controller('friends')
 @UseGuards(AuthenticatedGuard)

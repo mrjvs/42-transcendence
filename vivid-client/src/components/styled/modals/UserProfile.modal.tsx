@@ -79,7 +79,7 @@ function BlockAction(props: { userData: any; userId: string }) {
   );
 }
 
-function FriendAction(props: { userData: any; friendId: string }) {
+export function FriendAction(props: { userData: any; friendId: string }) {
   const friendUser = useFetch({
     url: `/api/v1/friends/add/${props.friendId}`,
     method: 'POST',
