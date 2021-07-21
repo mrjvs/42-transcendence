@@ -52,35 +52,50 @@
 }
 
 .button-new.button-duel {
-    background: #252a40;
-    color: #8892B2;
-    display: flex;
-    margin-right: 0.5rem;
-    width: 4rem;
-    font-size: 1.4rem;
+  background: #252a40;
+  color: #8892b2;
+  display: flex;
+  margin-right: 0.5rem;
+  width: 4rem;
+  font-size: 1.4rem;
+}
+
+.button-new.button-small-box {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #131524;
+}
+
+.button-new.button-small-box > *:first-child {
+  margin-right: 0;
 }
 
 .button-new.button-duel:hover {
-    background: #2a3453;
-    color: white;
+  background: #2a3453;
+  color: white;
 }
 
 .button-new.button-danger {
-    background: #9C3446;
-    color: white;
+  background: #9c3446;
+  color: white;
 }
 
 .button-new.button-danger:hover {
-    background: #E45655;
-    color: white;
+  background: #e45655;
+  color: white;
 }
 
 .button-new.button-less-padding {
-    padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.button-new.button-more-padding {
+  padding: 0.5rem 1.5rem;
 }
 
 .button-new.button-margin-right {
-    margin-right: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .button-new > *:first-child {
@@ -88,7 +103,7 @@
 }
 
 .button-new.button-duel > *:first-child {
-    margin-right: 0;
+  margin-right: 0;
 }
 
 .button-new:hover {

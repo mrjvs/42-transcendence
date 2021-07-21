@@ -28,6 +28,7 @@ export function Canvas({ width, height }: CanvasProps) {
     document.addEventListener('keydown', keydown);
     document.addEventListener('keyup', keyup);
     document.addEventListener('mousemove', mouseMove);
+    window.addEventListener('beforeunload', pauseGame);
   }
 
   function draw(gameState: IGameState) {
@@ -45,17 +46,24 @@ export function Canvas({ width, height }: CanvasProps) {
     client?.emit('start', gameId);
   }
 
+  function mouseMove(event: MouseEvent) {
+    client?.emit('mouseMove', event.clientY / canvas.height);
+  }
+
+  function pauseGame() {
+    client?.emit('pauseGame');
+  }
   function keydown(event: KeyboardEvent) {
-    if (event.key === 'w') client?.emit('keydown', -0.01);
-    else if (event.key === 's') client?.emit('keydown', 0.01);
+    if (event.key === 'w') client.emit('keydown', -0.01);
+    else if (event.key === 's') client.emit('keydown', 0.01);
+    else if (event.key === ' ') client.emit('addons', 1);
+    else if (event.key === 'd') client.emit('shoot', 1);
   }
 
   function keyup(event: KeyboardEvent) {
-    if (event.key === 'w' || event.key === 's') client?.emit('keydown', 0);
-  }
-
-  function mouseMove(event: MouseEvent) {
-    client?.emit('mouseMove', event.clientY / canvas.height);
+    if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
+    else if (event.key === ' ') client.emit('addons', 0);
+    else if (event.key === 'd') client.emit('shoot', 0);
   }
 
   React.useEffect(() => {
@@ -77,6 +85,7 @@ export function Canvas({ width, height }: CanvasProps) {
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('keyup', keyup);
       document.removeEventListener('mousemove', mouseMove);
+      window.removeEventListener('beforeunload', pauseGame);
     };
   }, [client]);
 

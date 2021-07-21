@@ -98,6 +98,7 @@ export class ChannelUserController {
     channelParam: 'id',
   })
   updateChannelUserPermissions(
+    @User() executingUser: UserEntity,
     @Body() bodyRequests: UserPunishmentsDto,
     @Param('id') channel: string,
     @Param('user') user: string,
@@ -109,6 +110,7 @@ export class ChannelUserController {
       bodyRequests.isBanned,
       bodyRequests.muteExpiry,
       bodyRequests.banExpiry,
+      executingUser.id,
     );
   }
 

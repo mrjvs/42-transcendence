@@ -13,9 +13,23 @@ import { AccountSetupModal } from '../components/styled/modals/AccountSetup.moda
 import { PongView } from '../views/PongView';
 import { SettingsView } from '../views/SettingsView';
 import { GameView } from '../views/GameView';
+import { ChannelSettingsView } from '../views/ChannelSettingsView';
+import { ChannelsContext } from '../hooks/useChannels';
+import { NotFoundView } from '../views/NotFoundView';
+import { DmChannelView } from '../views/DmChannelView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
+  const channelsData = React.useContext(ChannelsContext);
+
+  const joinedChannels = channelsData.channels
+    .filter((v: any) => {
+      return !!v?.data?.joined_users?.find((u: any) => {
+        return userData?.user?.id && u.user === userData.user.id && u.is_joined;
+      });
+    })
+    .filter((v: any) => !v?.data?.dmId)
+    .map((v: any) => v?.data);
 
   return (
     <div className="wrapper">
@@ -51,9 +65,9 @@ function SideBarRouter() {
             New
           </Button>
         </ActionRow>
-        {userData.user.joined_channels.map((v: any) => (
-          <SidebarLink key={v.channel.id} link={`/channel/${v.channel.id}`}>
-            {v.channel.title}
+        {joinedChannels.map((v: any) => (
+          <SidebarLink key={v.id} link={`/channel/${v.id}`}>
+            {v.title}
           </SidebarLink>
         ))}
       </nav>
@@ -65,6 +79,9 @@ function SideBarRouter() {
           <Route exact path="/channel/:id">
             <ChannelView />
           </Route>
+          <Route exact path="/dm/:id">
+            <DmChannelView />
+          </Route>
           <Route exact path="/pong">
             <p>pong</p>
             <GameView />
@@ -74,7 +91,7 @@ function SideBarRouter() {
             <PongView />
           </Route>
           <Route path="*">
-            <p>Not found</p>
+            <NotFoundView>Not Found</NotFoundView>
           </Route>
         </Switch>
       </div>
@@ -101,6 +118,9 @@ function MainRouter() {
         <Switch>
           <Route exact path="/settings">
             <SettingsView />
+          </Route>
+          <Route exact path="/channel/:id/settings">
+            <ChannelSettingsView />
           </Route>
           <Route path="*">
             <SideBarRouter />

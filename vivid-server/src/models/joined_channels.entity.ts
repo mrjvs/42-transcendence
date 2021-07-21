@@ -24,14 +24,14 @@ export class JoinedChannelEntity {
   is_muted: boolean;
 
   @Column({ default: null, nullable: true })
-  muted_expiry: Date;
+  muted_expiry?: Date;
 
   // banning
   @Column({ default: false })
   is_banned: boolean;
 
   @Column({ default: null, nullable: true })
-  ban_expiry: Date;
+  ban_expiry?: Date;
 
   // state
   @Column({ default: true })

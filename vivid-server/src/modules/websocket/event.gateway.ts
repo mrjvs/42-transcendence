@@ -9,7 +9,10 @@ import {
 import { Server, Socket } from 'socket.io';
 import { IMessage } from '@/messages.entity';
 import { UserService } from '$/users/user.service';
-import { IJoinedChannel } from '~/models/joined_channels.entity';
+import {
+  IJoinedChannel,
+  JoinedChannelEntity,
+} from '~/models/joined_channels.entity';
 import { UserEntity } from '~/models/user.entity';
 import { PongService } from '../pong/pong.service';
 import {
@@ -19,6 +22,7 @@ import {
   registerCallback,
   UserStatus,
 } from './statuses';
+import { ChannelEntity } from '~/models/channel.entity';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -70,27 +74,28 @@ export class EventGateway implements OnGatewayConnection {
     client.emit('status_list', getAllStatuses());
   }
 
-  /* MESSAGES */
-  sendChannelMessage(
-    message: IMessage,
-    joins: IJoinedChannel[],
-    user: UserEntity,
-  ) {
-    const data = {
-      message,
-      user,
-    };
+  /* CHANNELS */
+  _sendToChannelMembers(event: string, data: any, members: IJoinedChannel[]) {
     const sockets = this.server.sockets.connected;
-    const mappedJoins = joins.reduce((a, v: IJoinedChannel) => {
-      a[v.user as string] = true;
+    const mappedJoins = members.reduce((a, v: IJoinedChannel) => {
+      if (v.user.constructor === String) a[v.user as string] = true;
+      else a[(v.user as any).id] = true;
       return a;
     }, {});
     for (const socketId in sockets) {
       const client = sockets[socketId];
       if (!client.auth) continue; // skip user if not authed
       if (!mappedJoins[client.auth]) continue; // skip if user not in channel
-      client.emit('channel_message', data);
+      client.emit(event, data);
     }
+  }
+
+  sendChannelMessage(
+    message: IMessage,
+    joins: IJoinedChannel[],
+    user: UserEntity,
+  ) {
+    this._sendToChannelMembers('channel_message', { message, user }, joins);
   }
 
   deleteChannelMessage(
@@ -98,17 +103,74 @@ export class EventGateway implements OnGatewayConnection {
     joinedUsers: IJoinedChannel[],
     messageId: string,
   ) {
-    const sockets = this.server.sockets.connected;
-    const mappedJoins = joinedUsers.reduce((a, v: IJoinedChannel) => {
-      a[v.user as string] = true;
-      return a;
-    }, {});
-    for (const socketId in sockets) {
-      const client = sockets[socketId];
-      if (!client.auth) continue; // skip user if not authed
-      if (!mappedJoins[client.auth]) continue; // skip if user not in channel
-      client.emit('delete_channel_message', channelId, messageId);
-    }
+    this._sendToChannelMembers(
+      'delete_channel_message',
+      { channelId, messageId },
+      joinedUsers,
+    );
+  }
+
+  updateChannelUser(
+    channelId: string,
+    joinedUsers: IJoinedChannel[],
+    newUser: JoinedChannelEntity,
+  ) {
+    this._sendToChannelMembers(
+      'channel_user_update',
+      {
+        channelId,
+        id:
+          newUser.user.constructor === String
+            ? newUser.user
+            : (newUser.user as any).id,
+        muted: newUser.is_muted,
+        mod: newUser.is_mod,
+        banned: newUser.is_banned,
+        joined: newUser.is_joined,
+      },
+      joinedUsers,
+    );
+  }
+
+  leaveChannelUser(
+    channelId: string,
+    joinedUsers: IJoinedChannel[],
+    userId: string,
+  ) {
+    this._sendToChannelMembers(
+      'channel_user_update',
+      {
+        channelId,
+        id: userId,
+        joined: false,
+      },
+      joinedUsers,
+    );
+  }
+
+  updateChannel(
+    channelId: string,
+    joinedUsers: IJoinedChannel[],
+    channel: ChannelEntity,
+  ) {
+    this._sendToChannelMembers(
+      'channel_update',
+      {
+        channelId,
+        channel,
+      },
+      joinedUsers,
+    );
+  }
+
+  removeChannel(channelId: string, joinedUsers: IJoinedChannel[]) {
+    this._sendToChannelMembers(
+      'delete_channel',
+      {
+        channelId,
+      },
+      joinedUsers,
+    );
   }
 
   /* GAME EVENTS */
@@ -118,6 +180,12 @@ export class EventGateway implements OnGatewayConnection {
     this.pongService.readyEvent(client);
   }
 
+  @SubscribeMessage('pauseGame')
+  pauseEvent(@ConnectedSocket() client: Socket) {
+    if (!client.auth) return;
+    this.pongService.pauseGame(client);
+  }
+
   @SubscribeMessage('keydown')
   handleKeydown(
     @ConnectedSocket() client: Socket,
@@ -125,6 +193,21 @@ export class EventGateway implements OnGatewayConnection {
   ) {
     if (!client.auth) return;
     this.pongService.handleKeydown(client, move);
+  }
+
+  @SubscribeMessage('addons')
+  handleAddOns(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() spacebar: number,
+  ) {
+    if (!client.auth) return;
+    this.pongService.handleAddOns(client, spacebar);
+  }
+
+  @SubscribeMessage('shoot')
+  handleShoot(@ConnectedSocket() client: Socket, @MessageBody() shoot: number) {
+    if (!client.auth) return;
+    this.pongService.handleShoot(client, shoot);
   }
 
   @SubscribeMessage('start')

@@ -14,11 +14,16 @@ interface IStates {
   [gameId: string]: IGameState; // [gameId] = GameState
 }
 
+interface IInterval {
+  [gameId: string]: NodeJS.Timeout; // [gameId] = intervalId
+}
+
 enum playerNb {
   ONE,
   TWO,
 }
 
+const intervals: IInterval = {};
 const states: IStates = {};
 const clientRooms: IRoom = {};
 
@@ -82,30 +87,48 @@ export class PongService {
   }
 
   startGameInterval(clients: Socket, gameId: string) {
-    const intervalId = setInterval(async () => {
+    if (intervals[gameId]) return;
+
+    intervals[gameId] = setInterval(async () => {
       const game: IGameState = states[gameId];
-      const winner: IPlayer | null = gameLoop(game);
+      if (
+        game.players[playerNb.ONE].ready &&
+        game.players[playerNb.TWO].ready
+      ) {
+        const winner: IPlayer | null = gameLoop(game);
 
-      if (!winner) {
-        clients.emit('drawGame', game);
-      } else {
-        clients.emit('gameOver', winner.userId);
-        clearInterval(intervalId);
+        if (!winner) {
+          clients.emit('drawGame', game);
+        } else {
+          clients.emit('gameOver', winner.userId);
 
-        this.matchService.createGame({
-          user_id_req: game.players[playerNb.ONE].userId,
-          points_req: game.players[playerNb.ONE].score,
-          user_id_acpt: game.players[playerNb.TWO].userId,
-          points_acpt: game.players[playerNb.TWO].score,
-          winner_id: winner.userId,
-          game_type: '',
-        });
+          clearInterval(intervals[gameId]);
+          delete intervals[gameId];
+          delete clientRooms[game.players[playerNb.ONE].userId];
+          delete clientRooms[game.players[playerNb.TWO].userId];
+          delete states[gameId];
 
-        delete clientRooms[game.players[playerNb.ONE].userId];
-        delete clientRooms[game.players[playerNb.TWO].userId];
-        delete states[gameId];
+          this.matchService.createGame({
+            user_id_req: game.players[playerNb.ONE].userId,
+            points_req: game.players[playerNb.ONE].score,
+            user_id_acpt: game.players[playerNb.TWO].userId,
+            points_acpt: game.players[playerNb.TWO].score,
+            winner_id: winner.userId,
+            game_type: '',
+          });
+        }
       }
     }, 1000 / 50);
+  }
+
+  pauseGame(client: Socket) {
+    const gameId: string = clientRooms[client.auth];
+    if (!gameId) return;
+
+    const game: IGameState = states[gameId];
+    if (!game) return;
+    const player = game.players.find((v) => v.userId === client.auth);
+    player.ready = false;
   }
 
   handleKeydown(client: Socket, move: number) {
@@ -119,6 +142,26 @@ export class PongService {
 
     if (states[gameId].settings.controls === 'keys')
       states[gameId].players[playerNumber].move = move;
+  }
+
+  handleAddOns(client: Socket, spacebar: number) {
+    // Find room
+    const roomName = clientRooms[client.id];
+    if (!roomName) return;
+
+    // Set player move
+    if (states[roomName].settings.controls === 'keys')
+      states[roomName].players[client.number - 1].spacebar = spacebar;
+  }
+
+  handleShoot(client: Socket, shoot: number) {
+    // Find room
+    const roomName = clientRooms[client.id];
+    if (!roomName) return;
+
+    // Set player move
+    if (states[roomName].settings.controls === 'keys')
+      states[roomName].players[client.number - 1].shoot = shoot;
   }
 
   handleMouseMove(client: Socket, move: number) {

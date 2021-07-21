@@ -5,6 +5,7 @@ export function useFetch(options: {
   url: string;
   method?: string;
 }) {
+  let shouldCancel = false;
   options = {
     runOnLoad: false,
     method: 'GET',
@@ -17,6 +18,7 @@ export function useFetch(options: {
   const [done, setDone] = React.useState(false);
 
   function run(body?: any, overwriteUrl?: string) {
+    shouldCancel = false;
     setLoading(true);
     setError(null);
     let u = options.url;
@@ -44,12 +46,14 @@ export function useFetch(options: {
         return res.json().then((data) => ({ data, res }));
       })
       .then((data) => {
+        if (shouldCancel) return;
         if (data.res.status < 200 || data.res.status > 299) throw data;
         setData(data);
         setLoading(false);
         setDone(true);
       })
       .catch((err) => {
+        if (shouldCancel) return;
         setLoading(false);
         setError(err);
       });
@@ -57,6 +61,9 @@ export function useFetch(options: {
 
   React.useEffect(() => {
     if (options.runOnLoad) run();
+    return () => {
+      shouldCancel = true;
+    };
   }, []);
 
   function reset() {

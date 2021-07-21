@@ -67,7 +67,6 @@ export function ModalBase(props: {
             className="card"
             onClick={function (e) {
               if (e.target !== e.currentTarget) return;
-              console.log(props.onBackPress);
               props.onBackPress && props.onBackPress();
             }}
           >
