@@ -410,4 +410,33 @@ export class ChannelService {
     if (!user) throw new NotFoundException();
     return user;
   }
+
+  async makeOwner(
+    channelId: string,
+    newUserId: string,
+  ): Promise<ChannelEntity> {
+    const channel = await this.findChannel(channelId, false);
+    if (!channel) throw new NotFoundException();
+
+    if (!channel.joined_users.find((v) => v.user === newUserId))
+      throw new NotFoundException(null, 'Cannot find user');
+
+    const updateResult = await this.ChannelRepository.createQueryBuilder()
+      .update()
+      .set({
+        owner: newUserId,
+      })
+      .where('id = :id', { id: channelId })
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return <ChannelEntity>response.raw[0];
+      });
+    this.eventGateway.updateChannel(
+      updateResult.id,
+      channel.joined_users,
+      updateResult,
+    );
+    return updateResult;
+  }
 }

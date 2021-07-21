@@ -94,3 +94,8 @@ export class ChannelDto {
   @IsNotEmpty()
   title: string;
 }
+
+export class ChannelOwnerDto {
+  @IsNotEmpty()
+  owner: string;
+}

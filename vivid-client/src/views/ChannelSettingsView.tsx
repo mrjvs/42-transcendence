@@ -396,6 +396,11 @@ function ChannelMembersCard(props: { channelData: any }) {
     method: 'PATCH',
   });
 
+  const makeOwner = useFetch({
+    url: '',
+    method: 'PATCH',
+  });
+
   const updatePermissions = useFetch({
     url: '',
     method: 'PATCH',
@@ -413,11 +418,12 @@ function ChannelMembersCard(props: { channelData: any }) {
 
   React.useEffect(() => {
     if (makeMod.done) makeMod.reset();
+    if (makeOwner.done) makeOwner.reset();
     if (updatePermissions.done) {
       close();
       updatePermissions.reset();
     }
-  }, [makeMod.done, updatePermissions.done]);
+  }, [makeMod.done, makeOwner.done, updatePermissions.done]);
 
   function update(expiry: any) {
     const muteUpdate = {
@@ -453,6 +459,22 @@ function ChannelMembersCard(props: { channelData: any }) {
                 channelOwner={props.channelData?.channel.owner}
               />
               <div className="hideUnselected">
+                {v.user !== props.channelData.channel.owner &&
+                props.channelData.isOwner ? (
+                  <Button
+                    type="secondary"
+                    margin_right
+                    more_padding
+                    onclick={() =>
+                      makeOwner.run(
+                        { owner: v.user },
+                        `/api/v1/channels/${props.channelData.channel.id}/owner`,
+                      )
+                    }
+                  >
+                    Transfer owner
+                  </Button>
+                ) : null}
                 {!v.is_mod && props.channelData.isOwner ? (
                   <Button
                     type="secondary"
@@ -491,7 +513,7 @@ function ChannelMembersCard(props: { channelData: any }) {
             </li>
           ))}
       </ul>
-      {updatePermissions.error || makeMod.error ? (
+      {updatePermissions.error || makeMod.error || makeOwner.error ? (
         <p>Something went wrong, try again later</p>
       ) : null}
     </div>

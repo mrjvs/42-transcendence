@@ -16,6 +16,7 @@ import { ChannelService } from './channel.service';
 import {
   ChannelDto,
   ChannelEntity,
+  ChannelOwnerDto,
   ChannelVisibility,
   IChannel,
 } from '@/channel.entity';
@@ -99,5 +100,18 @@ export class ChannelController {
   })
   removeChannel(@Param('id') id: string): Promise<{ id: string }> {
     return this.channelService.remove(id);
+  }
+
+  @Patch('/:id/owner')
+  @ChannelRoleAuth({
+    channelParam: 'id',
+    role: ChannelRoles.OWNER,
+    canAdmin: true,
+  })
+  changeOwner(
+    @Param('id') id: string,
+    @Body() body: ChannelOwnerDto,
+  ): Promise<ChannelEntity> {
+    return this.channelService.makeOwner(id, body.owner);
   }
 }
