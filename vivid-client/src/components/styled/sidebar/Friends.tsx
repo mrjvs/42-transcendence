@@ -4,12 +4,10 @@ import { SidebarLink } from '../../../components/styled/sidebar/SidebarLink';
 import { Avatar } from '../../../components/styled/Avatar';
 import { UserContext } from '../../../hooks/useUser';
 
-export function Friends(props: { userId: string }) {
-  const user = React.useContext(UserContext);
-
+export function Friends(props: { userData: any }) {
   return (
     <>
-      {user.user.friends
+      {props.userData.user.friends
         ?.filter((v: any) => v.accepted)
         .map((v: any) => {
           return (

@@ -70,7 +70,7 @@ function SideBarRouter() {
           />
           <Icon type="plus" />
         </ActionRow>
-        <Friends userId={userData.id} />
+        <Friends userData={userData} />
       </nav>
       <div className="content">
         <Switch>
