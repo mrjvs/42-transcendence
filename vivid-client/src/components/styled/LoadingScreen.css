@@ -36,13 +36,11 @@
 .loading-screen .login-buttons {
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 100%;
   text-align: center;
 }
 
 .loading-screen .login-buttons p {
-  max-width: 16rem;
   line-height: 1.25;
 }
 

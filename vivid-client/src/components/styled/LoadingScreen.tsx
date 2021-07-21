@@ -30,7 +30,11 @@ function LoginButtons() {
   if (enabledMethods.length == 0) {
     return (
       <div className="login-buttons">
-        <p>Whoops, no enabled login methods to choose from</p>
+        <p>
+          Whoops, no enabled login methods
+          <br />
+          to choose from
+        </p>
       </div>
     );
   }
