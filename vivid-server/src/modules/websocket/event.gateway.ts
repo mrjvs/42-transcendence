@@ -60,6 +60,7 @@ export class EventGateway implements OnGatewayConnection {
 
   async handleDisconnect(socket: Socket) {
     disconnectClient(socket.id);
+    this.pongService.onDisconnect(socket);
   }
 
   /* STATUSES */
@@ -175,54 +176,28 @@ export class EventGateway implements OnGatewayConnection {
 
   /* GAME EVENTS */
   @SubscribeMessage('ready')
-  readyEvent(@ConnectedSocket() client: Socket) {
-    if (!client.auth) return;
-    this.pongService.readyEvent(client);
-  }
-
-  @SubscribeMessage('pauseGame')
-  pauseEvent(@ConnectedSocket() client: Socket) {
-    if (!client.auth) return;
-    this.pongService.pauseGame(client);
+  readyEvent(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+    if (!body?.gameId) return;
+    this.pongService.readyEvent(client, body.gameId);
   }
 
   @SubscribeMessage('keydown')
-  handleKeydown(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() move: number,
-  ) {
-    if (!client.auth) return;
-    this.pongService.handleKeydown(client, move);
+  handleKeydown(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+    this.pongService.handleKeydown(client, body.key);
   }
 
-  @SubscribeMessage('addons')
-  handleAddOns(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() spacebar: number,
-  ) {
-    if (!client.auth) return;
-    this.pongService.handleAddOns(client, spacebar);
+  @SubscribeMessage('keyup')
+  handleKeyup(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+    this.pongService.handleKeyup(client, body.key);
   }
 
-  @SubscribeMessage('shoot')
-  handleShoot(@ConnectedSocket() client: Socket, @MessageBody() shoot: number) {
-    if (!client.auth) return;
-    this.pongService.handleShoot(client, shoot);
+  @SubscribeMessage('keypress')
+  handlePress(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+    this.pongService.handlePress(client, body.key);
   }
 
-  @SubscribeMessage('start')
-  startGameInterval(@MessageBody() roomName: string) {
-    const clients = this.server.sockets.in(roomName);
-    if (!clients) return;
-    this.pongService.startGameInterval(clients, roomName);
-  }
-
-  @SubscribeMessage('mouseMove')
-  handleMouseMove(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() move: number,
-  ) {
-    if (!client.auth) return;
-    this.pongService.handleMouseMove(client, move);
+  @SubscribeMessage('gameleave')
+  leaveGameEvent(@ConnectedSocket() client: Socket) {
+    this.pongService.onDisconnect(client);
   }
 }

@@ -13,13 +13,14 @@ function resetBall(state: IGameState) {
 // Calculate if the ball hit a pad
 function collision(player: IPlayer, gameState: IGameState) {
   const playerTop = player.y;
-  const playerBottom = player.y + gameState.playerHeight;
+  const playerBottom = player.y + player.height;
   const playerLeft = player.x;
-  const playerRight = player.x + gameState.playerWidth;
+  const playerRight = player.x + player.width;
   const ballTop = gameState.ball.y - gameState.ball.radius;
   const ballBottom = gameState.ball.y + gameState.ball.radius;
   const ballLeft = gameState.ball.x - gameState.ball.radius;
   const ballRight = gameState.ball.x + gameState.ball.radius;
+  // TODO out of bounds check
 
   return (
     ballBottom > playerTop &&
@@ -51,8 +52,8 @@ function updateBallLocation(state: IGameState): IPlayer | null {
   // Check for pad collision and change ball direction
   if (collision(defendingPlayer, state)) {
     const collidePoint =
-      (state.ball.y - (defendingPlayer.y + state.playerHeight / 2)) /
-      (state.playerHeight / 2);
+      (state.ball.y - (defendingPlayer.y + defendingPlayer.height / 2)) /
+      (defendingPlayer.height / 2);
     const angleRad = collidePoint * (Math.PI / 4);
     const direction = state.ball.x < 0.5 ? 1 : -1;
     state.ball.velocityX = Math.cos(angleRad) * state.ball.speed * direction;
@@ -76,33 +77,21 @@ function updateBallLocation(state: IGameState): IPlayer | null {
   return null;
 }
 
-function moveRightPlayer(state: IGameState) {
-  if (state.twoPlayers) {
-    return state.players[1].move;
-  }
-  // If right player is a bot
-  return (
-    (state.ball.y - (state.players[1].y + state.playerHeight / 2)) *
-    state.computerLevel
-  );
-}
-
 // Update player locations
-function updatePlayerLocation(state: IGameState) {
+function updatePlayerLocation(state: IGameState, playerIndex: number) {
   if (
-    state.players[0].y + state.players[0].move <= 1 &&
-    state.players[0].y + state.playerHeight + state.players[0].move >= 0
+    state.players[playerIndex].y + state.players[playerIndex].move <= 1 &&
+    state.players[playerIndex].y +
+      state.players[playerIndex].height +
+      state.players[playerIndex].move >=
+      0
   )
-    state.players[0].y += state.players[0].move;
-  if (
-    state.players[1].y + state.players[1].move <= 1 &&
-    state.players[1].y + state.playerHeight + state.players[1].move >= 0
-  )
-    state.players[1].y += moveRightPlayer(state);
+    state.players[playerIndex].y += state.players[playerIndex].move;
 }
 
 // Game loop
 export function gameLoop(gameState: IGameState) {
-  updatePlayerLocation(gameState);
+  updatePlayerLocation(gameState, 0);
+  updatePlayerLocation(gameState, 1);
   return updateBallLocation(gameState);
 }

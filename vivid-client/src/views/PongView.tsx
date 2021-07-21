@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import './ChannelView.css';
 import { Canvas } from '../components/Canvas';
+import { useParams } from 'react-router-dom';
 
 export function PongView() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const { id }: any = useParams();
 
   const handleResize = () => {
     setWindowWidth(window.innerWidth);
@@ -18,7 +20,11 @@ export function PongView() {
 
   return (
     <>
-      <Canvas width={windowWidth * 0.75} height={windowHeight * 0.75} />
+      <Canvas
+        width={windowWidth * 0.75}
+        height={windowHeight * 0.75}
+        gameId={id}
+      />
     </>
   );
 }

@@ -1,5 +1,9 @@
-import { INet } from './Constants';
 import { IGameState } from './Constants';
+
+function getPlayerColor(index: number) {
+  if (index == 0) return 'blue';
+  return 'red';
+}
 
 export function drawGame(
   gameState: IGameState,
@@ -18,24 +22,24 @@ export function drawGame(
   if (gameState.players[0].special === true)
     playerZeroSpecial(gameState, canvas, context);
   else {
-    context.fillStyle = gameState.playerColor;
+    context.fillStyle = getPlayerColor(0);
     context.fillRect(
       gameState.players[0].x * canvas.width,
       gameState.players[0].y * canvas.height,
-      gameState.playerWidth * canvas.width,
-      gameState.playerHeight * canvas.height,
+      gameState.players[0].width * canvas.width,
+      gameState.players[0].height * canvas.height,
     );
   }
   // Draw right player
   if (gameState.players[1].special === true)
     playerOneSpecial(gameState, canvas, context);
   else {
-    context.fillStyle = gameState.playerColor;
+    context.fillStyle = getPlayerColor(1);
     context.fillRect(
       gameState.players[1].x * canvas.width,
       gameState.players[1].y * canvas.height,
-      gameState.playerWidth * canvas.width,
-      gameState.playerHeight * canvas.height,
+      gameState.players[1].width * canvas.width,
+      gameState.players[1].height * canvas.height,
     );
   }
   // Draw ball
@@ -116,7 +120,7 @@ function ball(
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
 ) {
-  context.fillStyle = gameState.ball.color;
+  context.fillStyle = 'white';
   context.beginPath();
   context.arc(
     gameState.ball.x * canvas.width,
@@ -131,7 +135,7 @@ function ball(
 }
 
 function net(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-  const net: INet = {
+  const net: any = {
     x: canvas.width / 2 - 4 / 2,
     y: 0,
     width: 4,
@@ -151,23 +155,25 @@ function playerZeroSpecial(
 ) {
   context.fillStyle = 'RED';
   context.fillRect(
-    (gameState.players[0].x + (gameState.playerWidth / 3) * 2) * canvas.width,
+    (gameState.players[0].x + (gameState.players[0].width / 3) * 2) *
+      canvas.width,
     gameState.players[0].y * canvas.height,
-    (gameState.playerWidth / 3) * canvas.width,
-    gameState.playerHeight * canvas.height,
+    (gameState.players[0].width / 3) * canvas.width,
+    gameState.players[0].height * canvas.height,
   );
   context.fillStyle = 'YELLOW';
   context.fillRect(
     gameState.players[0].x * canvas.width,
     gameState.players[0].y * canvas.height,
-    gameState.playerWidth * canvas.width,
-    (gameState.playerHeight / 5) * canvas.height,
+    gameState.players[0].width * canvas.width,
+    (gameState.players[0].height / 5) * canvas.height,
   );
   context.fillRect(
     gameState.players[0].x * canvas.width,
-    (gameState.players[0].y + (gameState.playerHeight / 5) * 4) * canvas.height,
-    gameState.playerWidth * canvas.width,
-    (gameState.playerHeight / 5) * canvas.height,
+    (gameState.players[0].y + (gameState.players[0].height / 5) * 4) *
+      canvas.height,
+    gameState.players[0].width * canvas.width,
+    (gameState.players[0].height / 5) * canvas.height,
   );
 }
 
@@ -180,20 +186,21 @@ function playerOneSpecial(
   context.fillRect(
     gameState.players[1].x * canvas.width,
     gameState.players[1].y * canvas.height,
-    (gameState.playerWidth / 3) * canvas.width,
-    gameState.playerHeight * canvas.height,
+    (gameState.players[1].width / 3) * canvas.width,
+    gameState.players[1].height * canvas.height,
   );
   context.fillStyle = 'YELLOW';
   context.fillRect(
     gameState.players[1].x * canvas.width,
     gameState.players[1].y * canvas.height,
-    gameState.playerWidth * canvas.width,
-    (gameState.playerHeight / 5) * canvas.height,
+    gameState.players[1].width * canvas.width,
+    (gameState.players[1].width / 5) * canvas.height,
   );
   context.fillRect(
     gameState.players[1].x * canvas.width,
-    (gameState.players[1].y + (gameState.playerHeight / 5) * 4) * canvas.height,
-    gameState.playerWidth * canvas.width,
-    (gameState.playerHeight / 5) * canvas.height,
+    (gameState.players[1].y + (gameState.players[1].height / 5) * 4) *
+      canvas.height,
+    gameState.players[1].width * canvas.width,
+    (gameState.players[1].width / 5) * canvas.height,
   );
 }

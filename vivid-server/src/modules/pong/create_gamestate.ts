@@ -1,37 +1,37 @@
-export function createGameState(gameId: string) {
+import { IGameState } from '~/models/game.interface';
+
+export function createGameState(gameId: string): IGameState {
+  const initPlayer = {
+    client: null,
+    userId: null,
+    ready: false,
+    score: 0,
+    width: 0.02,
+    height: 0.3,
+
+    move: 0,
+    spacebar: 0,
+    shoot: 0,
+
+    addOnPoints: 0,
+    special: false,
+  };
+
   return {
     gameId,
     settings: {
-      controls: 'keys',
-      multiPlayer: false,
-      addon: 'sticky',
+      addons: [],
     },
     players: [
       {
-        userId: '',
-        playerNumber: 1,
+        ...initPlayer,
         x: 0,
         y: 0.5,
-        score: 0,
-        move: 0,
-        spacebar: 0,
-        shoot: 0,
-        addOnPoints: 0,
-        special: false,
-        ready: false,
       },
       {
-        userId: '',
-        playerNumber: 2,
+        ...initPlayer,
         x: 0.98,
         y: 0.5,
-        score: 0,
-        move: 0,
-        spacebar: 0,
-        shoot: 0,
-        addOnPoints: 0,
-        special: false,
-        ready: false,
       },
     ],
     ball: {
@@ -41,14 +41,9 @@ export function createGameState(gameId: string) {
       speed: 0.01,
       velocityX: 0.005,
       velocityY: 0.005,
-      color: 'ORANGE',
     },
-    twoPlayers: true, // TODO change to settings
-    computerLevel: 0.01,
+
+    finished: false,
     increaseSpeedAfterContact: 0.0001,
-    playerWidth: 0.02,
-    playerHeight: 0.3,
-    playerColor: 'PURPLE',
-    addOnReady: 0,
   };
 }

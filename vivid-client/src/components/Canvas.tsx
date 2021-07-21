@@ -6,31 +6,41 @@ import { SocketContext } from '../hooks/useWebsocket';
 interface CanvasProps {
   width: number;
   height: number;
+  gameId: string;
 }
 
-export function Canvas({ width, height }: CanvasProps) {
+const keyMap = {
+  w: {
+    press: false,
+    key: 'up',
+  },
+  s: {
+    press: false,
+    key: 'down',
+  },
+  ' ': {
+    press: true,
+    key: 'action',
+  },
+};
+
+export function Canvas({ width, height, gameId }: CanvasProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { client } = React.useContext(SocketContext);
 
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
 
-  function ready() {
-    client?.emit('ready');
-  }
-
-  function init() {
+  // grab context on render
+  React.useEffect(() => {
     if (!canvasRef.current) return;
 
     canvas = canvasRef.current;
     context = canvas.getContext('2d');
+  }, [canvasRef]);
 
-    document.addEventListener('keydown', keydown);
-    document.addEventListener('keyup', keyup);
-    document.addEventListener('mousemove', mouseMove);
-    window.addEventListener('beforeunload', pauseGame);
-  }
-
+  // draw gamestate when you get new data
+  // TODO looping animation frame
   function draw(gameState: IGameState) {
     if (context === null) return;
     requestAnimationFrame(() => {
@@ -38,54 +48,54 @@ export function Canvas({ width, height }: CanvasProps) {
     });
   }
 
+  // called when winner is announced
   function gameOver(winner: string) {
     alert(`User: "${winner}" won the game`);
   }
 
-  function start(gameId: string) {
-    client?.emit('start', gameId);
-  }
-
-  function mouseMove(event: MouseEvent) {
-    client?.emit('mouseMove', event.clientY / canvas.height);
-  }
-
-  function pauseGame() {
-    client?.emit('pauseGame');
-  }
   function keydown(event: KeyboardEvent) {
-    if (event.key === 'w') client.emit('keydown', -0.01);
-    else if (event.key === 's') client.emit('keydown', 0.01);
-    else if (event.key === ' ') client.emit('addons', 1);
-    else if (event.key === 'd') client.emit('shoot', 1);
+    if (event.repeat) return;
+    const keyData = (keyMap as any)[event.key];
+    if (!keyData) return;
+    const eventName = keyData.press ? 'keypress' : 'keydown';
+    client?.emit(eventName, {
+      gameId,
+      key: keyData.key,
+    });
   }
 
   function keyup(event: KeyboardEvent) {
-    if (event.key === 'w' || event.key === 's') client.emit('keydown', 0);
-    else if (event.key === ' ') client.emit('addons', 0);
-    else if (event.key === 'd') client.emit('shoot', 0);
+    if (event.repeat) return;
+    const keyData = (keyMap as any)[event.key];
+    if (!keyData) return;
+    if (keyData.press) return;
+    client?.emit('keyup', {
+      gameId,
+      key: keyData.key,
+    });
   }
 
   React.useEffect(() => {
     if (client) {
-      ready();
-      client.on('init', init);
-      client.on('start', start);
+      // on load
+      client.emit('ready', {
+        gameId,
+      });
       client.on('drawGame', draw);
       client.on('gameOver', gameOver);
+      document.addEventListener('keydown', keydown);
+      document.addEventListener('keyup', keyup);
     }
 
     return () => {
+      // on unload
       if (client) {
-        client.off('init', init);
-        client.off('start', start);
+        client.emit('gameleave');
         client.off('drawGame', draw);
         client.off('gameOver', gameOver);
       }
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('keyup', keyup);
-      document.removeEventListener('mousemove', mouseMove);
-      window.removeEventListener('beforeunload', pauseGame);
     };
   }, [client]);
 

@@ -1,51 +1,53 @@
 export interface IPlayer {
-  userId: string;
-  playerNumber: number;
+  // connection data
+  client: any | null;
+  userId: string | null;
+  ready: boolean;
+
+  // game state
+  score: number;
+
+  // render variables
+  width: number;
+  height: number;
   x: number;
   y: number;
-  score: number;
+
+  // control states
   move: number;
   spacebar: number;
   shoot: number;
+
+  // ??
   addOnPoints: number;
   special: boolean;
-  ready: boolean;
-}
-
-export interface IBall {
-  x: number;
-  y: number;
-  radius: number;
-  speed: number;
-  velocityX: number;
-  velocityY: number;
-  color: string;
-}
-
-export interface INet {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-}
-
-export interface ISettings {
-  controls: string;
-  multiPlayer: boolean;
-  addon: string;
 }
 
 export interface IGameState {
+  // id for game
   gameId: string;
-  settings: ISettings;
-  players: IPlayer[];
-  ball: IBall;
-  twoPlayers: boolean;
-  computerLevel: number;
+
+  // player defined settings
+  settings: {
+    addons: string[];
+  };
+
+  // player entity
+  players: [IPlayer, IPlayer];
+
+  // ball entity
+  ball: {
+    x: number;
+    y: number;
+    radius: number;
+    speed: number; // ??
+    velocityX: number;
+    velocityY: number;
+  };
+
+  // game states
+  finished: boolean;
+
+  // ???
   increaseSpeedAfterContact: number;
-  playerWidth: number;
-  playerHeight: number;
-  playerColor: string;
-  addOnReady: number;
 }
