@@ -45,7 +45,6 @@ export function Message(props: {
   });
 
   function DeleteButton({ msgId }: { msgId: string }) {
-    console.log(props.currentChannelUser.is_mod);
     if (
       !props.owner && // not owner message
       props.channelData?.owner !== props.currentChannelUser.user.user && // not owner

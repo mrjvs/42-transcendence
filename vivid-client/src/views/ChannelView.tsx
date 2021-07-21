@@ -68,14 +68,16 @@ export function ChannelView() {
               onClick={() => history.push(`/channel/${id}/settings`)}
             />
           ) : null}
-          <ChannelLeaveIcon
-            onClick={() =>
-              leaveChannelFetch.run(
-                null,
-                `/api/v1/channels/${id}/users/${currentChannelUser.user.user}`,
-              )
-            }
-          />
+          {['owner'].includes(currentChannelUser.tag) ? null : (
+            <ChannelLeaveIcon
+              onClick={() =>
+                leaveChannelFetch.run(
+                  null,
+                  `/api/v1/channels/${id}/users/${currentChannelUser.user.user}`,
+                )
+              }
+            />
+          )}
         </div>
       }
     >
