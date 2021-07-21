@@ -87,7 +87,7 @@ export function Message(props: {
                   return (
                     <div key={v.id}>
                       <div className="messageInvite-wrapper">
-                        <div className="messageInvite-accent"/>
+                        <div className="messageInvite-accent" />
                         <div className="messageInvite-content">
                           <div className="messageInvite-user">
                             <Avatar user={props.user} small />
