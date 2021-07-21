@@ -13,11 +13,21 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(intraId: string): Promise<any> {
+  async validateIntraSignin(intraId: string): Promise<any> {
     let user = await this.userService.findIntraUser(intraId);
 
     if (!user) {
-      user = await this.userService.createUser(intraId);
+      user = await this.userService.createIntraUser(intraId);
+    }
+
+    return user;
+  }
+
+  async validateDiscordSignin(discordId: string): Promise<any> {
+    let user = await this.userService.findDiscordUser(discordId);
+
+    if (!user) {
+      user = await this.userService.createDiscordUser(discordId);
     }
 
     return user;

@@ -33,6 +33,24 @@
   color: white;
 }
 
+.loading-screen .login-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.loading-screen .login-buttons p {
+  max-width: 16rem;
+  line-height: 1.25;
+}
+
+.loading-screen .login-buttons .button-new {
+  margin-bottom: 0.5rem;
+  flex: 1;
+}
+
 .loading-screen .login-card .icon {
   margin-bottom: 3rem;
   margin-top: 1.5rem;
@@ -57,37 +75,6 @@
   max-width: 15rem;
   margin-bottom: 5rem;
   line-height: 1.4;
-}
-
-.loading-screen .login-card .button {
-  width: 100%;
-  padding: 1rem 1rem;
-  text-align: center;
-  box-sizing: border-box;
-  background: linear-gradient(to left, #29419f, #a34fec);
-  text-decoration: none;
-  color: white;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-  user-select: none;
-  border: none;
-}
-
-.loading-screen .login-card .button:visited,
-.loading-screen .login-card .button:hover,
-.loading-screen .login-card .button:focus,
-.loading-screen .login-card .button:active {
-  text-decoration: none;
-  color: white;
-}
-
-.loading-screen .login-card .button:hover {
-  background: linear-gradient(to left, #21378b, #893dcc);
-}
-
-.loading-screen .login-card .button:active {
-  transform: scale(1.05);
 }
 
 .loading-screen .icon-wrapper {

@@ -30,7 +30,7 @@ export class UserEntity extends BaseEntity {
   joined_channels: JoinedChannelEntity[];
 
   @Column()
-  intra_id: string;
+  oauth_id: string;
 
   @Column({ default: false })
   site_admin: boolean;
@@ -85,11 +85,11 @@ export class UsernameChangeDto {
 }
 
 export interface INewUser {
-  intra_id: string;
+  oauth_id: string;
 }
 
 export interface IUser {
-  intra_id: string;
+  oauth_id: string;
   name: string;
   avatar_colors: string[];
 }
@@ -102,7 +102,7 @@ export class UnrelatedUser {
 }
 
 export class RelatedUser extends UnrelatedUser {
-  @Expose() intra_id: string;
+  @Expose() oauth_id: string;
   @Expose() site_admin: boolean;
 
   @Expose()

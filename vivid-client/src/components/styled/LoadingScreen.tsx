@@ -15,6 +15,50 @@ const lines = [
   'Finding generic\nloading screen joke',
 ];
 
+function LoginButtons() {
+  const enabledMethods = ['INTRA', 'DISCORD']
+    .map((v) => ({ name: v, env: window._env_[`VIVID_AUTH_${v}`] }))
+    .filter((v) => v.env === 'true');
+  const [loading, setLoading] = React.useState<string[]>([]);
+
+  function getText(method: string) {
+    if (method === 'INTRA') return 'Log in with 42 intra';
+    if (method === 'DISCORD') return 'Log in with discord';
+    return 'Log in';
+  }
+
+  if (enabledMethods.length == 0) {
+    return (
+      <div className="login-buttons">
+        <p>Whoops, no enabled login methods to choose from</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="login-buttons">
+      {enabledMethods.map((v: any, i: number) => (
+        <Button
+          key={v.name}
+          loading={loading.includes(v.name)}
+          type={i == 0 ? 'primary' : 'secondary'}
+          onclick={() => {
+            window.location.href = `${
+              window._env_.VIVID_BASE_URL
+            }/api/v1/auth/login/${v.name.toLowerCase()}`;
+            setLoading((p: any) => {
+              if (p.includes(v.name)) return p;
+              return [...p, v.name];
+            });
+          }}
+        >
+          {getText(v.name)}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
 export function LoadingScreen(props: any) {
   const { client, connect, hasConnected, clientError } =
     React.useContext(SocketContext);
@@ -22,8 +66,6 @@ export function LoadingScreen(props: any) {
   const [line, setLine] = React.useState('');
   const [tokenInput, setTokenInput] = React.useState('');
   const history = useHistory();
-
-  const [loadingButton, setLoadingButton] = React.useState(false);
 
   // show random loading text
   React.useEffect(() => {
@@ -105,15 +147,7 @@ export function LoadingScreen(props: any) {
           <p className="text">
             Click the button below to continue to the login page
           </p>
-          <Button
-            loading={loadingButton}
-            onclick={() => {
-              window.location.href = `${window._env_.VIVID_BASE_URL}/api/v1/auth/login`;
-              setLoadingButton(true);
-            }}
-          >
-            Log in
-          </Button>
+          <LoginButtons />
         </div>
       </div>
     );

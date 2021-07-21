@@ -148,22 +148,37 @@ export class UserService {
   }
 
   // find by intra id
-  async findIntraUser(intraId: string): Promise<UserEntity> {
+  async findIntraUser(id: string): Promise<UserEntity> {
     return await this.userRepository.findOne({
       where: {
-        intra_id: intraId,
+        oauth_id: `intra-${id}`,
+      },
+    });
+  }
+
+  // find by discord id
+  async findDiscordUser(id: string): Promise<UserEntity> {
+    return await this.userRepository.findOne({
+      where: {
+        oauth_id: `discord-${id}`,
       },
     });
   }
 
   // create a new user
-  async createUser(intraId: string): Promise<UserEntity> {
+  async createUser(oauthId: string): Promise<UserEntity> {
     const user: IUser = {
       name: null,
-      intra_id: intraId,
+      oauth_id: oauthId,
       avatar_colors: generateGradientColors(),
     };
     return await this.userRepository.save(user);
+  }
+  createDiscordUser(discordId: string): Promise<UserEntity> {
+    return this.createUser(`discord-${discordId}`);
+  }
+  createIntraUser(intraId: string): Promise<UserEntity> {
+    return this.createUser(`intra-${intraId}`);
   }
 
   // get user, parsed from cookie string

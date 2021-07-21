@@ -8,7 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { User } from '~/middleware/decorators/login.decorator';
-import { IntraAuthGuard, No2faGuard } from '~/middleware/guards/auth.guards';
+import {
+  IntraAuthGuard,
+  No2faGuard,
+  DiscordAuthGuard,
+} from '~/middleware/guards/auth.guards';
 import { UserEntity } from '@/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
@@ -28,9 +32,15 @@ export class AuthController {
     private authService: AuthService,
   ) {}
 
-  @Get('/login')
+  @Get('/login/intra')
   @UseGuards(IntraAuthGuard)
-  login(@Res() res): any {
+  loginIntra(@Res() res): any {
+    res.redirect(this.configService.get('oauth.redirect'));
+  }
+
+  @Get('/login/discord')
+  @UseGuards(DiscordAuthGuard)
+  loginDiscord(@Res() res): any {
     res.redirect(this.configService.get('oauth.redirect'));
   }
 

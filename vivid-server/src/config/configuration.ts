@@ -4,8 +4,6 @@ export default () => {
     'POSTGRES_PASSWORD',
     'SESSION_SECRET',
     'USER_ENCRYPTION_SECRET',
-    'OAUTH_INTRA_CLIENT_ID',
-    'OAUTH_INTRA_CLIENT_SECRET',
     'OAUTH_REDIRECT',
   ];
   required.forEach((v) => {
@@ -13,6 +11,31 @@ export default () => {
       throw new Error(`Environment variable ${v} is missing`);
     }
   });
+
+  // check if there is at least one valid login
+  const logins = [
+    {
+      path: 'intra',
+      env: ['OAUTH_INTRA_CLIENT_ID', 'OAUTH_INTRA_CLIENT_SECRET'],
+    },
+    {
+      path: 'discord',
+      env: ['OAUTH_DISCORD_CLIENT_ID', 'OAUTH_DISCORD_CLIENT_SECRET'],
+    },
+  ];
+  const loginsValid = logins
+    .filter((v) => {
+      return v.env.reduce((acc, v) => {
+        if (!acc) return acc;
+        if (!process.env[v]) return false;
+        return true;
+      }, true);
+    })
+    .map((v) => v.path);
+  if (loginsValid.length < 1)
+    throw new Error(
+      `Environment variables incorrect: no login method is correctly configured`,
+    );
 
   const port = parseInt(process.env.PORT) || 3000;
 
@@ -35,12 +58,19 @@ export default () => {
       user: process.env.USER_ENCRYPTION_SECRET,
     },
     oauth: {
+      validLogins: loginsValid,
       intra: {
-        clientId: process.env.OAUTH_INTRA_CLIENT_ID,
-        clientSecret: process.env.OAUTH_INTRA_CLIENT_SECRET,
-        callbackHost:
-          process.env.OAUTH_INTRA_CALLBACK_HOST || `http://localhost:${port}`,
+        enabled: loginsValid.includes('intra'),
+        clientId: process.env.OAUTH_INTRA_CLIENT_ID || 'a',
+        clientSecret: process.env.OAUTH_INTRA_CLIENT_SECRET || 'a',
       },
+      discord: {
+        enabled: loginsValid.includes('discord'),
+        clientId: process.env.OAUTH_DISCORD_CLIENT_ID || 'a',
+        clientSecret: process.env.OAUTH_DISCORD_CLIENT_SECRET || 'a',
+      },
+      callbackHost:
+        process.env.OAUTH_CALLBACK_HOST || `http://localhost:${port}`,
       redirect: process.env.OAUTH_REDIRECT,
     },
   };
