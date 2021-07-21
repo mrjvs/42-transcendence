@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { ChannelsContext } from './useChannels';
 import { UserContext } from './useUser';
 import { UsersContext } from './useUsers';
 import { SocketContext } from './useWebsocket';
@@ -8,18 +9,21 @@ export const MessageContext = React.createContext<any>([]);
 MessageContext.displayName = 'MessageContext';
 
 export function useMessages(channel: string) {
-  const [channelInfo, setChannelInfo] = React.useState<any>(null);
+  const { addChannel, getChannel, channels } =
+    React.useContext(ChannelsContext);
   const [channelMessages, setMessages] = React.useState<any[]>([]);
   const { messages, setChannelMessages, getChannelMessages } =
     React.useContext(MessageContext);
   const history = useHistory();
-  const { addUser, getUser, users } = React.useContext(UsersContext);
+  const { getUser, users } = React.useContext(UsersContext);
 
   const userData = React.useContext(UserContext);
   const [currentChannelUser, setCurrentChannelUser] = React.useState<{
     user: any;
     tag: any;
   }>({ user: null, tag: null });
+
+  const channelInfo = getChannel(channel);
 
   const [error, setError] = React.useState(false);
   const [isLoading, setLoading] = React.useState(true);
@@ -35,9 +39,10 @@ export function useMessages(channel: string) {
         credentials: 'include',
       },
     )
-      .then((res) => res.json())
+      .then(async (res) => ({ res: res, data: await res.json() }))
       .then((result) => {
-        setChannelMessages(channel, result);
+        if (result.res.status >= 400) throw new Error('failed to fetch');
+        setChannelMessages(channel, result.data);
         return fetch(
           `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}`,
           {
@@ -45,16 +50,15 @@ export function useMessages(channel: string) {
           },
         );
       })
-      .then((res) => res.json())
+      .then(async (res) => ({ res: res, data: await res.json() }))
       .then((info) => {
-        setChannelInfo(info);
-        info.joined_users.forEach((join: any) => {
-          addUser(join.user);
-        });
+        if (info.res.status >= 400) throw new Error('failed to fetch');
+        addChannel(info.data);
         setLoading(false);
         setDone(true);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         setLoading(false);
         setError(true);
         setDone(true);
@@ -64,8 +68,8 @@ export function useMessages(channel: string) {
   function getRole(userId: string) {
     if (!userId) return null;
     let tag = null;
-    const channelUser = channelInfo?.joined_users.find(
-      (v: any) => v.user?.id === userId || v.user === userId,
+    const channelUser = channelInfo?.joined_users?.find(
+      (v: any) => v.user === userId,
     );
     if (channelUser && channelUser.is_mod) tag = 'mod';
     if (userId === channelInfo?.owner) tag = 'owner';
@@ -79,16 +83,15 @@ export function useMessages(channel: string) {
     }
     const n = {
       user: channelInfo?.joined_users?.find(
-        (v: any) =>
-          v.user?.id === userData.user?.id || v.user === userData.user?.id,
+        (v: any) => v.user === userData.user?.id,
       ),
       tag: getRole(userData.user?.id),
     };
     setCurrentChannelUser(n);
-  }, [channelInfo, userData]);
+  }, [channels, channelInfo, userData]);
 
   React.useEffect(() => {
-    requestMessages();
+    if (channel) requestMessages();
   }, [channel]);
 
   React.useEffect(() => {
@@ -129,8 +132,15 @@ export function useMessages(channel: string) {
   }
 
   return {
+    channels,
     messages: channelMessages,
-    channelInfo,
+    channelInfo: getChannel(channel),
+    updateChannelInfo(obj: any) {
+      addChannel({
+        ...obj,
+        id: channel,
+      });
+    },
     getUser,
     users,
     currentChannelUser,
@@ -168,13 +178,18 @@ export function useMessageContext() {
     });
   }
 
-  function deleteMessage(channelId: string, messageId: string) {
+  function deleteMessage({ channelId, messageId }: any) {
     setMessages((prev) => {
-      const channel = prev.find((v) => v.id === channelId);
-      const list = channel.messages.filter((v: any) => {
-        if (v.id !== messageId) return v;
-      });
-      setChannelMessages(channelId, list);
+      const list = [...prev];
+      let found = list.find((v) => v.id === channelId);
+      if (!found) {
+        found = {
+          id: channelId,
+          messages: [],
+        };
+        list.push(found);
+      }
+      found.messages = found.messages.filter((v: any) => v.id !== messageId);
       return list;
     });
   }

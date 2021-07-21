@@ -1,9 +1,11 @@
 import React from 'react';
+import { ChannelsContext } from './useChannels';
 
 export const UserContext = React.createContext<any>(null);
 
 export function useUser() {
-  const [user, setUser] = React.useState({});
+  const [user, setUserReal] = React.useState({});
+  const { addChannel } = React.useContext(ChannelsContext);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [done, setDone] = React.useState(false);
@@ -13,6 +15,22 @@ export function useUser() {
   const [invalidToken, setInvalidToken] = React.useState(false);
   const [needsToken, setNeedsToken] = React.useState(false);
   const [isLoggedIn, setLoggedIn] = React.useState(false);
+
+  function setUser(obj: any, merge = false) {
+    obj?.joined_channels?.forEach((chan: any) => {
+      const channel = { ...chan.channel };
+      const join = { ...chan };
+      join.channel = channel.id;
+      channel.joined_users = [join];
+      addChannel(channel);
+    });
+    if (!merge) setUserReal(obj);
+    else
+      setUserReal((prev) => ({
+        ...prev,
+        ...obj,
+      }));
+  }
 
   function fetchUser() {
     setLoading(true);
@@ -42,10 +60,13 @@ export function useUser() {
             .then((res) => res.json())
             .then((user) => {
               setUser(user);
+              // TODO loop through all joined channels and add them with setChannel()
               setLoading(false);
               setDone(true);
             })
-            .catch(() => {
+            .catch((err) => {
+              console.log(err);
+
               setLoading(false);
               setError(true);
             });
@@ -54,7 +75,8 @@ export function useUser() {
           setDone(true);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         setLoading(false);
         setError(true);
       });
@@ -113,10 +135,7 @@ export function useUser() {
     user,
     isLoggedIn,
     updateUser(obj: any) {
-      setUser((v) => ({
-        ...v,
-        ...obj,
-      }));
+      setUser(obj, true);
     },
   };
 }

@@ -38,6 +38,7 @@ export function getUserRolesFromChannel(user: UserEntity, channel: string) {
     (v) => (v.channel as any).id === channel,
   );
   if (!joinObject) return out;
+  if (!joinObject.is_joined) return out;
   const channelObject: ChannelEntity = (joinObject as any).channel;
   out.user = true;
 
@@ -98,8 +99,8 @@ export class ChannelRoleGuard implements CanActivate {
       else if (roleToCheck === ChannelRoles.MUTED && userRoles.isMuted)
         hasRole = true;
 
-      if (role.notRole && hasRole) return false; // must not have role but does
-      if (!role.notRole && !hasRole) return false; // must have role, but does not
+      if (role.notRole !== undefined && hasRole) return false; // must not have role but does
+      if (role.notRole === undefined && !hasRole) return false; // must have role, but does not
     }
 
     // has passed roles, allow passing through
