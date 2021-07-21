@@ -85,10 +85,36 @@ export function FriendsModal(props: {
   });
 
   React.useEffect(() => {
-    if (findFriendRequests.done)
-      setFriendRequests(findFriendRequests.data.data);
-    findFriendRequests.reset();
+    if (findFriendRequests.done) {
+      props.userData.updateUser({
+        friends: [
+          ...findFriendRequests.data.data.map((v: any) => {
+            const friend =
+              v.user_1.id === props.userData.user.id ? v.user_2 : v.user_1;
+            return {
+              id: v.id,
+              userId: props.userData.user.id,
+              user_1: v.user_1,
+              user_2: v.user_2,
+              friend,
+              requested_by: v.requested_by,
+              requested_to: v.requested_to,
+              accepted: v.accepted,
+            };
+          }),
+        ],
+      });
+      findFriendRequests.reset();
+    }
   }, [findFriendRequests.done]);
+
+  React.useEffect(() => {
+    setFriendRequests(() => {
+      return props.userData.user.friends?.filter(
+        (v: any) => !v.accepted && v.requested_by !== props.userData.user.id,
+      );
+    });
+  }, [props.userData]);
 
   return (
     <ModalBase

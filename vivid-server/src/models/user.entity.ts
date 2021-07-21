@@ -135,6 +135,8 @@ function friendTransform(arr, userField, friendField) {
           id: v.id,
           userId: v[userField],
           friend: v[friendField],
+          user_1: v.user_1,
+          user_2: v.user_2,
           requested_by: v.requested_by,
           requested_to: v.requested_to,
           accepted: v.accepted,

@@ -111,6 +111,8 @@ export function FriendAction(props: { userData: any; friendId: string }) {
           {
             id: friendship.id,
             userId: props.userData.user.id,
+            user_1: friendship.user_1,
+            user_2: friendship.user_2,
             friend,
             requested_by: friendship.requested_by,
             requested_to: friendship.requested_to,

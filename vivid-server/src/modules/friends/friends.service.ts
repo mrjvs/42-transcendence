@@ -41,7 +41,6 @@ export class FriendsService {
       relations: ['user_1', 'user_2'],
       where: {
         requested_to: userId,
-        accepted: false,
       },
     });
   }
