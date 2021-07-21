@@ -15,20 +15,29 @@ export function drawGame(
   // Draw net
   net(canvas, context);
   // Draw left player
-  context.fillStyle = gameState.playerColor;
-  context.fillRect(
-    gameState.players[0].x * canvas.width,
-    gameState.players[0].y * canvas.height,
-    gameState.playerWidth * canvas.width,
-    gameState.playerHeight * canvas.height,
-  );
+  if (gameState.players[0].special === true)
+    playerZeroSpecial(gameState, canvas, context);
+  else {
+    context.fillStyle = gameState.playerColor;
+    context.fillRect(
+      gameState.players[0].x * canvas.width,
+      gameState.players[0].y * canvas.height,
+      gameState.playerWidth * canvas.width,
+      gameState.playerHeight * canvas.height,
+    );
+  }
   // Draw right player
-  context.fillRect(
-    gameState.players[1].x * canvas.width,
-    gameState.players[1].y * canvas.height,
-    gameState.playerWidth * canvas.width,
-    gameState.playerHeight * canvas.height,
-  );
+  if (gameState.players[1].special === true)
+    playerOneSpecial(gameState, canvas, context);
+  else {
+    context.fillStyle = gameState.playerColor;
+    context.fillRect(
+      gameState.players[1].x * canvas.width,
+      gameState.players[1].y * canvas.height,
+      gameState.playerWidth * canvas.width,
+      gameState.playerHeight * canvas.height,
+    );
+  }
   // Draw ball
   ball(gameState, canvas, context);
 }
@@ -68,6 +77,38 @@ function scores(
     'RED',
     '75px Serif',
   );
+  let points: number = gameState.players[0].addOnPoints;
+  let print = '';
+  if (points) {
+    while (points) {
+      print = print.concat('x');
+      points -= 1;
+    }
+    text(
+      context,
+      print,
+      canvas.width / 20,
+      canvas.height / 20,
+      'YELLOW',
+      '65px Arial',
+    );
+  }
+  points = gameState.players[1].addOnPoints;
+  print = '';
+  if (points) {
+    while (points) {
+      print = print.concat('x');
+      points -= 1;
+    }
+    text(
+      context,
+      print,
+      (canvas.width / 20) * 11,
+      canvas.height / 20,
+      'YELLOW',
+      '65px Arial',
+    );
+  }
 }
 
 function ball(
@@ -101,4 +142,58 @@ function net(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
   for (let i = 0; i <= canvas.height; i += 30) {
     context.fillRect(net.x, net.y + i, net.width, net.height);
   }
+}
+
+function playerZeroSpecial(
+  gameState: IGameState,
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+) {
+  context.fillStyle = 'RED';
+  context.fillRect(
+    (gameState.players[0].x + (gameState.playerWidth / 3) * 2) * canvas.width,
+    gameState.players[0].y * canvas.height,
+    (gameState.playerWidth / 3) * canvas.width,
+    gameState.playerHeight * canvas.height,
+  );
+  context.fillStyle = 'YELLOW';
+  context.fillRect(
+    gameState.players[0].x * canvas.width,
+    gameState.players[0].y * canvas.height,
+    gameState.playerWidth * canvas.width,
+    (gameState.playerHeight / 5) * canvas.height,
+  );
+  context.fillRect(
+    gameState.players[0].x * canvas.width,
+    (gameState.players[0].y + (gameState.playerHeight / 5) * 4) * canvas.height,
+    gameState.playerWidth * canvas.width,
+    (gameState.playerHeight / 5) * canvas.height,
+  );
+}
+
+function playerOneSpecial(
+  gameState: IGameState,
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+) {
+  context.fillStyle = 'RED';
+  context.fillRect(
+    gameState.players[1].x * canvas.width,
+    gameState.players[1].y * canvas.height,
+    (gameState.playerWidth / 3) * canvas.width,
+    gameState.playerHeight * canvas.height,
+  );
+  context.fillStyle = 'YELLOW';
+  context.fillRect(
+    gameState.players[1].x * canvas.width,
+    gameState.players[1].y * canvas.height,
+    gameState.playerWidth * canvas.width,
+    (gameState.playerHeight / 5) * canvas.height,
+  );
+  context.fillRect(
+    gameState.players[1].x * canvas.width,
+    (gameState.players[1].y + (gameState.playerHeight / 5) * 4) * canvas.height,
+    gameState.playerWidth * canvas.width,
+    (gameState.playerHeight / 5) * canvas.height,
+  );
 }

@@ -4,7 +4,7 @@ export function createGameState(gameId: string) {
     settings: {
       controls: 'keys',
       multiPlayer: false,
-      addon: '',
+      addon: 'sticky',
     },
     players: [
       {
@@ -14,6 +14,10 @@ export function createGameState(gameId: string) {
         y: 0.5,
         score: 0,
         move: 0,
+        spacebar: 0,
+        shoot: 0,
+        addOnPoints: 0,
+        special: false,
         ready: false,
       },
       {
@@ -23,6 +27,10 @@ export function createGameState(gameId: string) {
         y: 0.5,
         score: 0,
         move: 0,
+        spacebar: 0,
+        shoot: 0,
+        addOnPoints: 0,
+        special: false,
         ready: false,
       },
     ],
@@ -31,8 +39,8 @@ export function createGameState(gameId: string) {
       y: 0.5,
       radius: 0.03,
       speed: 0.01,
-      velocityX: 0.01,
-      velocityY: 0.01,
+      velocityX: 0.005,
+      velocityY: 0.005,
       color: 'ORANGE',
     },
     twoPlayers: true, // TODO change to settings
@@ -41,5 +49,6 @@ export function createGameState(gameId: string) {
     playerWidth: 0.02,
     playerHeight: 0.3,
     playerColor: 'PURPLE',
+    addOnReady: 0,
   };
 }
