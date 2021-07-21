@@ -39,6 +39,16 @@
   padding-bottom: 0.8rem;
 }
 
+.messageWrapper .message-special {
+  color: #6c738b;
+}
+
+.messageWrapper .message-special .messageUserNameSpecial {
+  color: #ffffff;
+  font-weight: bold;
+  padding-right: 0.5rem;
+}
+
 .messageWrapper .messageUsernameWrap {
   display: flex;
   align-items: center;

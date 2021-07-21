@@ -15,6 +15,8 @@ export function Message(props: {
   user: any;
   tags: string[];
   owner: boolean;
+  channelData: any;
+  currentChannelUser: any;
 }) {
   const history = useHistory();
   const gameFetch = useFetch({
@@ -43,14 +45,19 @@ export function Message(props: {
   });
 
   function DeleteButton({ msgId }: { msgId: string }) {
-    if (!props.owner) return null;
-    // TODO moderator/admin
+    console.log(props.currentChannelUser.is_mod);
+    if (
+      !props.owner && // not owner message
+      props.channelData?.owner !== props.currentChannelUser.user.user && // not owner
+      !props.currentChannelUser.user.is_mod // not mod
+    )
+      return null;
+
     return (
       <div className="message-delete-button">
         <Button
           type="small-box"
           onclick={() => {
-            console.log('DELETING', msgId);
             run(null, `/api/v1/channels/${props.channelId}/messages/${msgId}`);
           }}
         >
@@ -137,7 +144,33 @@ export function Message(props: {
                       </div>
                     </div>
                   );
-                else
+                else if (v.type == 2) {
+                  return (
+                    <p key={v.id} className="messageMessage message-special">
+                      <span className="bg-underlay bg-layers" />
+                      <span className="bg-overlay bg-layers">
+                        <DeleteButton msgId={v.id} />
+                      </span>
+                      <span className="messageUserNameSpecial">
+                        {props.user.name}
+                      </span>
+                      has joined the channel
+                    </p>
+                  );
+                } else if (v.type == 3) {
+                  return (
+                    <p key={v.id} className="messageMessage message-special">
+                      <span className="bg-underlay bg-layers" />
+                      <span className="bg-overlay bg-layers">
+                        <DeleteButton msgId={v.id} />
+                      </span>
+                      <span className="messageUserNameSpecial">
+                        {props.user.name}
+                      </span>
+                      has left the channel
+                    </p>
+                  );
+                } else
                   return (
                     <p key={v.id} className="messageMessage">
                       <span className="bg-underlay bg-layers" />

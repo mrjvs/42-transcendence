@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   ChannelEntity,
   IChannel,
@@ -24,6 +24,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { EventGateway } from '$/websocket/event.gateway';
+import { ChannelMessageService } from './channel.message.service';
 
 @Injectable()
 export class ChannelService {
@@ -34,6 +35,7 @@ export class ChannelService {
     private JoinedChannelRepository: Repository<JoinedChannelEntity>,
     private configService: ConfigService,
     private readonly eventGateway: EventGateway,
+    private readonly channelMessageService: ChannelMessageService,
   ) {}
 
   async add(channelInput: ChannelDto, userId: string): Promise<IChannel> {
@@ -220,6 +222,10 @@ export class ChannelService {
         is_joined: true,
       });
       alreadyJoined.is_joined = true;
+      this.channelMessageService.sendJoinMessage(
+        joinedChannelInput.channel,
+        joinedChannelInput.user,
+      );
       this.eventGateway.updateChannelUser(
         joinedChannelInput.channel,
         channel.joined_users,
@@ -233,6 +239,10 @@ export class ChannelService {
       channel: joinedChannelInput.channel,
       user: joinedChannelInput.user,
     });
+    await this.channelMessageService.sendJoinMessage(
+      joinedChannelInput.channel,
+      joinedChannelInput.user,
+    );
     this.eventGateway.updateChannelUser(
       joinedChannelInput.channel,
       channel.joined_users,
@@ -314,7 +324,7 @@ export class ChannelService {
         ban_expiry: expiry,
       };
 
-      // leave channel and remove mod
+      // leave channel (doesnt send leave message) and remove mod
       if (isBanned) {
         obj.is_joined = false;
         obj.is_mod = false;
@@ -355,6 +365,10 @@ export class ChannelService {
       await this.JoinedChannelRepository.update(alreadyRemoved, {
         is_joined: false,
       });
+      await this.channelMessageService.sendLeaveMessage(
+        joinedChannelInput.channel,
+        joinedChannelInput.user,
+      );
       this.eventGateway.leaveChannelUser(
         joinedChannelInput.channel,
         channel.joined_users,
@@ -364,6 +378,10 @@ export class ChannelService {
     }
 
     await this.JoinedChannelRepository.delete(alreadyRemoved);
+    await this.channelMessageService.sendLeaveMessage(
+      joinedChannelInput.channel,
+      joinedChannelInput.user,
+    );
     this.eventGateway.leaveChannelUser(
       joinedChannelInput.channel,
       channel.joined_users,

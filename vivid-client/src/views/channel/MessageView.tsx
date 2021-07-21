@@ -99,6 +99,8 @@ export function MessageView(props: { channelId: string; messageData: any }) {
                     user={v.userData}
                     tags={[v.userTag]}
                     owner={v.user === currentChannelUser.user.user}
+                    channelData={messageData.channelInfo}
+                    currentChannelUser={messageData.currentChannelUser}
                   />
                 ))}
               </div>

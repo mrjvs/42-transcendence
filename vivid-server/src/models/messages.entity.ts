@@ -40,6 +40,13 @@ export class IMessage {
   message_type: number;
 }
 
+export enum MessageTypes {
+  PLAIN = 0,
+  GAME_INVITE = 1,
+  JOIN = 2,
+  LEAVE = 3,
+}
+
 export class IMessageInput {
   content: string;
   message_type?: number;
