@@ -34,6 +34,7 @@ export function Message(props: {
   React.useEffect(() => {
     // redirect once accepted duel
     if (gameFetch.done) {
+      if (!gameFetch.data?.data?.gameId) return;
       history.push(`/pong/${gameFetch.data?.data?.gameId}`);
     }
   }, [gameFetch.done]);

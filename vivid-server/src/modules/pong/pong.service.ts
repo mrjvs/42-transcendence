@@ -209,9 +209,9 @@ export class PongService {
     return gameId;
   }
 
-  joinGame(userId: string, gameId: string): { gameId: string } {
+  joinGame(userId: string, gameId: string): { gameId: string } | false {
     const game = states[gameId];
-    if (!game) return;
+    if (!game) return false;
 
     // check if client is already ingame
     const isUserAlreadyJoined = !!clientUserMap[userId];

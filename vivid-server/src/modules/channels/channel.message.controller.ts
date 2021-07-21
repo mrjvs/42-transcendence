@@ -147,6 +147,7 @@ export class ChannelMessageController {
       user.id,
       message.aux_content.invite_game_id,
     );
+    if (!game) return { gameId: null };
     return {
       gameId: game.gameId,
     };
