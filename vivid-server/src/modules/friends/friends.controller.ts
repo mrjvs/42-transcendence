@@ -54,7 +54,7 @@ export class FriendsController {
   // Find all pending friend requests
   @Get('requests')
   findRequests(@User() user: UserEntity): Promise<FriendsEntity[]> {
-    return this.friendsService.findAllFriendRequests(user.id);
+    return this.friendsService.findFriendRequests(user.id);
   }
 
   // Accept pending friend request

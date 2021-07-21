@@ -79,6 +79,13 @@ export class UserService {
       });
   }
 
+  async findUsers(username: string): Promise<UserEntity[]> {
+    return await this.userRepository
+      .createQueryBuilder()
+      .where('name like :n', { n: `%${username}%` })
+      .getMany();
+  }
+
   // delete user, invalidates sessions and disconnects from websocket
   async deleteUser(id: string): Promise<void> {
     // TODO disconnect websocket connections
@@ -308,11 +315,6 @@ export class UserService {
       }
     }
   }
-  // let war_user_acpt = user_acpt.guild.current_war.id;
-  // let war_user_req = user_req.guild.current_war.id;
-  // if (war_user_acpt === war_user_req)
-  //   return war_user_acpt;
-  // return null;
 
   async updateAvatarName(userId: string, filename: string): Promise<any> {
     const res = await this.userRepository

@@ -4,6 +4,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  Param,
   Patch,
   UseGuards,
 } from '@nestjs/common';
@@ -13,7 +14,12 @@ import {
   UserParam,
 } from '~/middleware/decorators/login.decorator';
 import { AccountNotSetupGuard } from '~/middleware/guards/auth.guards';
-import { FullDetailsUser, UserEntity, UsernameChangeDto } from '@/user.entity';
+import {
+  FullDetailsUser,
+  UnrelatedUser,
+  UserEntity,
+  UsernameChangeDto,
+} from '@/user.entity';
 import { formatObject } from '~/utils/format';
 import { UserService } from './user.service';
 
@@ -21,6 +27,12 @@ import { UserService } from './user.service';
 @UseGuards(AccountNotSetupGuard)
 export class UserSetupController {
   constructor(private userService: UserService) {}
+
+  @Get('/find/:username')
+  async findUsers(@Param('username') username: string): Promise<any> {
+    const userRet = await this.userService.findUsers(username);
+    return formatObject(UnrelatedUser, userRet);
+  }
 
   // TODO private vs public data
   @Get(':id')

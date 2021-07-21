@@ -14,7 +14,7 @@ import { PongView } from '../views/PongView';
 import { SettingsView } from '../views/SettingsView';
 import { GameView } from '../views/GameView';
 import { Friends } from '../components/styled/sidebar/Friends';
-import { FriendsModal } from '../components/styled/sidebar/FriendsModal';
+import { FriendsModal } from '../components/styled/modals/Friends.modal';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
