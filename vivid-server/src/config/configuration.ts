@@ -32,10 +32,6 @@ export default () => {
       }, true);
     })
     .map((v) => v.path);
-  if (loginsValid.length < 1)
-    throw new Error(
-      `Environment variables incorrect: no login method is correctly configured`,
-    );
 
   const port = parseInt(process.env.PORT) || 3000;
 

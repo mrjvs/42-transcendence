@@ -29,7 +29,7 @@ export class IntraAuthGuard extends AuthGuard('intra-oauth') {
     return activate;
   }
 
-  handleRequest(err: any, user: any, info: any, context: any, status: any) {
+  handleRequest(err: any, user: any) {
     if (err || !user) {
       throw new HttpException('failed to login', err.status);
     }
@@ -56,7 +56,7 @@ export class DiscordAuthGuard extends AuthGuard('discord-oauth') {
     return activate;
   }
 
-  handleRequest(err: any, user: any, info: any, context: any, status: any) {
+  handleRequest(err: any, user: any) {
     if (err || !user) {
       throw new HttpException('failed to login', err.status);
     }

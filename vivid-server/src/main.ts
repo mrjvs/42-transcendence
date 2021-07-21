@@ -54,6 +54,6 @@ async function bootstrap() {
       .join(', ')}`,
   );
   if (configService.get('oauth.validLogins').length < 1)
-    logger.warn(`No enabled login methods!`);
+    logger.error(`No enabled login methods!`);
 }
 bootstrap();
