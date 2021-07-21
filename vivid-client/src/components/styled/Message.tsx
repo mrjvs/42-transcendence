@@ -94,7 +94,8 @@ export function Message(props: {
                 if (v.type == 0)
                   return (
                     <p key={v.id} className="messageMessage">
-                      <span className="bg-underlay">
+                      <span className="bg-underlay bg-layers" />
+                      <span className="bg-overlay bg-layers">
                         <DeleteButton msgId={v.id} />
                       </span>
                       {v.content}
@@ -102,40 +103,48 @@ export function Message(props: {
                   );
                 else if (v.type == 1)
                   return (
-                    <div key={v.id}>
-                      <div className="messageInvite-wrapper">
-                        <div className="messageInvite-accent" />
-                        <div className="messageInvite-content">
-                          <div className="messageInvite-user">
-                            <Avatar user={props.user} small />
-                            {props.user.name}
-                          </div>
-                          <p className="text">
-                            You&apos;ve been invited to a duel!
-                          </p>
-                          <Button
-                            loading={gameFetch.loading}
-                            onclick={() => runDuelAccept(v.id)}
-                          >
-                            Accept
-                          </Button>
-                          {gameFetch.error ? (
-                            <p className="error">
-                              Something went wrong, try again later.
+                    <div key={v.id} className="messageMessage">
+                      <span className="bg-underlay bg-layers" />
+                      <span className="bg-overlay bg-layers">
+                        <DeleteButton msgId={v.id} />
+                      </span>
+                      <div className="messageInvite-wrapper-wrapper">
+                        <div className="messageInvite-wrapper">
+                          <div className="messageInvite-accent" />
+                          <div className="messageInvite-content">
+                            <div className="messageInvite-user">
+                              <Avatar user={props.user} small />
+                              {props.user.name}
+                            </div>
+                            <p className="text">
+                              You&apos;ve been invited to a duel!
                             </p>
-                          ) : null}
-                          <div className="red-cube"></div>
-                          <div className="dark-cube"></div>
+                            <Button
+                              loading={gameFetch.loading}
+                              onclick={() => runDuelAccept(v.id)}
+                            >
+                              Accept
+                            </Button>
+                            {gameFetch.error ? (
+                              <p className="error">
+                                Something went wrong, try again later.
+                              </p>
+                            ) : null}
+                            <div className="red-cube"></div>
+                            <div className="dark-cube"></div>
+                          </div>
                         </div>
                       </div>
-                      <DeleteButton msgId={v.id} />
                     </div>
                   );
                 else
                   return (
                     <p key={v.id} className="messageMessage">
-                      Unknown message type
-                      <DeleteButton msgId={v.id} />
+                      <span className="bg-underlay bg-layers" />
+                      <span className="bg-overlay bg-layers">
+                        <DeleteButton msgId={v.id} />
+                      </span>
+                      Invalid message
                     </p>
                   );
               })}

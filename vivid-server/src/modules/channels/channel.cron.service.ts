@@ -21,7 +21,7 @@ export class ChannelTaskService {
     const unmuteResults = await this.joinedChannelRepository
       .createQueryBuilder()
       .update()
-      .where(`muted_expiry < now()`)
+      .where(`muted_expiry IS NOT null AND muted_expiry < now()`)
       .set({
         is_muted: false,
         muted_expiry: null,
@@ -32,7 +32,7 @@ export class ChannelTaskService {
     const unbanResults = await this.joinedChannelRepository
       .createQueryBuilder()
       .update()
-      .where(`ban_expiry < now()`)
+      .where(`ban_expiry IS NOT null AND ban_expiry < now()`)
       .set({ is_banned: false, ban_expiry: null })
       .returning('*')
       .execute();

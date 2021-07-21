@@ -29,6 +29,13 @@ export function ChannelSettingsView() {
     getRole,
     currentChannelUser,
     isOwner,
+    canPunishUser(v: any) {
+      if (v.user === channelInfo.owner) return false;
+      if (this.isOwner) return true;
+      if (v.is_mod) return false;
+      if (!currentChannelUser.user?.is_mod) return false;
+      return true;
+    },
   };
 
   const deleteChannelFetch = useFetch({
@@ -79,10 +86,14 @@ export function ChannelSettingsView() {
           />
         </div>
       ) : null}
-      <h1>Channel moderators</h1>
-      <ChannelModeratorCard channelData={channelProps} />
-      <h1>Punished members</h1>
-      <ChannelPunishedMembersCard channelData={channelProps} />
+      {currentChannelUser.user?.is_mod || isOwner ? (
+        <div>
+          <h1>Channel moderators</h1>
+          <ChannelModeratorCard channelData={channelProps} />
+          <h1>Punished members</h1>
+          <ChannelPunishedMembersCard channelData={channelProps} />
+        </div>
+      ) : null}
       <h1>All members</h1>
       <ChannelMembersCard channelData={channelProps} />
     </div>
@@ -272,18 +283,18 @@ function ChannelModeratorCard(props: { channelData: any }) {
     if (makeMod.done) makeMod.reset();
   }, [makeMod.done]);
 
+  const moderator_list = props.channelData?.channel.joined_users.filter(
+    (v: any) => v.is_mod,
+  );
+
   return (
-    <div className="card">
+    <div className="card channel-settings-view-card">
       <ul>
-        {props.channelData?.channel.joined_users
-          .filter((v: any) => v.is_mod)
-          .map((v: any) => (
-            <li key={v.user}>
-              <UserTag
-                user={v}
-                channelOwner={props.channelData?.channel.owner}
-              />
-              <div className="hideUnselected">
+        {moderator_list.map((v: any) => (
+          <li key={v.user}>
+            <UserTag user={v} channelOwner={props.channelData?.channel.owner} />
+            <div className="hideUnselected">
+              {props.channelData.isOwner ? (
                 <Button
                   more_padding
                   type="danger"
@@ -296,10 +307,14 @@ function ChannelModeratorCard(props: { channelData: any }) {
                 >
                   Remove moderator
                 </Button>
-              </div>
-            </li>
-          ))}
+              ) : null}
+            </div>
+          </li>
+        ))}
       </ul>
+      {moderator_list.length === 0 ? (
+        <p className="no-list">Nothing to see here.</p>
+      ) : null}
       {makeMod.error ? <p>Something went wrong, try again later</p> : null}
     </div>
   );
@@ -315,51 +330,53 @@ function ChannelPunishedMembersCard(props: { channelData: any }) {
     if (updatePermissions.done) updatePermissions.reset();
   }, [updatePermissions.done]);
 
+  const punished_list = props.channelData?.channel.joined_users.filter(
+    (v: any) => v.is_banned || v.is_muted,
+  );
+
   return (
-    <div className="card">
+    <div className="card channel-settings-view-card">
       <ul>
-        {props.channelData?.channel.joined_users
-          .filter((v: any) => v.is_banned || v.is_muted)
-          .map((v: any) => (
-            <li key={v.user}>
-              <UserTag
-                user={v}
-                channelOwner={props.channelData?.channel.owner}
-              />
-              <div className="hideUnselected">
-                {v.is_banned ? (
-                  <Button
-                    more_padding
-                    type="secondary"
-                    margin_right
-                    onclick={() =>
-                      updatePermissions.run(
-                        { isBanned: false, banExpiry: null },
-                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
-                      )
-                    }
-                  >
-                    Unban
-                  </Button>
-                ) : null}
-                {v.is_muted ? (
-                  <Button
-                    more_padding
-                    type="danger"
-                    onclick={() =>
-                      updatePermissions.run(
-                        { isMuted: false, muteExpiry: null },
-                        `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
-                      )
-                    }
-                  >
-                    Unmute
-                  </Button>
-                ) : null}
-              </div>
-            </li>
-          ))}
+        {punished_list.map((v: any) => (
+          <li key={v.user}>
+            <UserTag user={v} channelOwner={props.channelData?.channel.owner} />
+            <div className="hideUnselected">
+              {v.is_banned && props.channelData.canPunishUser(v) ? (
+                <Button
+                  more_padding
+                  type="secondary"
+                  margin_right
+                  onclick={() =>
+                    updatePermissions.run(
+                      { isBanned: false, banExpiry: null },
+                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
+                    )
+                  }
+                >
+                  Unban
+                </Button>
+              ) : null}
+              {v.is_muted && props.channelData.canPunishUser(v) ? (
+                <Button
+                  more_padding
+                  type="danger"
+                  onclick={() =>
+                    updatePermissions.run(
+                      { isMuted: false, muteExpiry: null },
+                      `/api/v1/channels/${props.channelData.channel.id}/users/${v.user}`,
+                    )
+                  }
+                >
+                  Unmute
+                </Button>
+              ) : null}
+            </div>
+          </li>
+        ))}
       </ul>
+      {punished_list.length === 0 ? (
+        <p className="no-list">Nothing to see here.</p>
+      ) : null}
       {updatePermissions.error ? (
         <p>Something went wrong, try again later</p>
       ) : null}
@@ -402,7 +419,7 @@ function ChannelMembersCard(props: { channelData: any }) {
     }
   }, [makeMod.done, updatePermissions.done]);
 
-  function update(expiry: number) {
+  function update(expiry: any) {
     const muteUpdate = {
       isMuted: true,
       muteExpiry: expiry,
@@ -420,10 +437,10 @@ function ChannelMembersCard(props: { channelData: any }) {
   }
 
   return (
-    <div className="card">
+    <div className="card channel-settings-view-card">
       <PunishmentModal
         open={openModal}
-        onSubmit={(v: number) => update(v)}
+        onSubmit={(v: any) => update(v)}
         close={close}
       />
       <ul>
@@ -436,7 +453,7 @@ function ChannelMembersCard(props: { channelData: any }) {
                 channelOwner={props.channelData?.channel.owner}
               />
               <div className="hideUnselected">
-                {!v.is_mod ? (
+                {!v.is_mod && props.channelData.isOwner ? (
                   <Button
                     type="secondary"
                     margin_right
@@ -451,7 +468,7 @@ function ChannelMembersCard(props: { channelData: any }) {
                     Make mod
                   </Button>
                 ) : null}
-                {!v.is_muted ? (
+                {!v.is_muted && props.channelData.canPunishUser(v) ? (
                   <Button
                     type="danger"
                     margin_right
@@ -461,7 +478,7 @@ function ChannelMembersCard(props: { channelData: any }) {
                     Mute
                   </Button>
                 ) : null}
-                {!v.is_banned ? (
+                {!v.is_banned && props.channelData.canPunishUser(v) ? (
                   <Button
                     more_padding
                     type="danger"

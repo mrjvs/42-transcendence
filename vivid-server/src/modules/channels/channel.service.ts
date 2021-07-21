@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import {
   ChannelEntity,
   IChannel,
@@ -213,6 +213,8 @@ export class ChannelService {
     if (alreadyJoined) {
       if (alreadyJoined.is_joined)
         throw new ConflictException(null, 'User is already joined');
+      if (alreadyJoined.is_banned)
+        throw new ForbiddenException(null, 'User is banned');
       await this.JoinedChannelRepository.save({
         id: alreadyJoined.id,
         is_joined: true,
@@ -272,16 +274,25 @@ export class ChannelService {
     isBanned?: boolean,
     muteExpiry?: number,
     banExpiry?: number,
+    executingUser?: string,
   ): Promise<IJoinedChannel> {
     const channel = await this.findChannel(channelId);
     if (!channel) throw new NotFoundException();
 
+    // cant punish owner, EVER
+    if (channel.owner === user) throw new ForbiddenException();
+
+    const q: any = {
+      channel: channelId,
+      user,
+    };
+    // if not the owner, you can only punish non-mods
+    if (executingUser !== undefined && executingUser !== channel.owner)
+      q.is_mod = false;
     let builder: any = this.JoinedChannelRepository.createQueryBuilder()
       .update()
-      .where({
-        channel: channelId,
-        user,
-      });
+      .where(q);
+
     let hasChanges = false;
     if (isMuted !== undefined) {
       hasChanges = true;
@@ -302,7 +313,12 @@ export class ChannelService {
         is_banned: isBanned,
         ban_expiry: expiry,
       };
-      if (isBanned) obj.is_joined = false;
+
+      // leave channel and remove mod
+      if (isBanned) {
+        obj.is_joined = false;
+        obj.is_mod = false;
+      }
       builder = builder.set(obj);
     }
     if (!hasChanges) throw new BadRequestException();
@@ -310,6 +326,8 @@ export class ChannelService {
     const res = await builder.execute().then((response) => {
       return <JoinedChannelEntity>response.raw[0];
     });
+
+    if (!res) throw new NotFoundException();
 
     this.eventGateway.updateChannelUser(channelId, channel.joined_users, res);
     return res;

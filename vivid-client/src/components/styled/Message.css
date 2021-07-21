@@ -36,7 +36,7 @@
   margin: 0;
   padding: 0;
   color: white;
-  margin-bottom: 0.8rem;
+  padding-bottom: 0.8rem;
 }
 
 .messageWrapper .messageUsernameWrap {
@@ -45,10 +45,10 @@
 }
 
 .messageWrapper .messageUserName {
-  margin-top: 0.1rem;
-  margin-bottom: 0.5rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.5rem;
   color: #9da6c4;
-  margin-right: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 .messageWrapper.blocked .messageUserNamem,
@@ -60,6 +60,10 @@
   background: #272c43;
 }
 
+.messageInvite-wrapper-wrapper {
+  padding-bottom: 0.8rem;
+}
+
 .messageInvite-wrapper {
   background: #121727;
   max-width: 100%;
@@ -68,7 +72,6 @@
   overflow: hidden;
   border-radius: 5px;
   display: flex;
-  margin-bottom: 0.8rem;
 }
 
 .messageInvite-wrapper .userAvatar .status-bubble {
@@ -163,27 +166,39 @@
   color: #d46074;
 }
 
-.messageWrapper .messageMessage:hover .bg-underlay,
+.messageWrapper .messageMessage:hover .bg-layers,
 .messageWrapper
   .messageUserName:hover
   + .messageMessageContainer
   .messageMessage:first-child
-  .bg-underlay {
+  .bg-layers,
+.messageWrapper .messageMessage:hover .bg-layers {
   opacity: 1;
 }
 
-.messageWrapper .messageMessage:first-child .bg-underlay {
+.messageWrapper .messageMessage:first-child .bg-layers {
   margin-top: -1.8rem;
 }
 
-.messageWrapper .bg-underlay {
-  opacity: 0;
+.messageWrapper .bg-layers {
   position: absolute;
+  opacity: 0;
   left: -5.5rem;
   right: -1.5rem;
-  background-color: #181b2c;
   top: 0;
   bottom: 0;
-  margin: -0.1rem 0 -0.7rem 0;
+  margin: -0.1rem 0 0.2rem 0;
+}
+
+.messageWrapper .bg-underlay {
+  background-color: #181b2c;
   z-index: -15;
+}
+
+.messageMessage .bg-overlay {
+  pointer-events: none;
+}
+
+.messageMessage .bg-overlay > * {
+  pointer-events: all;
 }
