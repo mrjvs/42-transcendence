@@ -53,7 +53,7 @@ export function Message(props: {
       return null;
 
     return (
-      <div className="message-delete-button">
+      <span className="message-delete-button">
         <Button
           type="small-box"
           onclick={() => {
@@ -62,7 +62,7 @@ export function Message(props: {
         >
           <Icon className="red-icon" type="trashcan" />
         </Button>
-      </div>
+      </span>
     );
   }
 

@@ -134,6 +134,7 @@ export class ChannelService {
     return updateResult;
   }
 
+  // TODO possible racecondition: joining between joins delete and channel delete
   async remove(channel_id: string): Promise<{ id: string }> {
     const channel = await this.ChannelRepository.findOne({
       relations: ['joined_users'],
