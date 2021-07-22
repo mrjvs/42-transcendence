@@ -7,6 +7,9 @@ import { IGameState } from './game/Constants';
 import { UserContext } from '../hooks/useUser';
 import { Button } from '../components/styled/Button';
 import moment from 'moment';
+import momentDurationFormatSetup from 'moment-duration-format';
+
+momentDurationFormatSetup(moment as any);
 
 export function PongView() {
   const { id }: any = useParams();
@@ -124,7 +127,7 @@ export function PongView() {
             <p className="pong-value">
               {moment
                 .duration(gameState?.amountOfSeconds, 'seconds')
-                .humanize()}
+                .format('m[m] s[s]')}
             </p>
           </div>
           <div className="pong-endcard-keyvalue pong-marginbottom">
@@ -139,12 +142,14 @@ export function PongView() {
     );
   }
 
+  // TODO show winner on game stat screen
+  // TODO go back instead of home all the time
   return (
     <div className="pong-wrapper">
       <div className="pong-game-view">
         <div className="pong-score">
           <div
-            className={`pong-score-name right-align red ${
+            className={`pong-score-name right-align ${
               leftPlayer.waiting ? 'gray' : ''
             }`}
           >
