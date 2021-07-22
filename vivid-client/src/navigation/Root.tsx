@@ -15,10 +15,24 @@ import { SettingsView } from '../views/SettingsView';
 import { GameView } from '../views/GameView';
 import { Friends } from '../components/styled/sidebar/Friends';
 import { FriendsModal } from '../components/styled/modals/Friends.modal';
+import { ChannelSettingsView } from '../views/ChannelSettingsView';
+import { ChannelsContext } from '../hooks/useChannels';
+import { NotFoundView } from '../views/NotFoundView';
+import { DmChannelView } from '../views/DmChannelView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
-  const [state, setState] = React.useState(false);
+  const channelsData = React.useContext(ChannelsContext);
+  const [friendsOpen, setFriendsOpen] = React.useState(false);
+
+  const joinedChannels = channelsData.channels
+    .filter((v: any) => {
+      return !!v?.data?.joined_users?.find((u: any) => {
+        return userData?.user?.id && u.user === userData.user.id && u.is_joined;
+      });
+    })
+    .filter((v: any) => !v?.data?.dmId)
+    .map((v: any) => v?.data);
 
   return (
     <div className="wrapper">
@@ -54,19 +68,19 @@ function SideBarRouter() {
             New
           </Button>
         </ActionRow>
-        {userData.user.joined_channels.map((v: any) => (
-          <SidebarLink key={v.channel.id} link={`/channel/${v.channel.id}`}>
-            {v.channel.title}
+        {joinedChannels.map((v: any) => (
+          <SidebarLink key={v.id} link={`/channel/${v.id}`}>
+            {v.title}
           </SidebarLink>
         ))}
         <ActionRow label="friends">
-          <Button small={true} type="secondary" onclick={() => setState(true)}>
+          <Button small={true} type="secondary" onclick={() => setFriendsOpen(true)}>
             Friends
           </Button>
           <FriendsModal
-            open={state}
+            open={friendsOpen}
             userData={userData}
-            close={() => setState(false)}
+            close={() => setFriendsOpen(false)}
           />
           <Icon type="plus" />
         </ActionRow>
@@ -80,6 +94,9 @@ function SideBarRouter() {
           <Route exact path="/channel/:id">
             <ChannelView />
           </Route>
+          <Route exact path="/dm/:id">
+            <DmChannelView />
+          </Route>
           <Route exact path="/pong">
             <p>pong</p>
             <GameView />
@@ -89,7 +106,7 @@ function SideBarRouter() {
             <PongView />
           </Route>
           <Route path="*">
-            <p>Not found</p>
+            <NotFoundView>Not Found</NotFoundView>
           </Route>
         </Switch>
       </div>
@@ -116,6 +133,9 @@ function MainRouter() {
         <Switch>
           <Route exact path="/settings">
             <SettingsView />
+          </Route>
+          <Route exact path="/channel/:id/settings">
+            <ChannelSettingsView />
           </Route>
           <Route path="*">
             <SideBarRouter />

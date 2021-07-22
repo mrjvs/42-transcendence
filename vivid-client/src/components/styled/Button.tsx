@@ -8,15 +8,18 @@ export function Button(props: {
   small?: boolean;
   loading?: boolean;
   less_padding?: boolean;
+  more_padding?: boolean;
   margin_right?: boolean;
   no_button?: boolean;
-  type?: 'primary' | 'secondary' | 'duel' | 'danger';
+  type?: 'primary' | 'secondary' | 'duel' | 'danger' | 'small-box';
 }) {
   const type = props.type || 'primary';
   const button_props = {
     className: `button-new ${props.small ? 'small' : ''} button-${type} ${
       props.less_padding ? 'button-less-padding' : ''
-    } ${props.margin_right ? 'button-margin-right' : ''}`,
+    } ${props.margin_right ? 'button-margin-right' : ''} ${
+      props.more_padding ? 'button-more-padding' : ''
+    }`,
     onClick: props.onclick ? props.onclick : () => true,
   };
   if (props.no_button)

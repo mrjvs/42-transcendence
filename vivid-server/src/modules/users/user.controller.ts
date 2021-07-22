@@ -10,7 +10,6 @@ import {
   UnauthorizedException,
   UseInterceptors,
   UploadedFile,
-  Res,
   Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -23,7 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
 import { join } from 'path';
 import { unlink } from 'fs';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -123,13 +122,5 @@ export class UserController {
         );
       });
     }
-  }
-
-  @Get('avatar/:avatar_name')
-  findAvatar(
-    @Param('avatar_name') avatar_name: string,
-    @Res() res: Response,
-  ): void {
-    res.sendFile(join(__dirname, '../../../uploads/', avatar_name));
   }
 }

@@ -1,0 +1,109 @@
+.channel-settings-view {
+  color: white;
+  display: block;
+  width: 60rem;
+  max-width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  padding-top: 4rem;
+}
+
+.channel-settings-view > .card,
+.channel-settings-view-card {
+  background: #15192a;
+  border-radius: 10px;
+  padding: 2rem;
+  margin-bottom: 1rem;
+}
+
+.channel-settings-wrapper {
+  display: flex;
+  align-items: flex-start;
+}
+
+.channel-settings-expand {
+  flex: 1;
+}
+
+.channel-settings-expand Button {
+  margin-top: 5rem;
+}
+
+.channel-settings-view .password {
+  display: flex;
+  align-items: flex-end;
+}
+
+.channel-settings-view .password .text-wrapper {
+  flex: 1;
+}
+
+.channel-settings-view .password Button.hidden {
+  display: none;
+}
+
+.channel-settings-view .password input:focus Button.hidden {
+  display: flex;
+}
+
+.channel-settings-view .password Button {
+  padding: 1rem;
+  margin-left: 0.5rem;
+  margin-top: 0;
+}
+
+.channel-settings-view .info-card {
+  background: #1e253d;
+  border-radius: 10px;
+  padding: 0.5rem 2rem 2rem 2rem;
+  width: 15rem;
+  margin-left: 6rem;
+  margin-right: 2rem;
+  margin-top: 1rem;
+}
+
+.channel-settings-view .info-card .info-line {
+  margin-top: 0.5rem;
+}
+
+.channel-settings-view .channel-settings-view-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.channel-settings-view .channel-settings-view-card ul > li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.channel-settings-view .channel-settings-view-card ul > li .hideUnselected {
+  display: none;
+}
+
+.channel-settings-view
+  .channel-settings-view-card
+  ul
+  > li:hover
+  .hideUnselected {
+  display: block;
+}
+
+.channel-settings-view .channel-settings-view-card ul > li:hover {
+  background: #23273b;
+  border-radius: 10px;
+}
+
+.channel-settings-view .channel-settings-view-card ul li .user {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.channel-settings-view .no-list {
+  color: #9da6c4;
+  padding-left: 2rem;
+}

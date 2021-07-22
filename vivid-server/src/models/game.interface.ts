@@ -5,6 +5,10 @@ export interface IPlayer {
   y: number;
   score: number;
   move: number;
+  spacebar: number;
+  shoot: number;
+  addOnPoints: number;
+  special: boolean;
   ready: boolean;
 }
 
@@ -43,4 +47,5 @@ export interface IGameState {
   playerWidth: number;
   playerHeight: number;
   playerColor: string;
+  addOnReady: number;
 }
