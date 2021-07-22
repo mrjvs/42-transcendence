@@ -3,16 +3,17 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
 } from 'typeorm';
-import { UserEntity } from './user.entity';
 
 @Entity({ name: 'matches' })
 export class MatchesEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column()
   user_req: string;
+
+  @Column()
   user_acpt: string;
 
   @CreateDateColumn()
@@ -44,6 +45,7 @@ export class MatchesEntity {
 }
 
 export interface IMatch {
+  id: string;
   user_req: string;
   user_acpt: string;
   game_ended: Date;

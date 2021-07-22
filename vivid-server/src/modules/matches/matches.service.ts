@@ -46,6 +46,7 @@ export class MatchesService {
     gameType,
   ): Promise<IMatch> {
     const newMatch: IMatch = {
+      id: game.gameId,
       user_req: game.players[0].userId,
       user_acpt: game.players[1].userId,
       game_ended: endDate,
@@ -57,5 +58,9 @@ export class MatchesService {
     };
 
     return await this.matchesRepository.save(newMatch);
+  }
+
+  async findMatch(gameId: string): Promise<IMatch> {
+    return await this.matchesRepository.findOne(gameId);
   }
 }

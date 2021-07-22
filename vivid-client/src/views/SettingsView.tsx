@@ -15,7 +15,7 @@ export function SettingsView() {
 
   return (
     <div className="settings-view-wrapper">
-      <Button type="secondary" onclick={() => history.push('/')}>
+      <Button type="secondary-small" onclick={() => history.push('/')}>
         <Icon type="left_arrow" />
         Back home
       </Button>

@@ -178,7 +178,21 @@ export class EventGateway implements OnGatewayConnection {
   @SubscribeMessage('ready')
   readyEvent(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
     if (!body?.gameId) return;
-    this.pongService.readyEvent(client, body.gameId);
+    this.pongService
+      .readyEvent(client, body.gameId)
+      .then((result) => {
+        if (result.constructor !== String) {
+          client.emit('readyReturn', {
+            status: 'finished',
+            match: result.match,
+          });
+        } else {
+          client.emit('readyReturn', {
+            status: result,
+          });
+        }
+      })
+      .catch(() => {});
   }
 
   @SubscribeMessage('keydown')

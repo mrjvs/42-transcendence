@@ -1,11 +1,20 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { EndReasons, GameProgress, IGameState } from '@/game.interface';
+import {
+  EndReasons,
+  GameProgress,
+  IGameState,
+  IPlayer,
+} from '@/game.interface';
 import { v4 as uuid } from 'uuid';
 import { Socket } from 'socket.io';
 import { createGameState } from './create_gamestate';
 import { gameLoop as renderGameLoop, resetField } from './Pong_simple';
 import { MatchesService } from '$/matches/matches.service';
 import { UserService } from '../users/user.service';
+import { IMatch } from '~/models/matches.entity';
+import { UserEntity } from '~/models/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 interface IClientGameMap {
   [clientId: string]: string; // [clientId] = gameId
@@ -195,10 +204,7 @@ export class GameState {
   }
 
   // user is connected and ready for game
-  async setReady(
-    client: any,
-    userService?: UserService,
-  ): Promise<string | void> {
+  async setReady(client: any, userService?: UserService): Promise<string> {
     // check if client is authed
     if (!client || !client.auth) return 'notregistered';
 
@@ -220,6 +226,7 @@ export class GameState {
     player.client = client;
 
     this.startGameIfAble();
+    return 'playing';
   }
 
   // input events
@@ -259,6 +266,8 @@ export class PongService {
     private matchService: MatchesService,
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
   ) {}
 
   createGame() {
@@ -275,7 +284,8 @@ export class PongService {
       state.players.forEach((v) => {
         // remove states from maps
         if (clientUserMap[v.userId]) clientUserMap[v.userId] = undefined;
-        if (clientGameMap[v.client.id]) clientGameMap[v.client.id] = undefined;
+        if (v.client && clientGameMap[v.client.id])
+          clientGameMap[v.client.id] = undefined;
       });
 
       // remove gamestate
@@ -292,7 +302,11 @@ export class PongService {
     const isUserAlreadyJoined = !!clientUserMap[userId];
     if (isUserAlreadyJoined) return;
 
-    game.addUser(userId);
+    try {
+      game.addUser(userId);
+    } catch (err) {
+      return false;
+    }
     return {
       gameId: gameId,
     };
@@ -303,27 +317,69 @@ export class PongService {
     if (!gameId) return;
 
     const game = states[gameId];
-    game.disconnectClient(client);
+    if (game) game.disconnectClient(client);
   }
 
-  async readyEvent(client: Socket, gameId: string) {
+  _convertMatchToGame(match: IMatch, users: UserEntity[]): IGameState {
+    const state = createGameState(match.id);
+    const players = [
+      {
+        userId: match.user_acpt,
+        name: users.find((v) => v.id === match.user_acpt)?.name || null,
+        score: match.user_acpt_score,
+      },
+      {
+        userId: match.user_req,
+        name: users.find((v) => v.id === match.user_req)?.name || null,
+        score: match.user_req_score,
+      },
+    ];
+    return {
+      ...state,
+      amoutOfSeconds: 0, // TODO save in a match
+      pastGame: true,
+      players: state.players.map((v, i) => ({
+        ...v,
+        ...players[i],
+      })) as [IPlayer, IPlayer],
+      settings: {
+        ...state.settings,
+        addons: match.addons.split(';'),
+      },
+      endReason: EndReasons.FAIRFIGHT,
+    };
+  }
+
+  async readyEvent(
+    client: Socket,
+    gameId: string,
+  ): Promise<string | { match: any }> {
     const game = states[gameId];
-    if (!game) return;
+    if (!game) {
+      const match = await this.matchService.findMatch(gameId);
+      if (!match) return 'notfound';
+      const users = await this.userRepository.findByIds(
+        [match.user_acpt, match.user_req],
+        {
+          relations: [],
+        },
+      );
+      return {
+        match: this._convertMatchToGame(match, users),
+      };
+    }
 
     client.join(gameId);
     const res = await game.setReady(client, this.userService);
     if (res === 'notregistered') {
-      return {
-        status: false,
-      };
+      return res;
     }
 
+    if (res === 'playing') {
+      clientUserMap[client.auth] = gameId;
+    }
     clientGameMap[client.id] = gameId;
-    clientUserMap[client.auth] = gameId;
-    return {
-      status: true,
-      spectating: false,
-    };
+    return res;
   }
 
   handleKeydown(client: Socket, key: PlayerInputs) {

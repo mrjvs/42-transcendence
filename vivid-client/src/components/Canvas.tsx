@@ -2,6 +2,8 @@ import React from 'react';
 import { drawGame } from '../views/game/Draw';
 import { IGameState } from '../views/game/Constants';
 import { SocketContext } from '../hooks/useWebsocket';
+import { Button } from './styled/Button';
+import { useHistory } from 'react-router-dom';
 
 interface CanvasProps {
   gameId: string;
@@ -30,6 +32,7 @@ export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
   const gameStateReal = React.useRef<IGameState | null>(null);
   const countdownNum = React.useRef<number>(-1);
   const [showing, setShowing] = React.useState(false);
+  const history = useHistory();
 
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
@@ -136,6 +139,9 @@ export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
           <div className="loading-icon-rotate small" />
           <h2>Waiting for opponent</h2>
           <p>Lovely day isn&apos;t it?</p>
+          <Button type="danger" onclick={() => history.push('/')}>
+            cancel
+          </Button>
         </div>
       </div>
       {React.useMemo(

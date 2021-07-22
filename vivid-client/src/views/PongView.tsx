@@ -14,10 +14,16 @@ export function PongView() {
   const { user } = React.useContext(UserContext);
   const history = useHistory();
   const [gameState, setGameState] = React.useState<IGameState | null>(null);
+  const [gameStatus, setGameStatus] = React.useState<string>('fetching');
 
   // gamestate update
   function updateGameState(newState: IGameState) {
     setGameState(newState);
+  }
+
+  function readyReturn(readyState: { status: string; match?: IGameState }) {
+    setGameStatus(readyState.status);
+    if (readyState.match) setGameState(readyState.match);
   }
 
   // client loading
@@ -28,6 +34,7 @@ export function PongView() {
         gameId: id,
       });
       client.on('drawGame', updateGameState);
+      client.on('readyReturn', readyReturn);
     }
 
     return () => {
@@ -35,6 +42,7 @@ export function PongView() {
       if (client) {
         client.emit('gameleave');
         client.off('drawGame', updateGameState);
+        client.off('readyReturn', readyReturn);
       }
     };
   }, [client, id]);
@@ -63,6 +71,34 @@ export function PongView() {
   );
   const spectators = gameState?.spectators.length || 0;
   const isSpectating = gameState?.spectators.find((v) => v === user.id);
+
+  if (gameStatus === 'fetching')
+    return (
+      <div className="pong-wrapper">
+        <div className="pong-endcard">
+          <h2 className="pong-endcard-title">Loading game...</h2>
+          <Button type="secondary" onclick={() => history.push('/')}>
+            Back to home
+          </Button>
+        </div>
+      </div>
+    );
+
+  if (gameStatus === 'notfound')
+    return (
+      <div className="pong-wrapper">
+        <div className="pong-wrapper">
+          <div className="pong-endcard">
+            <h2 className="pong-endcard-title">
+              This match doesn&apos;t exist
+            </h2>
+            <Button type="secondary" onclick={() => history.push('/')}>
+              Back to home
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
 
   if (gameState?.endReason) {
     return (

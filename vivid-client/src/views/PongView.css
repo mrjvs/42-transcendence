@@ -120,6 +120,7 @@
   flex-direction: column;
   text-align: center;
   align-items: center;
+  pointer-events: all;
 }
 
 .pong-wrapper .pong-waiting h2 {
