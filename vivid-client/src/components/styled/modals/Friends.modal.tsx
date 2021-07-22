@@ -57,7 +57,7 @@ function FriendRequests(props: { requests: any; userData: any }) {
     const potentialFriend =
       v.user_1.id === props.userData.user.id ? v.user_2 : v.user_1;
     return (
-      <div key={potentialFriend.id}>
+      <div key={v.id}>
         <SidebarLink link="">
           <Avatar isClickable user={potentialFriend} small={true} />
           <span>{potentialFriend.name}</span>
