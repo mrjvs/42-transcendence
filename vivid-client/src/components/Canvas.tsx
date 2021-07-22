@@ -4,9 +4,9 @@ import { IGameState } from '../views/game/Constants';
 import { SocketContext } from '../hooks/useWebsocket';
 
 interface CanvasProps {
-  width: number;
-  height: number;
   gameId: string;
+  loading: boolean;
+  gameState: IGameState | null;
 }
 
 const keyMap = {
@@ -24,12 +24,38 @@ const keyMap = {
   },
 };
 
-export function Canvas({ width, height, gameId }: CanvasProps) {
+export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { client } = React.useContext(SocketContext);
+  const gameStateReal = React.useRef<IGameState | null>(null);
+  const countdownNum = React.useRef<number>(-1);
+  const [showing, setShowing] = React.useState(false);
 
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
+
+  React.useEffect(() => {
+    gameStateReal.current = gameState;
+    if (
+      gameStateReal.current?.countdownNum &&
+      gameStateReal.current?.countdownNum !== countdownNum.current
+    )
+      countdownNum.current = gameStateReal.current.countdownNum;
+  }, [gameState]);
+
+  React.useEffect(() => {
+    let timeout: any = null;
+    if (countdownNum.current >= 0) {
+      setShowing(true);
+      timeout = setTimeout(() => {
+        setShowing(false);
+        timeout = null;
+      }, 700);
+    }
+    return () => {
+      timeout && clearTimeout(timeout);
+    };
+  }, [countdownNum.current]);
 
   // grab context on render
   React.useEffect(() => {
@@ -38,20 +64,6 @@ export function Canvas({ width, height, gameId }: CanvasProps) {
     canvas = canvasRef.current;
     context = canvas.getContext('2d');
   }, [canvasRef]);
-
-  // draw gamestate when you get new data
-  // TODO looping animation frame
-  function draw(gameState: IGameState) {
-    if (context === null) return;
-    requestAnimationFrame(() => {
-      drawGame(gameState, canvas, context);
-    });
-  }
-
-  // called when winner is announced
-  function gameOver(winner: string) {
-    alert(`User: "${winner}" won the game`);
-  }
 
   function keydown(event: KeyboardEvent) {
     if (event.repeat) return;
@@ -75,33 +87,68 @@ export function Canvas({ width, height, gameId }: CanvasProps) {
     });
   }
 
+  // do render
+  function render(ctx: any) {
+    requestAnimationFrame(() => {
+      if (ctx.stop) {
+        return;
+      }
+      drawGame(gameStateReal.current, canvas, context);
+      render(ctx);
+    });
+  }
+
+  // render loop
   React.useEffect(() => {
-    if (client) {
-      // on load
-      client.emit('ready', {
-        gameId,
-      });
-      client.on('drawGame', draw);
-      client.on('gameOver', gameOver);
-      document.addEventListener('keydown', keydown);
-      document.addEventListener('keyup', keyup);
-    }
+    const cancelKey = {
+      stop: false,
+    };
+    render(cancelKey);
+    return () => {
+      cancelKey.stop = true;
+    };
+  }, []);
+
+  // client loading
+  React.useEffect(() => {
+    // on load
+    document.addEventListener('keydown', keydown);
+    document.addEventListener('keyup', keyup);
 
     return () => {
       // on unload
-      if (client) {
-        client.emit('gameleave');
-        client.off('drawGame', draw);
-        client.off('gameOver', gameOver);
-      }
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('keyup', keyup);
     };
-  }, [client]);
+  }, []);
 
   return (
-    <>
-      <canvas ref={canvasRef} height={height} width={width} />
-    </>
+    <div className={`pong-canvas-wrapper ${loading ? 'loading' : ''}`}>
+      <div className={`pong-countdown-overlay ${showing ? 'showing' : ''}`}>
+        <p className="pong-countdown-text">{countdownNum.current}</p>
+      </div>
+      <div
+        className={`pong-countdown-overlay invisible ${
+          loading ? 'showing' : ''
+        }`}
+      >
+        <div className="pong-waiting">
+          <div className="loading-icon-rotate small" />
+          <h2>Waiting for opponent</h2>
+          <p>Lovely day isn&apos;t it?</p>
+        </div>
+      </div>
+      {React.useMemo(
+        () => (
+          <canvas
+            ref={canvasRef}
+            height={1080}
+            width={1920}
+            className="pong-canvas"
+          />
+        ),
+        [],
+      )}
+    </div>
   );
 }

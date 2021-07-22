@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { IGame } from '@/match.interface';
-import { MatchesEntity } from '@/matches.entity';
+import { IMatch, MatchesEntity } from '@/matches.entity';
 import { UserService } from '$/users/user.service';
+import { IGameState } from '~/models/game.interface';
 
 @Injectable()
 export class MatchesService {
@@ -27,15 +28,34 @@ export class MatchesService {
       .createQueryBuilder()
       .insert()
       .values({
-        user_req: user_req,
-        user_acpt: user_acpt,
+        user_req: user_req.id,
+        user_acpt: user_acpt.id,
         points_req: game.points_req,
         points_acpt: game.points_acpt,
-        add_ons: game.add_ons,
+        addons: game.add_ons,
         game_type: game.game_type,
         winner_id: game.winner_id,
-        war_id: war,
+        war_id: war.id,
       })
       .execute();
+  }
+
+  async saveMatchResults(
+    game: IGameState,
+    endDate: Date,
+    gameType,
+  ): Promise<IMatch> {
+    const newMatch: IMatch = {
+      user_req: game.players[0].userId,
+      user_acpt: game.players[1].userId,
+      game_ended: endDate,
+      user_req_score: game.players[0].score,
+      user_acpt_score: game.players[1].score,
+      addons: game.settings.addons.join(';'),
+      game_type: gameType,
+      winner_id: game.winner,
+    };
+
+    return await this.matchesRepository.save(newMatch);
   }
 }

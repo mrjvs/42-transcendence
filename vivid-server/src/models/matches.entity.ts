@@ -7,32 +7,31 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { WarEntity } from './war.entity';
 
 @Entity({ name: 'matches' })
 export class MatchesEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @ManyToOne(() => UserEntity, (user) => user.matches_req)
-  @JoinColumn({ name: 'user_req' })
-  user_req: UserEntity;
-
-  @ManyToOne(() => UserEntity, (user) => user.matches_acpt)
-  @JoinColumn({ name: 'user_acpt' })
-  user_acpt: UserEntity;
+  user_req: string;
+  user_acpt: string;
 
   @CreateDateColumn()
   game_ended: Date;
 
   @Column()
-  points_req: number;
+  user_req_score: number;
 
   @Column()
+  user_acpt_score: number;
+
+  @Column({ nullable: true, default: null })
+  points_req: number;
+
+  @Column({ nullable: true, default: null })
   points_acpt: number;
 
   @Column('varchar', { default: null })
-  add_ons: string;
+  addons: string;
 
   @Column()
   game_type: string;
@@ -40,7 +39,17 @@ export class MatchesEntity {
   @Column()
   winner_id: string;
 
-  @ManyToOne(() => WarEntity, (war) => war.id)
-  @JoinColumn({ name: 'war_id' })
-  war_id: WarEntity;
+  @Column({ nullable: true, default: null })
+  war_id?: string;
+}
+
+export interface IMatch {
+  user_req: string;
+  user_acpt: string;
+  game_ended: Date;
+  user_req_score: number;
+  user_acpt_score: number;
+  addons: string;
+  game_type: string;
+  winner_id: string;
 }

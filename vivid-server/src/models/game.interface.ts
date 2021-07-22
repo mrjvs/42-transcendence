@@ -2,10 +2,12 @@ export interface IPlayer {
   // connection data
   client: any | null;
   userId: string | null;
+  name: string | null;
   ready: boolean;
 
   // game state
   score: number;
+  speed: number;
 
   // render variables
   width: number;
@@ -14,6 +16,9 @@ export interface IPlayer {
   y: number;
 
   // control states
+  holdingUp: number;
+  holdingDown: number;
+  lastPressed: null | 'up' | 'down';
   move: number;
   spacebar: number;
   shoot: number;
@@ -23,13 +28,34 @@ export interface IPlayer {
   special: boolean;
 }
 
+export interface ISpectator {
+  client?: any | null;
+}
+
+export enum EndReasons {
+  RAGEQUIT = 'ragequit',
+  FAIRFIGHT = 'fairfight',
+  CANCELLED = 'cancelled',
+}
+
+export enum GameProgress {
+  WAITING = 'waiting',
+  COUNTDOWN = 'countdown',
+  PLAYING = 'playing',
+  FINISHED = 'finished',
+  CANCELLED = 'cancelled',
+}
+
 export interface IGameState {
   // id for game
   gameId: string;
 
   // player defined settings
   settings: {
+    fieldWidth: number;
+    fieldHeight: number;
     addons: string[];
+    ticksPerMs: number;
   };
 
   // player entity
@@ -46,8 +72,18 @@ export interface IGameState {
   };
 
   // game states
-  finished: boolean;
+  gameProgress: GameProgress;
+  spectators: ISpectator[];
+  countdownNum: number;
+  countdownTicks: number;
+  endReason: EndReasons | null;
+  pastGame: boolean;
 
-  // ???
+  amoutOfSeconds: number;
+
+  // game ball speed get's progressively faster
   increaseSpeedAfterContact: number;
+
+  // game winner
+  winner: string | null;
 }

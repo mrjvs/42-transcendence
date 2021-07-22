@@ -82,7 +82,8 @@
   justify-content: center;
 }
 
-.loading-screen .icon-wrapper .icon {
+.loading-screen .icon-wrapper .icon,
+.loading-icon-rotate {
   background: linear-gradient(to bottom right, #29419f, #a34fec);
   transform: rotate(45deg);
   height: 5rem;
@@ -91,6 +92,14 @@
   animation: loading-rotate 2.2s cubic-bezier(0.57, 0.01, 0.35, 1) 0.2s infinite;
   margin-bottom: 3rem;
   margin-top: 6.5rem;
+}
+
+.loading-icon-rotate.small {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  margin-top: 0;
 }
 
 .loading-screen .icon-wrapper .text {

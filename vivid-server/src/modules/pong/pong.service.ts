@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { IGameState, IPlayer } from '@/game.interface';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { EndReasons, GameProgress, IGameState } from '@/game.interface';
 import { v4 as uuid } from 'uuid';
 import { Socket } from 'socket.io';
 import { createGameState } from './create_gamestate';
-import { gameLoop as renderGameLoop } from './Pong_simple';
+import { gameLoop as renderGameLoop, resetField } from './Pong_simple';
 import { MatchesService } from '$/matches/matches.service';
+import { UserService } from '../users/user.service';
 
 interface IClientGameMap {
   [clientId: string]: string; // [clientId] = gameId
@@ -63,43 +64,73 @@ export class GameState {
     this.#state.players
       .filter((v) => v.client)
       .forEach((v) => clients.push(v.client));
+    this.#state.spectators
+      .filter((v) => v.client)
+      .forEach((v) => clients.push(v.client));
     clients.forEach((c) => {
       c.emit(event, data);
     });
   }
 
+  renderCountDown() {
+    this.#state.countdownTicks -= 1;
+    if (this.#state.countdownTicks <= 0) {
+      this.#state.countdownTicks = 1000 / this.#state.settings.ticksPerMs;
+      this.#state.countdownNum -= 1;
+    }
+  }
+
+  createState() {
+    return {
+      gameId: this.#state.gameId,
+      players: this.#state.players.map((p) => ({
+        ...p,
+        spacebar: 0,
+        shoot: 0,
+        client: null,
+      })),
+      settings: {
+        ...this.#state.settings,
+        addons: [...this.#state.settings.addons],
+      },
+      ball: {
+        ...this.#state.ball,
+      },
+      gameProgress: this.#state.gameProgress,
+      spectators: this.#state.spectators.map((v) => v.client.auth),
+      countdownNum: this.#state.countdownNum,
+      countdownTicks: this.#state.countdownTicks,
+      endReason: this.#state.endReason,
+      increaseSpeedAfterContact: this.#state.increaseSpeedAfterContact,
+      winner: this.#state.winner,
+      amountOfSeconds: this.#state.amoutOfSeconds,
+    };
+  }
+
   // code run on every tick
   gameloop() {
-    const winner: IPlayer | null = renderGameLoop(this.#state);
-
-    // no winner, render game
-    if (!winner) {
-      const formattedData = {
-        gameId: this.#state.gameId,
-        players: this.#state.players.map((p) => ({
-          ...p,
-          move: 0,
-          spacebar: 0,
-          shoot: 0,
-          client: null,
-        })),
-        settings: {
-          ...this.#state.settings,
-        },
-        ball: {
-          ...this.#state.ball,
-        },
-        increaseSpeedAfterContact: this.#state.increaseSpeedAfterContact,
-      };
-      this.emitToClients('drawGame', formattedData);
+    if (this.#state.gameProgress === GameProgress.COUNTDOWN) {
+      this.renderCountDown();
+      if (this.#state.countdownNum <= 0) {
+        this.#state.gameProgress = GameProgress.PLAYING;
+      }
+      this.emitToClients('drawGame', this.createState());
       return;
     }
 
-    // send end event
-    this.emitToClients('gameOver', winner.userId);
+    this.#state.countdownTicks -= 1;
+    if (this.#state.countdownTicks <= 0) {
+      this.#state.countdownTicks = 1000 / this.#state.settings.ticksPerMs;
+      this.#state.amoutOfSeconds += 1;
+    }
+    this.#state.winner = renderGameLoop(this.#state);
+    this.emitToClients('drawGame', this.createState());
 
-    // stop gameloop
-    this.stopGame();
+    if (this.#state.winner) {
+      // stop gameloop
+      this.stopGame(EndReasons.FAIRFIGHT);
+      return;
+    }
   }
 
   // start if every player is ready
@@ -108,23 +139,40 @@ export class GameState {
     if (this.playerReadyCount < 2) return;
 
     // if game is no longer active, error out
-    if (this.#state.finished) return;
+    if (this.#state.gameProgress !== GameProgress.WAITING) return;
 
     // start game
+    this.#state.gameProgress = GameProgress.COUNTDOWN;
+    this.#state.countdownNum = 5;
+    this.#state.countdownTicks =
+      this.#state.settings.ticksPerMs / this.#state.settings.ticksPerMs;
     this.emitToClients('start');
+
+    // do initial render to set correct data
+    resetField(this.#state);
 
     if (!this.isInProgress)
       this.#interval = setInterval(() => {
         this.gameloop();
-      }, 1000 / 50);
+      }, this.#state.settings.ticksPerMs);
   }
 
   // stop game
-  stopGame() {
+  stopGame(reason: EndReasons) {
     if (this.isInProgress) clearInterval(this.#interval);
     this.#interval = null;
-    if (this.#state.finished) return;
-    this.#state.finished = true;
+    if (
+      ![GameProgress.PLAYING, GameProgress.COUNTDOWN].includes(
+        this.#state.gameProgress,
+      )
+    ) {
+      this.#state.gameProgress = GameProgress.CANCELLED;
+      this.#state.endReason = EndReasons.CANCELLED;
+    } else {
+      this.#state.gameProgress = GameProgress.FINISHED;
+      this.#state.endReason = reason;
+    }
+    this.emitToClients('drawGame', this.createState());
     try {
       this.#callback(this.#state);
     } catch (err) {}
@@ -136,7 +184,7 @@ export class GameState {
     if (!player) return false;
 
     // stop game because of disconnect
-    this.stopGame();
+    this.stopGame(EndReasons.RAGEQUIT);
   }
 
   // register user for game
@@ -147,15 +195,28 @@ export class GameState {
   }
 
   // user is connected and ready for game
-  setReady(client: any) {
+  async setReady(
+    client: any,
+    userService?: UserService,
+  ): Promise<string | void> {
     // check if client is authed
     if (!client || !client.auth) return 'notregistered';
 
     // find player
-    const player = this.#state.players.find((v) => v.userId === client.auth);
-    if (!player) return 'notregistered';
+    const player = this.#state.players.find(
+      (v) => v.userId === client.auth && !v.client,
+    );
+    if (!player) {
+      this.#state.spectators.push({
+        client,
+      });
+      return 'spectator';
+    }
+
+    const user = await userService.findUser(client.auth, []);
 
     player.ready = true;
+    player.name = user.name;
     player.client = client;
 
     this.startGameIfAble();
@@ -166,13 +227,19 @@ export class GameState {
     const player = this.getPlayerFromClient(client);
     if (!player) return false;
     if (keyState === PlayerInputState.KEYUP) {
-      // TODO record seperate inputs
-      if (key === PlayerInputs.UP || key === PlayerInputs.DOWN) player.move = 0;
-      else return false;
+      if (key === PlayerInputs.UP) {
+        player.holdingUp = 0;
+      } else if (key === PlayerInputs.DOWN) {
+        player.holdingDown = 0;
+      } else return false;
     } else if (keyState === PlayerInputState.KEYDOWN) {
-      if (key === PlayerInputs.UP) player.move = -0.01;
-      else if (key === PlayerInputs.DOWN) player.move = 0.01;
-      else return false;
+      if (key === PlayerInputs.UP) {
+        player.holdingUp = 1;
+        player.lastPressed = key;
+      } else if (key === PlayerInputs.DOWN) {
+        player.holdingDown = 1;
+        player.lastPressed = key;
+      } else return false;
     } else if (keyState === PlayerInputState.PRESS) {
       if (key === PlayerInputs.ACTION) {
         // TODO ??
@@ -188,11 +255,22 @@ const clientUserMap: IClientUserMap = {};
 
 @Injectable()
 export class PongService {
-  constructor(private matchService: MatchesService) {}
+  constructor(
+    private matchService: MatchesService,
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
+  ) {}
 
   createGame() {
     const gameId: string = uuid();
     states[gameId] = new GameState(gameId, (state) => {
+      // save if game occured and not cancelled
+      if (state.gameProgress !== GameProgress.CANCELLED) {
+        this.matchService
+          .saveMatchResults(state, new Date(), 'DUEL')
+          .catch(() => {});
+      }
+
       // remove clients from maps
       state.players.forEach((v) => {
         // remove states from maps
@@ -202,9 +280,6 @@ export class PongService {
 
       // remove gamestate
       states[state.gameId] = undefined;
-
-      // TODO save match
-      console.log('Someone won, lol');
     });
     return gameId;
   }
@@ -231,12 +306,12 @@ export class PongService {
     game.disconnectClient(client);
   }
 
-  readyEvent(client: Socket, gameId: string) {
+  async readyEvent(client: Socket, gameId: string) {
     const game = states[gameId];
     if (!game) return;
 
     client.join(gameId);
-    const res = game.setReady(client);
+    const res = await game.setReady(client, this.userService);
     if (res === 'notregistered') {
       return {
         status: false,

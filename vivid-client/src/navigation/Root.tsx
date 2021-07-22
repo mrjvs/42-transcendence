@@ -86,10 +86,6 @@ function SideBarRouter() {
             <p>pong</p>
             <GameView />
           </Route>
-          <Route exact path="/pong/:id">
-            <p>pong</p>
-            <PongView />
-          </Route>
           <Route path="*">
             <NotFoundView>Not Found</NotFoundView>
           </Route>
@@ -118,6 +114,9 @@ function MainRouter() {
         <Switch>
           <Route exact path="/settings">
             <SettingsView />
+          </Route>
+          <Route exact path="/pong/:id">
+            <PongView />
           </Route>
           <Route exact path="/channel/:id/settings">
             <ChannelSettingsView />

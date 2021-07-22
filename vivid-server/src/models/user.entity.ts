@@ -12,7 +12,6 @@ import {
 import { GuildsEntity } from './guilds.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Exclude, Expose, Transform } from 'class-transformer';
-import { MatchesEntity } from './matches.entity';
 import { BlocksEntity } from '@/blocks.entity';
 
 @Entity({ name: 'users' })
@@ -48,18 +47,8 @@ export class UserEntity extends BaseEntity {
   @JoinColumn({ name: 'guild' })
   guild: GuildsEntity;
 
-  @OneToMany(() => MatchesEntity, (matches) => matches.user_req)
-  matches_req: MatchesEntity[];
-
-  @OneToMany(() => MatchesEntity, (matches) => matches.user_acpt)
-  matches_acpt: MatchesEntity[];
-
   @OneToMany(() => BlocksEntity, (blocks) => blocks.user_id)
   blocks: BlocksEntity[];
-
-  //   onDelete: 'SET NULL',
-  // })
-  // guild: GuildsEntity;
 
   @Column({ nullable: true, type: 'text' })
   twofactor: string;
