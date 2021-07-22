@@ -6,19 +6,13 @@ import { Button } from './Button';
 import { useHistory } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { Icon } from './Icon';
+import { GameEventContext } from '../../hooks/useGameEvents';
 
-export function Message(props: {
-  channelId: string;
-  tag?: string;
-  messages: any[];
-  blocked: boolean;
-  user: any;
-  tags: string[];
-  owner: boolean;
-  channelData: any;
-  currentChannelUser: any;
-}) {
+// TODO styling for different statuses
+function DuelMessage(props: { message: any; channelId: string; user: any }) {
   const history = useHistory();
+  const inviteId = props.message?.aux_content?.invite_game_id;
+  const { getGameStatus, subscribe } = React.useContext(GameEventContext);
   const gameFetch = useFetch({
     url: '',
     method: 'POST',
@@ -39,6 +33,49 @@ export function Message(props: {
     }
   }, [gameFetch.done]);
 
+  React.useEffect(() => {
+    if (inviteId) subscribe(inviteId);
+  }, [props.message]);
+
+  return (
+    <div className="messageInvite-wrapper-wrapper">
+      <div className="messageInvite-wrapper">
+        <div className="messageInvite-accent" />
+        <div className="messageInvite-content">
+          <div className="messageInvite-user">
+            <Avatar user={props.user} small />
+            {props.user.name}
+          </div>
+          <p>status: {getGameStatus(inviteId).status}</p>
+          <p className="text">You&apos;ve been invited to a duel!</p>
+          <Button
+            loading={gameFetch.loading}
+            onclick={() => runDuelAccept(props.message.id)}
+          >
+            Accept
+          </Button>
+          {gameFetch.error ? (
+            <p className="error">Something went wrong, try again later.</p>
+          ) : null}
+          <div className="red-cube"></div>
+          <div className="dark-cube"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Message(props: {
+  channelId: string;
+  tag?: string;
+  messages: any[];
+  blocked: boolean;
+  user: any;
+  tags: string[];
+  owner: boolean;
+  channelData: any;
+  currentChannelUser: any;
+}) {
   const { run } = useFetch({
     runOnLoad: false,
     url: '',
@@ -115,33 +152,11 @@ export function Message(props: {
                       <span className="bg-overlay bg-layers">
                         <DeleteButton msgId={v.id} />
                       </span>
-                      <div className="messageInvite-wrapper-wrapper">
-                        <div className="messageInvite-wrapper">
-                          <div className="messageInvite-accent" />
-                          <div className="messageInvite-content">
-                            <div className="messageInvite-user">
-                              <Avatar user={props.user} small />
-                              {props.user.name}
-                            </div>
-                            <p className="text">
-                              You&apos;ve been invited to a duel!
-                            </p>
-                            <Button
-                              loading={gameFetch.loading}
-                              onclick={() => runDuelAccept(v.id)}
-                            >
-                              Accept
-                            </Button>
-                            {gameFetch.error ? (
-                              <p className="error">
-                                Something went wrong, try again later.
-                              </p>
-                            ) : null}
-                            <div className="red-cube"></div>
-                            <div className="dark-cube"></div>
-                          </div>
-                        </div>
-                      </div>
+                      <DuelMessage
+                        user={props.user}
+                        message={v}
+                        channelId={props.channelId}
+                      />
                     </div>
                   );
                 else if (v.type == 2) {

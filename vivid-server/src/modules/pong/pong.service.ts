@@ -107,6 +107,7 @@ export class GameState {
       },
       gameProgress: this.#state.gameProgress,
       spectators: this.#state.spectators.map((v) => v.client.auth),
+      subscribers: [],
       countdownNum: this.#state.countdownNum,
       countdownTicks: this.#state.countdownTicks,
       endReason: this.#state.endReason,
@@ -121,7 +122,7 @@ export class GameState {
     if (this.#state.gameProgress === GameProgress.COUNTDOWN) {
       this.renderCountDown();
       if (this.#state.countdownNum <= 0) {
-        this.#state.gameProgress = GameProgress.PLAYING;
+        this.setAndSendStatus(GameProgress.PLAYING);
       }
       this.emitToClients('drawGame', this.createState());
       return;
@@ -151,7 +152,7 @@ export class GameState {
     if (this.#state.gameProgress !== GameProgress.WAITING) return;
 
     // start game
-    this.#state.gameProgress = GameProgress.COUNTDOWN;
+    this.setAndSendStatus(GameProgress.COUNTDOWN);
     this.#state.countdownNum = 5;
     this.#state.countdownTicks =
       this.#state.settings.ticksPerMs / this.#state.settings.ticksPerMs;
@@ -175,10 +176,10 @@ export class GameState {
         this.#state.gameProgress,
       )
     ) {
-      this.#state.gameProgress = GameProgress.CANCELLED;
+      this.setAndSendStatus(GameProgress.CANCELLED);
       this.#state.endReason = EndReasons.CANCELLED;
     } else {
-      this.#state.gameProgress = GameProgress.FINISHED;
+      this.setAndSendStatus(GameProgress.FINISHED);
       this.#state.endReason = reason;
     }
     this.emitToClients('drawGame', this.createState());
@@ -253,6 +254,36 @@ export class GameState {
       } else return false;
     }
     return true;
+  }
+
+  setAndSendStatus(status: GameProgress) {
+    this.#state.gameProgress = status;
+    let toSend = status;
+    if (toSend === GameProgress.CANCELLED) toSend = GameProgress.FINISHED;
+    this.#state.subscribers.forEach((v) => {
+      v.client.emit('gameSubscribeReturn', {
+        gameId: this.#state.gameId,
+        status: toSend,
+      });
+    });
+  }
+
+  sendCurrentStatus(client: any) {
+    let toSend = this.#state.gameProgress;
+    if (toSend === GameProgress.CANCELLED) toSend = GameProgress.FINISHED;
+    client.emit('gameSubscribeReturn', {
+      gameId: this.#state.gameId,
+      status: toSend,
+    });
+  }
+
+  subscribeClient(client: any) {
+    this.sendCurrentStatus(client);
+    const found = this.#state.subscribers.find(
+      (v) => v.client.id === client.id,
+    );
+    if (found) return;
+    this.#state.subscribers.push({ client });
   }
 }
 
@@ -380,6 +411,19 @@ export class PongService {
     }
     clientGameMap[client.id] = gameId;
     return res;
+  }
+
+  subscribeEvent(client: Socket, gameId: string) {
+    const game = states[gameId];
+    if (!game) {
+      client.emit('gameSubscribeReturn', {
+        gameId: gameId,
+        status: 'finished',
+      });
+      return;
+    }
+
+    game.subscribeClient(client);
   }
 
   handleKeydown(client: Socket, key: PlayerInputs) {

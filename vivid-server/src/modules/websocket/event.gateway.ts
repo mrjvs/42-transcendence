@@ -177,6 +177,7 @@ export class EventGateway implements OnGatewayConnection {
   /* GAME EVENTS */
   @SubscribeMessage('ready')
   readyEvent(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+    if (!client.auth) return;
     if (!body?.gameId) return;
     this.pongService
       .readyEvent(client, body.gameId)
@@ -212,6 +213,17 @@ export class EventGateway implements OnGatewayConnection {
 
   @SubscribeMessage('gameleave')
   leaveGameEvent(@ConnectedSocket() client: Socket) {
+    if (!client.auth) return;
     this.pongService.onDisconnect(client);
+  }
+
+  @SubscribeMessage('subscribeGame')
+  subscribeGameEvent(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() gameId: string,
+  ) {
+    if (!client.auth) return;
+    if (!gameId) return;
+    this.pongService.subscribeEvent(client, gameId);
   }
 }

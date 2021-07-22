@@ -74,6 +74,7 @@ export interface IGameState {
   // game states
   gameProgress: GameProgress;
   spectators: ISpectator[];
+  subscribers: ISpectator[];
   countdownNum: number;
   countdownTicks: number;
   endReason: EndReasons | null;

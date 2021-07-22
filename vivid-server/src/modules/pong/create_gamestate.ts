@@ -54,6 +54,7 @@ export function createGameState(gameId: string): IGameState {
 
     gameProgress: GameProgress.WAITING,
     spectators: [],
+    subscribers: [],
     countdownNum: 3,
     countdownTicks: fps,
     increaseSpeedAfterContact: 1,
