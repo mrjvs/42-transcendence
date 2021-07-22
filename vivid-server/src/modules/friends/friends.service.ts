@@ -37,12 +37,13 @@ export class FriendsService {
   }
 
   async findFriendRequests(userId: string): Promise<FriendsEntity[]> {
-    return await this.friendsRepository.find({
-      relations: ['user_1', 'user_2'],
-      where: {
-        requested_to: userId,
-      },
-    });
+    return await this.friendsRepository
+      .createQueryBuilder('friends')
+      .leftJoinAndSelect('friends.user_1', 'user_1')
+      .leftJoinAndSelect('friends.user_2', 'user_2')
+      .where('user_1 = :u1', { u1: userId })
+      .orWhere('user_2 = :u2', { u2: userId })
+      .getMany();
   }
 
   // Add FriendEntity to database (=> send friend request)

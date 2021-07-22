@@ -148,4 +148,11 @@ export class EventGateway implements OnGatewayConnection {
     if (!client.auth) return;
     this.pongService.handleMouseMove(client, move);
   }
+
+  /* FRIENDSHIPS */
+  @SubscribeMessage('friendship_update')
+  updateFriendships(@ConnectedSocket() client: Socket) {
+    if (!client.auth) return;
+    client.emit('friendship_update');
+  }
 }

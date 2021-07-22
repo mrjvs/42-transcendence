@@ -4,6 +4,7 @@ import { ModalBase } from './ModalBase';
 import { Button } from '../Button';
 import { useFetch } from '../../../hooks/useFetch';
 import { UserContext } from '../../../hooks/useUser';
+import { SocketContext } from '../../../hooks/useWebsocket';
 
 export function UserProfileModal(props: {
   user: any;
@@ -80,6 +81,8 @@ function BlockAction(props: { userData: any; userId: string }) {
 }
 
 export function FriendAction(props: { userData: any; friendId: string }) {
+  const { client } = React.useContext(SocketContext);
+
   const friendUser = useFetch({
     url: `/api/v1/friends/add/${props.friendId}`,
     method: 'POST',
@@ -120,6 +123,7 @@ export function FriendAction(props: { userData: any; friendId: string }) {
           },
         ],
       });
+      client.emit('friendship_update');
     }
 
     if (unFriend.done) {
@@ -130,6 +134,7 @@ export function FriendAction(props: { userData: any; friendId: string }) {
           (v: any) => v.id !== friendship.id,
         ),
       });
+      client.emit('friendship_update');
     }
     if (acceptFriend.done) {
       const friendship = acceptFriend.data.data;
@@ -140,6 +145,7 @@ export function FriendAction(props: { userData: any; friendId: string }) {
           return v;
         }),
       });
+      client.emit('friendship_update');
     }
   }, [friendUser.done, unFriend.done, props.userData, acceptFriend.done]);
 
