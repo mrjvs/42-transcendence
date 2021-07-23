@@ -8,7 +8,7 @@ import {
 import { v4 as uuid } from 'uuid';
 import { Socket } from 'socket.io';
 import { createGameState } from './create_gamestate';
-import { gameLoop as renderGameLoop, resetField } from './Pong_simple';
+import { gameLoop as renderGameLoop, resetField } from './pong';
 import { MatchesService } from '$/matches/matches.service';
 import { UserService } from '../users/user.service';
 import { IMatch } from '~/models/matches.entity';
