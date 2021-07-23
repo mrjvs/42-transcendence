@@ -55,6 +55,7 @@ export function createGameState(gameId: string): IGameState {
       x: 0,
       y: 0,
       speed: 0,
+      addedSpeed: 0,
       velocityX: 0,
       velocityY: 0,
       extraRadiuses: [],

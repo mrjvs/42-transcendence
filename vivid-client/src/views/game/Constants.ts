@@ -77,6 +77,7 @@ export interface IGameState {
     speed: number;
     velocityX: number;
     velocityY: number;
+    addedSpeed: number;
   };
 
   // game states

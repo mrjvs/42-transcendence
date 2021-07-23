@@ -4,11 +4,13 @@ import { IGameState } from '../views/game/Constants';
 import { SocketContext } from '../hooks/useWebsocket';
 import { Button } from './styled/Button';
 import { useHistory } from 'react-router-dom';
+import { Controls } from './styled/Controls';
 
 interface CanvasProps {
   gameId: string;
   loading: boolean;
   gameState: IGameState | null;
+  selfIndex?: number;
 }
 
 const keyMap = {
@@ -26,7 +28,12 @@ const keyMap = {
   },
 };
 
-export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
+export function PongGameCanvas({
+  gameId,
+  loading,
+  gameState,
+  selfIndex,
+}: CanvasProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { client } = React.useContext(SocketContext);
   const gameStateReal = React.useRef<IGameState | null>(null);
@@ -136,12 +143,17 @@ export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
         }`}
       >
         <div className="pong-waiting">
-          <div className="loading-icon-rotate small" />
-          <h2>Waiting for opponent</h2>
-          <p>Lovely day isn&apos;t it?</p>
-          <Button type="danger" onclick={() => history.push('/')}>
-            cancel
-          </Button>
+          <div className="waiting-left">
+            <Controls />
+          </div>
+          <div className="waiting-right">
+            <div className="loading-icon-rotate small" />
+            <h2>Waiting for opponent</h2>
+            <p>Lovely day isn&apos;t it?</p>
+            <Button type="danger" onclick={() => history.push('/')}>
+              cancel
+            </Button>
+          </div>
         </div>
       </div>
       {React.useMemo(

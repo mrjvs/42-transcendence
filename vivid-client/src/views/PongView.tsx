@@ -191,6 +191,7 @@ export function PongView() {
           gameId={id}
           gameState={gameState}
           loading={leftPlayer.waiting || rightPlayer.waiting}
+          selfIndex={self.index}
         />
         {isSpectating ? (
           <p className="pong-spectators">You are spectating</p>

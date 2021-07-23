@@ -75,6 +75,7 @@ export interface IGameState {
     extraRadiuses: { player: string; factor: number }[];
     extraSpeeds: { player: string; factor: number }[];
     speed: number;
+    addedSpeed: number;
     velocityX: number;
     velocityY: number;
   };

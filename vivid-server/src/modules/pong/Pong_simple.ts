@@ -21,7 +21,7 @@ const constants = {
       duration: 200,
     },
   },
-  addonResetTime: 3,
+  addonResetTime: 15,
 };
 
 export function resetField(state: IGameState) {
@@ -51,6 +51,7 @@ function resetBall(state: IGameState) {
   const angleRad = degrees * (Math.PI / 180);
   state.ball.velocityX = Math.cos(angleRad);
   state.ball.velocityY = Math.sin(angleRad);
+  state.ball.addedSpeed = 0;
 }
 
 function runAddon(gameState: IGameState, player: IPlayer) {
@@ -82,7 +83,9 @@ function revertAddon(gameState: IGameState, player: IPlayer) {
     );
   else if (player.stashedAddon === 'fastpad') player.extraSpeed = 0;
   else if (player.stashedAddon === 'sticky') {
-    gameState.ball.speed = constants.ballStartSpeed;
+    gameState.ball.speed =
+      constants.ballStartSpeed +
+      gameState.increaseSpeedAfterContact * gameState.ball.addedSpeed;
     player.sticky = false;
   }
 }
@@ -200,11 +203,11 @@ function updateBallLocation(state: IGameState): string | null {
     attackingPlayer = state.players[0];
   }
 
+  // change ball y position when 'sticky' addon is active
   if (state.ball.speed === 0 && defendingPlayer.sticky) {
     state.ball.y +=
       defendingPlayer.move *
       (defendingPlayer.speed + defendingPlayer.extraSpeed);
-    // TODO check if radius increases then readjust ball.x
   }
 
   // Check for pad collision and change ball direction
@@ -214,7 +217,6 @@ function updateBallLocation(state: IGameState): string | null {
         (defendingPlayer.y +
           (defendingPlayer.height + defendingPlayer.extraHeight) / 2)) /
       ((defendingPlayer.height + defendingPlayer.extraHeight) / 2);
-    const oldDirection = state.ball.velocityX;
     const angleRad = collidePoint * (Math.PI / 4);
     const direction = state.ball.x < state.settings.fieldWidth / 2 ? 1 : -1;
     state.ball.velocityX = Math.cos(angleRad) * direction;
@@ -222,10 +224,14 @@ function updateBallLocation(state: IGameState): string | null {
 
     if (defendingPlayer.sticky) {
       state.ball.speed = 0;
-    } else state.ball.speed += state.increaseSpeedAfterContact;
+    } else {
+      state.ball.speed += state.increaseSpeedAfterContact;
+      state.ball.addedSpeed += 1;
+    }
 
     // move ball position outside of pad
-    if (oldDirection < 0) state.ball.x = defendingPlayer.width + radius;
+    if (state.ball.x < state.settings.fieldWidth / 2)
+      state.ball.x = defendingPlayer.width + radius;
     else state.ball.x = defendingPlayer.x - radius;
   }
 

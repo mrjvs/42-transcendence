@@ -91,7 +91,7 @@
 .pong-wrapper .pong-spectators.topleft {
   position: fixed;
   left: 1rem;
-  top: 1rem;
+  bottom: 1rem;
   text-align: left;
   margin: 0;
 }
@@ -123,8 +123,9 @@
 }
 
 .pong-wrapper .pong-waiting {
+  width: 35rem;
   display: none;
-  flex-direction: column;
+  flex-direction: row;
   text-align: center;
   align-items: center;
   pointer-events: all;
@@ -261,4 +262,39 @@
 
 .pong-endcard .pong-marginbottom {
   margin-bottom: 5rem;
+}
+
+/* waiting screen */
+.waiting-left,
+.waiting-right {
+  flex: 1;
+  padding: 3rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}
+
+.waiting-header {
+  font-weight: bold;
+  font-size: 1.6rem;
+  margin: 0 0 3rem 0;
+  color: white;
+}
+
+.waiting-color.blue {
+  background-color: #3253bf;
+}
+
+.waiting-color.red {
+  background-color: #9b403f;
+}
+
+.waiting-color {
+  padding: 0.1rem 0.5rem;
+  font-size: 1rem;
+  border-radius: 2px;
+  color: white;
+  margin-left: 0.5rem;
 }
