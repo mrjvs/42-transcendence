@@ -23,6 +23,7 @@ import {
   UserStatus,
 } from './statuses';
 import { ChannelEntity } from '~/models/channel.entity';
+import { MatchMakingService } from '../ladder/matchmaking.service';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -32,6 +33,7 @@ export class EventGateway implements OnGatewayConnection {
   constructor(
     private readonly userService: UserService,
     private readonly pongService: PongService,
+    private readonly matchmakingService: MatchMakingService,
   ) {
     registerCallback((s: UserStatus) => this.statusCallback(s));
   }
@@ -225,5 +227,18 @@ export class EventGateway implements OnGatewayConnection {
     if (!client.auth) return;
     if (!gameId) return;
     this.pongService.subscribeEvent(client, gameId);
+  }
+
+  /* MATCHMAKING */
+  @SubscribeMessage('matchmaking')
+  async joinMatchmaking(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: any,
+  ) {
+    if (!client || !client.auth) return;
+    if (!body || !body?.ladderId) return;
+    try {
+      await this.matchmakingService.joinPool(client, body.ladderId);
+    } catch (err) {}
   }
 }

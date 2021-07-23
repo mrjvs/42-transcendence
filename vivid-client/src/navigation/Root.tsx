@@ -1,4 +1,4 @@
-import { Route, Switch, useHistory } from 'react-router-dom';
+import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import React from 'react';
 import './Root.css';
 import { Heading } from '../components/styled/Heading';
@@ -17,6 +17,8 @@ import { ChannelSettingsView } from '../views/ChannelSettingsView';
 import { ChannelsContext } from '../hooks/useChannels';
 import { NotFoundView } from '../views/NotFoundView';
 import { DmChannelView } from '../views/DmChannelView';
+import { GameMatchView } from '../views/GameMatch';
+import { LadderMatchView } from '../views/LadderMatch';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
@@ -37,18 +39,14 @@ function SideBarRouter() {
         <div className="top">
           <Heading size="small">Vivid</Heading>
         </div>
-        <ActionRow label="guild" />
-        <SidebarLink link="/guilds">
-          <Icon type="gear" />
-          Guild Settings
+        <ActionRow label="Games" />
+        <SidebarLink link="/">
+          <Icon type="crown" />
+          Play a game
         </SidebarLink>
-        <SidebarLink link="/tournaments">
-          <Icon type="flag" />
-          Tournaments
-        </SidebarLink>
-        <SidebarLink link="/wars">
-          <Icon type="award" />
-          War History
+        <SidebarLink link="/history">
+          <Icon type="crown" />
+          Match history
         </SidebarLink>
         <SidebarLink link="/stats">
           <Icon type="stats" />
@@ -74,7 +72,7 @@ function SideBarRouter() {
       <div className="content">
         <Switch>
           <Route exact path="/">
-            <p>home</p>
+            <GameMatchView />
           </Route>
           <Route exact path="/channel/:id">
             <ChannelView />
@@ -114,6 +112,9 @@ function MainRouter() {
         <Switch>
           <Route exact path="/settings">
             <SettingsView />
+          </Route>
+          <Route exact path="/ladder/:id">
+            <LadderMatchView />
           </Route>
           <Route exact path="/pong/:id">
             <PongView />

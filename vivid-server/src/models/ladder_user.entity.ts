@@ -5,8 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserEntity } from '@/user.entity';
-import { IUser } from '@/user.interface';
+import { IUser, UserEntity } from '@/user.entity';
 import { ERank, LadderEntity } from '@/ladder.entity';
 
 @Entity('ladder_user')
@@ -31,23 +30,15 @@ export class LadderUserEntity {
   getRank() {
     if (this.ladder.constructor === String) return;
     const ladderObj = this.ladder as unknown as LadderEntity;
-    ladderObj.rank.forEach((rank) =>
-      this.points > rank.topLimit ? (this.rank = rank.name) : null,
-    );
-    if (this.rank === null) this.rank = ladderObj.rank[0].name;
+    if (ladderObj.type === 'ranked') {
+      const rank = ladderObj.ranks.find(
+        (rank) =>
+          this.points > rank.bottomLimit &&
+          (this.points <= rank.topLimit || rank.topLimit == -1),
+      );
+      this.rank = rank?.name;
+    } else this.rank = 0;
   }
-
-  @Column()
-  wins: number;
-
-  @Column()
-  losses: number;
-
-  @Column()
-  in_queue: boolean;
-
-  @Column({ type: 'timestamp', nullable: true, default: null })
-  queue_time: Date;
 }
 
 export class ILadderUser {
@@ -55,8 +46,4 @@ export class ILadderUser {
   user: string | IUser;
   points: number;
   rank: ERank;
-  wins: number;
-  losses: number;
-  in_queue: boolean;
-  queue_time: Date;
 }

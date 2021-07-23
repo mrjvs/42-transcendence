@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   LessThanOrEqual,
@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 
 import {
+  ERank,
   ILadder,
   LadderDto,
   LadderEntity,
@@ -31,6 +32,63 @@ export class LadderService {
     return await this.ladderRepository.save(ladderInput);
   }
 
+  async generateDefaults(): Promise<void> {
+    const logger: Logger = new Logger(LadderService.name);
+    try {
+      await this.ladderRepository.insert({
+        type: 'casual',
+        special_id: 'casual',
+        ranks: [],
+      });
+    } catch (err) {
+      if (err.code !== '23505') {
+        logger.error('Failed to create default ladder');
+        throw err;
+      }
+    }
+
+    try {
+      await this.ladderRepository.insert({
+        type: 'ranked',
+        special_id: 'ranked',
+        ranks: [
+          {
+            name: ERank.BRONZE,
+            topLimit: 400,
+            bottomLimit: 0,
+          },
+          {
+            name: ERank.SILVER,
+            topLimit: 800,
+            bottomLimit: 400,
+          },
+          {
+            name: ERank.GOLD,
+            topLimit: 1600,
+            bottomLimit: 800,
+          },
+          {
+            name: ERank.DIAMOND,
+            topLimit: 2400,
+            bottomLimit: 1600,
+          },
+          {
+            name: ERank.MASTER,
+            topLimit: -1,
+            bottomLimit: 2400,
+          },
+        ],
+      });
+    } catch (err) {
+      if (err.code !== '23505') {
+        logger.error('Failed to create default ladder');
+        throw err;
+      }
+    }
+
+    logger.log('Successfully created default ladders');
+  }
+
   async delete(ladderId: string): Promise<ILadder> {
     return await this.ladderRepository
       .createQueryBuilder()
@@ -43,6 +101,10 @@ export class LadderService {
       });
   }
 
+  async listLadders(): Promise<ILadder[]> {
+    return this.ladderRepository.find();
+  }
+
   // list all users
   async listLadder(
     ladderId: string,
@@ -51,7 +113,7 @@ export class LadderService {
     if (!ladderPagination) {
       return await this.ladderUserRepository.find({
         where: { ladder: ladderId },
-        order: { points: 'DESC', wins: 'DESC' },
+        order: { points: 'DESC' },
       });
     }
     return await this.ladderUserRepository.find({
@@ -62,7 +124,7 @@ export class LadderService {
           ladderPagination.bottomLimit,
         ),
       },
-      order: { points: 'DESC', wins: 'DESC' },
+      order: { points: 'DESC' },
     });
   }
 
@@ -75,7 +137,7 @@ export class LadderService {
     if (!ladderPagination) {
       return await this.ladderUserRepository.find({
         where: { ladder: ladderId, rank: rankId },
-        order: { points: 'DESC', wins: 'DESC' },
+        order: { points: 'DESC' },
       });
     }
     return await this.ladderUserRepository.find({
@@ -87,7 +149,7 @@ export class LadderService {
           ladderPagination.bottomLimit,
         ),
       },
-      order: { points: 'DESC', wins: 'DESC' },
+      order: { points: 'DESC' },
     });
   }
 
@@ -99,59 +161,6 @@ export class LadderService {
         id: userId,
       },
     });
-  }
-
-  // TODO possible race condition
-  // this will be called once before the matchmaking
-  async startSearch(ladderId: string, userId: string): Promise<void> {
-    const res = await this.ladderUserRepository
-      .createQueryBuilder()
-      .update()
-      .set({ queue_time: new Date(), in_queue: true })
-      .where({ id: userId })
-      .execute();
-    if (!res) throw new NotFoundException();
-  }
-
-  // opponent found so no more in queue
-  async endSearch(ladderId: string, userId: string): Promise<void> {
-    const res = await this.ladderUserRepository
-      .createQueryBuilder()
-      .update()
-      .set({ queue_time: null, in_queue: false })
-      .where({ ladder: ladderId, id: userId })
-      .execute();
-    if (!res) throw new NotFoundException();
-  }
-
-  // find opponent (excluding yourself)
-  // this will be called many times
-  async matchMake(ladderId: string, user: ILadderUser): Promise<ILadderUser> {
-    if (user.in_queue === false) await this.startSearch(ladderId, user.id);
-
-    const opponentParams: {
-      id: any;
-      ladder: string;
-      rank: any;
-      in_queue: boolean;
-    } = {
-      id: Not(user.id),
-      ladder: ladderId,
-      rank: user.rank - 1 || user.rank || user.rank + 1,
-      in_queue: true,
-    };
-
-    const currentTime: Date = new Date();
-    if (currentTime.getSeconds() >= user.queue_time.getSeconds() + 60) {
-      opponentParams.rank =
-        LessThanOrEqual(user.rank) || MoreThanOrEqual(user.rank);
-    }
-    const opponent = await this.ladderUserRepository.findOne(opponentParams);
-    if (opponent) {
-      await this.endSearch(ladderId, user.id);
-      return opponent;
-    }
-    return undefined;
   }
 
   private static calculateProbability(
@@ -195,8 +204,6 @@ export class LadderService {
         .update()
         .set({
           points: () => `points = ${user1_points}`,
-          wins: () => (user1_won ? 'wins + 1' : 'wins'),
-          losses: () => (!user1_won ? 'losses + 1' : 'losses'),
         })
         .where({ ladder: ladder, id: user1.id })
         .returning('*')
@@ -211,8 +218,6 @@ export class LadderService {
         .update()
         .set({
           points: () => `points = ${user2_points}`,
-          wins: () => (!user1_won ? 'wins + 1' : 'wins'),
-          losses: () => (user1_won ? 'losses + 1' : 'losses'),
         })
         .where({ ladder: ladder, id: user1.id })
         .returning('*')

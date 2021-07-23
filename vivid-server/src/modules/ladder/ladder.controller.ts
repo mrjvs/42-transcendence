@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 
 import { LadderService } from '$/ladder/ladder.service';
@@ -9,6 +9,11 @@ import { ILadderUser } from '@/ladder_user.entity';
 @UseGuards(AuthenticatedGuard)
 export class LadderController {
   constructor(private ladderService: LadderService) {}
+
+  @Get('/')
+  getLadders(): Promise<ILadder[]> {
+    return this.ladderService.listLadders();
+  }
 
   @Get('/:id')
   getLadder(
@@ -27,28 +32,11 @@ export class LadderController {
     return this.ladderService.listRank(ladderId, rank, ladderPagination);
   }
 
-  @Get('/:id/:user')
+  @Get('/:id/user/:user')
   getUser(
     @Param('id') ladderId: string,
     @Param('user') userId: string,
   ): Promise<ILadderUser> {
     return this.ladderService.getUser(ladderId, userId);
-  }
-
-  @Get('/:id/matchmake')
-  startMatchmaking(
-    @Param('id') ladderId: string,
-    @Body('user') ladderUser: ILadderUser,
-  ): Promise<ILadderUser> {
-    return this.ladderService.matchMake(ladderId, ladderUser);
-  }
-
-  @Patch('/:id/rating')
-  adjustRating(
-    @Param('id') ladderId: ILadder,
-    @Body('usr1') usr1: ILadderUser,
-    @Body('usr2') usr2: ILadderUser,
-  ): Promise<ILadderUser[]> {
-    return this.ladderService.adjustRating(ladderId, usr1, usr2, true);
   }
 }

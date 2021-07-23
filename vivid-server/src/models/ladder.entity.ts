@@ -5,6 +5,7 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import {
   IsBoolean,
@@ -18,19 +19,22 @@ import { ILadderUser, LadderUserEntity } from '@/ladder_user.entity';
 
 @Check(`"end_date" > "start_date"`)
 @Check(`"start_date" > "created_at"`)
+@Unique(['special_id'])
 @Entity('ladder')
 export class LadderEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ default: true })
-  is_ranked: boolean;
-
-  @Column({ type: 'json' })
-  rank: IRank[];
+  @Column({ default: null, nullable: true })
+  special_id: string | null;
 
   @Column()
-  @OneToMany(() => LadderUserEntity, (user) => user.id)
+  type: string;
+
+  @Column({ type: 'json' })
+  ranks: IRank[];
+
+  @OneToMany(() => LadderUserEntity, (user) => user.ladder)
   users: LadderUserEntity[];
 
   @CreateDateColumn()
@@ -43,11 +47,17 @@ export class LadderEntity {
   end_date: Date;
 }
 
+export interface IRank {
+  name: ERank;
+  topLimit: number;
+  bottomLimit: number;
+}
+
 export interface ILadder {
   id: string;
-  rank: IRank[];
+  ranks: IRank[];
   users: ILadderUser[];
-  is_ranked?: boolean;
+  type: string;
   start_date?: Date;
   end_date?: Date;
 }
@@ -55,12 +65,11 @@ export interface ILadder {
 export class LadderDto {
   @IsNotEmpty()
   @IsJSON()
-  rank: IRank[];
+  ranks: IRank[];
 
   @IsNotEmpty()
-  @IsBoolean()
   @IsOptional()
-  is_ranked: boolean;
+  type: string;
 
   @IsNotEmpty()
   @IsDate()
@@ -71,12 +80,6 @@ export class LadderDto {
   @IsDate()
   @IsOptional()
   end_date: Date;
-}
-
-export interface IRank {
-  name: ERank;
-  topLimit: number;
-  bottomLimit: number;
 }
 
 export enum ERank {
