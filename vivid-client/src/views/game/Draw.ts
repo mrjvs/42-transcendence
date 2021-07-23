@@ -43,7 +43,7 @@ function renderPlayer(
     playerCtx.x + padding,
     playerCtx.y,
     playerCtx.width,
-    playerCtx.height,
+    playerCtx.height + playerCtx.extraHeight,
     5,
   );
 }
@@ -110,17 +110,11 @@ export function drawGame(
   // Draw net
   net(gameState, context);
   // Draw left player
-  if (gameState.players[0].special === true)
-    playerZeroSpecial(gameState, context);
-  else {
-    renderPlayer(context, gameState.players[0], 0);
-  }
+  renderPlayer(context, gameState.players[0], 0);
+
   // Draw right player
-  if (gameState.players[1].special === true)
-    playerOneSpecial(gameState, context);
-  else {
-    renderPlayer(context, gameState.players[1], 1);
-  }
+  renderPlayer(context, gameState.players[1], 1);
+
   // Draw ball
   ball(gameState, context);
 }
@@ -131,18 +125,22 @@ function ball(gameState: IGameState, context: CanvasRenderingContext2D) {
   if (trailData.length > 15) {
     trailData.shift();
   }
+  const radius = gameState.ball.extraRadiuses.reduce(
+    (a, v) => a * v.factor,
+    gameState.ball.radius,
+  );
   trailData.forEach((v, i, a) => {
     const ratio = (i + 1) / a.length;
-    let radius = gameState.ball.radius * 0.75;
+    let r = radius * 0.75;
     context.fillStyle = `rgba(77, 87, 128, ${ratio * 0.1})`;
     if (i == a.length - 1) {
       context.fillStyle = '#B5C1F9';
-      radius = gameState.ball.radius;
+      r = radius;
       context.shadowBlur = 15;
       context.shadowColor = '#6378D9';
     }
     context.beginPath();
-    context.arc(v[0], v[1], radius, 0, Math.PI * 2, false);
+    context.arc(v[0], v[1], r, 0, Math.PI * 2, false);
     context.closePath();
     context.fill();
   });
@@ -162,56 +160,4 @@ function net(gameState: IGameState, context: CanvasRenderingContext2D) {
   for (let i = 1; i <= gameState.settings.fieldHeight; i += 50) {
     context.fillRect(net.x + padding, net.y + i, net.width, net.height);
   }
-}
-
-function playerZeroSpecial(
-  gameState: IGameState,
-  context: CanvasRenderingContext2D,
-) {
-  context.fillStyle = 'RED';
-  context.fillRect(
-    gameState.players[0].x + (gameState.players[0].width / 3) * 2,
-    gameState.players[0].y,
-    gameState.players[0].width / 3,
-    gameState.players[0].height,
-  );
-  context.fillStyle = 'YELLOW';
-  context.fillRect(
-    gameState.players[0].x,
-    gameState.players[0].y,
-    gameState.players[0].width,
-    gameState.players[0].height / 5,
-  );
-  context.fillRect(
-    gameState.players[0].x,
-    gameState.players[0].y + (gameState.players[0].height / 5) * 4,
-    gameState.players[0].width,
-    gameState.players[0].height / 5,
-  );
-}
-
-function playerOneSpecial(
-  gameState: IGameState,
-  context: CanvasRenderingContext2D,
-) {
-  context.fillStyle = 'RED';
-  context.fillRect(
-    gameState.players[1].x,
-    gameState.players[1].y,
-    gameState.players[1].width / 3,
-    gameState.players[1].height,
-  );
-  context.fillStyle = 'YELLOW';
-  context.fillRect(
-    gameState.players[1].x,
-    gameState.players[1].y,
-    gameState.players[1].width,
-    gameState.players[1].width / 5,
-  );
-  context.fillRect(
-    gameState.players[1].x,
-    gameState.players[1].y + (gameState.players[1].height / 5) * 4,
-    gameState.players[1].width,
-    gameState.players[1].width / 5,
-  );
 }

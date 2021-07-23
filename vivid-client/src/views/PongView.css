@@ -35,7 +35,7 @@
 
 .pong-wrapper .pong-score {
   display: flex;
-  margin: 0 2rem 5rem 2rem;
+  margin: 0 2rem 3rem 2rem;
   user-select: none;
 }
 
@@ -87,6 +87,13 @@
   color: #8892b2;
   text-align: center;
   margin: 1.5rem 0 0 0;
+}
+.pong-wrapper .pong-spectators.topleft {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  text-align: left;
+  margin: 0;
 }
 
 .pong-wrapper .pong-countdown-overlay {
@@ -192,7 +199,21 @@
   width: 100%;
 }
 
+.pong-endcard .pong-endcard-crown {
+  position: absolute;
+  color: #c9f65c;
+  font-size: 1.8rem;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -3rem);
+}
+
+.pong-endcard .pong-endcard-crown.hide {
+  display: none;
+}
+
 .pong-endcard .pong-endcard-score {
+  position: relative;
   padding: 0.5rem;
   border-radius: 10px;
   background-color: #1a1f31;

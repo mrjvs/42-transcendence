@@ -8,6 +8,8 @@ import { UserContext } from '../hooks/useUser';
 import { Button } from '../components/styled/Button';
 import moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';
+import { AddonData, AddonList } from './game/Powerup';
+import { Icon } from '../components/styled/Icon';
 
 momentDurationFormatSetup(moment as any);
 
@@ -53,6 +55,8 @@ export function PongView() {
   const leftPlayer = gameState?.players[0].userId
     ? {
         name: gameState?.players[0].name || 'Unknown user',
+        userId: gameState?.players[0].userId,
+        index: 0,
         waiting: false,
       }
     : {
@@ -62,6 +66,8 @@ export function PongView() {
   const rightPlayer = gameState?.players[1].userId
     ? {
         name: gameState?.players[1].name || 'Unknown user',
+        userId: gameState?.players[1].userId,
+        index: 1,
         waiting: false,
       }
     : {
@@ -74,6 +80,7 @@ export function PongView() {
   );
   const spectators = gameState?.spectators.length || 0;
   const isSpectating = gameState?.spectators.find((v) => v === user.id);
+  const self = rightPlayer.userId === user.id ? rightPlayer : leftPlayer;
 
   if (gameStatus === 'fetching')
     return (
@@ -114,10 +121,22 @@ export function PongView() {
           </h2>
           <div className="pong-endcard-scores">
             <div className="pong-endcard-score">
+              <Icon
+                type="crown"
+                className={`pong-endcard-crown ${
+                  gameState?.winner === leftPlayer.userId ? '' : 'hide'
+                }`}
+              />
               <h2 className="pong-endcard-score-num">{scores[0]}</h2>
               <p className="pong-endcard-score-name">{leftPlayer.name}</p>
             </div>
             <div className="pong-endcard-score">
+              <Icon
+                type="crown"
+                className={`pong-endcard-crown ${
+                  gameState?.winner === rightPlayer.userId ? '' : 'hide'
+                }`}
+              />
               <h2 className="pong-endcard-score-num">{scores[1]}</h2>
               <p className="pong-endcard-score-name red">{rightPlayer.name}</p>
             </div>
@@ -132,7 +151,9 @@ export function PongView() {
           </div>
           <div className="pong-endcard-keyvalue pong-marginbottom">
             <p className="pong-key">Addons</p>
-            <p className="pong-value">TODO</p>
+            <div className="pong-value">
+              <AddonList addons={gameState?.settings.addons} />
+            </div>
           </div>
           <Button type="secondary" onclick={() => history.push('/')}>
             Back to home
@@ -142,8 +163,8 @@ export function PongView() {
     );
   }
 
-  // TODO show winner on game stat screen
   // TODO go back instead of home all the time
+  // TODO spectator if same userid
   return (
     <div className="pong-wrapper">
       <div className="pong-game-view">
@@ -173,8 +194,22 @@ export function PongView() {
         />
         {isSpectating ? (
           <p className="pong-spectators">You are spectating</p>
-        ) : null}
-        <p className="pong-spectators">
+        ) : (
+          <AddonData
+            activatedTicks={
+              gameState?.players[self.index as any]?.activatedTicks
+            }
+            activatedMax={
+              gameState?.players[self.index as any]?.activatedTicksMax
+            }
+            currentAddon={gameState?.players[self.index as any]?.stashedAddon}
+            countdown={
+              gameState?.players[self.index as any]?.addonUsageCountdown
+            }
+            show={!!gameState && gameState.settings.addons.length > 0}
+          />
+        )}
+        <p className="pong-spectators topleft">
           {spectators == 0
             ? 'Nobody is spectating'
             : `${spectators} spectator${spectators != 1 ? 's' : ''}`}

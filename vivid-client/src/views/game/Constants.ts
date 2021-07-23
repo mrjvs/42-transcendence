@@ -8,9 +8,11 @@ export interface IPlayer {
   // game state
   score: number;
   speed: number;
+  extraSpeed: number;
 
   // render variables
   width: number;
+  extraHeight: number;
   height: number;
   x: number;
   y: number;
@@ -21,11 +23,15 @@ export interface IPlayer {
   lastPressed: null | 'up' | 'down';
   move: number;
   spacebar: number;
-  shoot: number;
 
-  // ??
-  addOnPoints: number;
+  // addons
+  addonUsageCountdown: number; // how long to wait until you get a new addon
+  addonUsageTicks: number;
+  stashedAddon: string | null;
   special: boolean;
+  activatedTicks: number; // how long its activated for
+  activatedTicksMax: number;
+  sticky: boolean;
 }
 
 export interface ISpectator {
@@ -66,7 +72,9 @@ export interface IGameState {
     x: number;
     y: number;
     radius: number;
-    speed: number; // ??
+    extraRadiuses: { player: string; factor: number }[];
+    extraSpeeds: { player: string; factor: number }[];
+    speed: number;
     velocityX: number;
     velocityY: number;
   };
@@ -74,6 +82,7 @@ export interface IGameState {
   // game states
   gameProgress: GameProgress;
   spectators: ISpectator[];
+  subscribers: ISpectator[];
   countdownNum: number;
   countdownTicks: number;
   endReason: EndReasons | null;

@@ -10,16 +10,23 @@ export function createGameState(gameId: string): IGameState {
     width: 20,
     height: 160,
     speed: 20,
+    extraSpeed: 0,
+    extraHeight: 0,
 
     holdingUp: 0,
     holdingDown: 0,
     lastPressed: null,
     move: 0,
     spacebar: 0,
-    shoot: 0,
 
-    addOnPoints: 0,
+    // addons
+    addonUsageCountdown: 0,
+    addonUsageTicks: 0,
+    stashedAddon: null,
     special: false,
+    activatedTicks: 0,
+    activatedTicksMax: 0,
+    sticky: false,
   };
   const fps = 1000 / 60;
 
@@ -28,7 +35,7 @@ export function createGameState(gameId: string): IGameState {
     settings: {
       fieldWidth: 1920,
       fieldHeight: 1080,
-      addons: [],
+      addons: ['bigpad', 'bigball', 'fastball', 'fastpad', 'sticky'],
       ticksPerMs: fps,
     },
     players: [
@@ -50,6 +57,8 @@ export function createGameState(gameId: string): IGameState {
       speed: 0,
       velocityX: 0,
       velocityY: 0,
+      extraRadiuses: [],
+      extraSpeeds: [],
     },
 
     gameProgress: GameProgress.WAITING,

@@ -250,7 +250,7 @@ export class GameState {
       } else return false;
     } else if (keyState === PlayerInputState.PRESS) {
       if (key === PlayerInputs.ACTION) {
-        // TODO ??
+        if (player.spacebar == 0) player.spacebar = 1;
       } else return false;
     }
     return true;
@@ -378,6 +378,7 @@ export class PongService {
         addons: match.addons.split(';'),
       },
       endReason: EndReasons.FAIRFIGHT,
+      winner: match.winner_id,
     };
   }
 
