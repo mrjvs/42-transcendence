@@ -8,7 +8,6 @@ import { useFetch } from '../../hooks/useFetch';
 import { Icon } from './Icon';
 import { GameEventContext } from '../../hooks/useGameEvents';
 
-// TODO styling for different statuses
 function DuelMessage(props: { message: any; channelId: string; user: any }) {
   const history = useHistory();
   const inviteId = props.message?.aux_content?.invite_game_id;
@@ -37,29 +36,65 @@ function DuelMessage(props: { message: any; channelId: string; user: any }) {
     if (inviteId) subscribe(inviteId);
   }, [props.message]);
 
+  const texts = {
+    finished: [
+      'Match has ended',
+      'See match results',
+      '',
+      'hideCubes',
+      'secondary',
+    ],
+    progress: [
+      'Duel in progress',
+      'Spectate',
+      'blue',
+      'hideCubes',
+      'secondary',
+    ],
+    waiting: ['Waiting for a duel opponent', 'Accept', 'green', '', 'primary'],
+    unknown: [
+      'Match state is unknown',
+      'Accept',
+      'green',
+      'hideCubes',
+      'primary',
+    ],
+    loading: ['loading'],
+  };
+  let status: any = getGameStatus(inviteId).status;
+  if (status === 'countdown' || status === 'playing') status = texts.progress;
+  else if (status === 'finished') status = texts.finished;
+  else if (status === 'waiting') status = texts.waiting;
+  else if (status === 'loading') status = texts.loading;
+  else status = texts.unknown;
+
   return (
     <div className="messageInvite-wrapper-wrapper">
-      <div className="messageInvite-wrapper">
-        <div className="messageInvite-accent" />
-        <div className="messageInvite-content">
-          <div className="messageInvite-user">
-            <Avatar user={props.user} small />
-            {props.user.name}
+      <div className={`messageInvite-wrapper ${status[3]}`}>
+        <div className={`messageInvite-accent ${status[2]}`} />
+        {status[0] === 'loading' ? (
+          <div className="messageInvite-content">loading...</div>
+        ) : (
+          <div className="messageInvite-content">
+            <div className="messageInvite-user">
+              <Avatar user={props.user} small />
+              {props.user.name}
+            </div>
+            <p className="text">{status[0]}</p>
+            <Button
+              type={status[4]}
+              loading={gameFetch.loading}
+              onclick={() => runDuelAccept(props.message.id)}
+            >
+              {status[1]}
+            </Button>
+            {gameFetch.error ? (
+              <p className="error">Something went wrong, try again later.</p>
+            ) : null}
+            <div className="red-cube"></div>
+            <div className="dark-cube"></div>
           </div>
-          <p>status: {getGameStatus(inviteId).status}</p>
-          <p className="text">You&apos;ve been invited to a duel!</p>
-          <Button
-            loading={gameFetch.loading}
-            onclick={() => runDuelAccept(props.message.id)}
-          >
-            Accept
-          </Button>
-          {gameFetch.error ? (
-            <p className="error">Something went wrong, try again later.</p>
-          ) : null}
-          <div className="red-cube"></div>
-          <div className="dark-cube"></div>
-        </div>
+        )}
       </div>
     </div>
   );

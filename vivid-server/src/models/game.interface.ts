@@ -80,7 +80,7 @@ export interface IGameState {
   endReason: EndReasons | null;
   pastGame: boolean;
 
-  amoutOfSeconds: number;
+  amountOfSeconds: number;
 
   // game ball speed get's progressively faster
   increaseSpeedAfterContact: number;

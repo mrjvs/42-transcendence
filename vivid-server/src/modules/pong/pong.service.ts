@@ -113,7 +113,7 @@ export class GameState {
       endReason: this.#state.endReason,
       increaseSpeedAfterContact: this.#state.increaseSpeedAfterContact,
       winner: this.#state.winner,
-      amountOfSeconds: this.#state.amoutOfSeconds,
+      amountOfSeconds: this.#state.amountOfSeconds,
     };
   }
 
@@ -131,7 +131,7 @@ export class GameState {
     this.#state.countdownTicks -= 1;
     if (this.#state.countdownTicks <= 0) {
       this.#state.countdownTicks = 1000 / this.#state.settings.ticksPerMs;
-      this.#state.amoutOfSeconds += 1;
+      this.#state.amountOfSeconds += 1;
     }
     this.#state.winner = renderGameLoop(this.#state);
     this.emitToClients('drawGame', this.createState());
@@ -367,7 +367,7 @@ export class PongService {
     ];
     return {
       ...state,
-      amoutOfSeconds: 0, // TODO save in a match
+      amountOfSeconds: match.time_elapsed,
       pastGame: true,
       players: state.players.map((v, i) => ({
         ...v,

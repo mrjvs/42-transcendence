@@ -61,6 +61,6 @@ export function createGameState(gameId: string): IGameState {
     endReason: null,
     winner: null,
     pastGame: false,
-    amoutOfSeconds: 0,
+    amountOfSeconds: 0,
   };
 }

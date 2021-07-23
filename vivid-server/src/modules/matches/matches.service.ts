@@ -55,6 +55,7 @@ export class MatchesService {
       addons: game.settings.addons.join(';'),
       game_type: gameType,
       winner_id: game.winner,
+      time_elapsed: game.amountOfSeconds,
     };
 
     return await this.matchesRepository.save(newMatch);

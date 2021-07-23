@@ -40,6 +40,9 @@ export class MatchesEntity {
   @Column()
   winner_id: string;
 
+  @Column()
+  time_elapsed: number;
+
   @Column({ nullable: true, default: null })
   war_id?: string;
 }
@@ -54,4 +57,5 @@ export interface IMatch {
   addons: string;
   game_type: string;
   winner_id: string;
+  time_elapsed: number;
 }
