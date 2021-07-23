@@ -10,6 +10,7 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { GuildsEntity } from './guilds.entity';
+import { LadderUserEntity } from '@/ladder_user.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { BlocksEntity } from '@/blocks.entity';
@@ -27,6 +28,9 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => JoinedChannelEntity, (channel) => channel.user)
   joined_channels: JoinedChannelEntity[];
+
+  @OneToMany(() => LadderUserEntity, (ladder_user) => ladder_user.user)
+  ranks: LadderUserEntity[];
 
   @Column()
   oauth_id: string;

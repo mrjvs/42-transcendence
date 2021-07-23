@@ -14,6 +14,7 @@ import { FriendsModule } from '$/friends/friends.module';
 import { BlocksModule } from '$/blocks/blocks.module';
 import { GuildsModule } from '$/guilds/guilds.module';
 import { GuildrequestModule } from '$/guildrequest/guildrequest.module';
+import { LadderModule } from '$/ladder/ladder.module';
 import { MatchesModule } from '../matches/matches.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -55,6 +56,7 @@ const config = ConfigModule.forRoot({
     GuildsModule,
     WarsModule,
     GuildrequestModule,
+    LadderModule,
     MatchesModule,
     DmModule,
 
