@@ -14,11 +14,6 @@ export class BlocksService {
     private blocksRepository: Repository<BlocksEntity>,
   ) {}
 
-  // see all blocks
-  async findAll(): Promise<BlocksEntity[]> {
-    return await this.blocksRepository.find();
-  }
-
   // block user
   async block(userId: string, blockId: string): Promise<UpdateResult> {
     return await this.blocksRepository
@@ -40,7 +35,7 @@ export class BlocksService {
     return await this.blocksRepository
       .createQueryBuilder()
       .delete()
-      .where('id = :id', { id: blockId })
+      .where('blocked_user_id = :id', { id: blockId })
       .andWhere('user_id = :u', { u: userId })
       .execute()
       .catch((error) => {

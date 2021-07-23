@@ -1,0 +1,30 @@
+.messageBox > input {
+  border-radius: 3px;
+  background-color: #252a40;
+  border: none;
+  display: block;
+  width: 100%;
+  color: white;
+  padding: 1rem 1.5rem;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.messageBox > input:focus,
+.messageBox > input:hover {
+  background-color: #2f344d;
+}
+
+.messageBox > input::placeholder {
+  color: #7f86a3;
+}
+
+.messageRow {
+    display: flex;
+    width: 100%;
+    height: auto;
+}
+
+.messageBox {
+    flex: 1;
+}

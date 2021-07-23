@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import {
   Column,
   Entity,
@@ -17,6 +17,12 @@ export class MessageEntity {
   @Column()
   content: string;
 
+  @Column({ type: 'json', nullable: true, default: null })
+  aux_content: IAuxContent;
+
+  @Column({ default: 0 })
+  message_type: number;
+
   @Column({ type: 'uuid' })
   user: string;
 
@@ -30,18 +36,41 @@ export class IMessage {
   user: string;
   channel: string;
   content: string;
+  aux_content: IAuxContent;
+  message_type: number;
+}
+
+export enum MessageTypes {
+  PLAIN = 0,
+  GAME_INVITE = 1,
+  JOIN = 2,
+  LEAVE = 3,
 }
 
 export class IMessageInput {
   content: string;
+  message_type?: number;
+  aux_content?: IAuxContent;
   user: string;
   channel: string;
 }
 
 export class MessageDto {
   @IsNotEmpty()
+  @IsString()
   content: string;
+}
 
-  @IsNotEmpty()
-  user: string;
+export class PaginationDto {
+  @IsOptional()
+  @IsDate()
+  date1: Date;
+
+  @IsOptional()
+  @IsDate()
+  date2: Date;
+}
+
+export interface IAuxContent {
+  invite_game_id: string;
 }

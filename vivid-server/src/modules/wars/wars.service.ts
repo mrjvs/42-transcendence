@@ -34,6 +34,7 @@ export class WarsService {
   }
 
   // Check if all War Times are within the timeframe of the war
+  // deze loopt niet UTC
   private validWartimes(war: IWar): boolean {
     for (const block of war.war_time) {
       if (block.start_date < war.start_date || block.end_date > war.end_date)
@@ -162,6 +163,20 @@ export class WarsService {
     return this.guildsService.startWar(war);
   }
 
+  async checkWars(now: string): Promise<UpdateResult> {
+    // const war = await this.findWar(warId);
+    // if (!war) throw new NotFoundException();
+    // return this.guildsService.startWar(war);
+
+    return await this.warsRepository
+      .createQueryBuilder()
+      .select()
+      .where(`accepted = ${true}`)
+      .andWhere(`start_date <= '${now}'`)
+      .andWhere(`end_date >= '${now}'`)
+      .execute();
+  }
+
   async endWar(warId: string): Promise<GuildsEntity[]> {
     // Find war
     const war = await this.findWar(warId);
@@ -188,6 +203,36 @@ export class WarsService {
       this.guildsService.guildLose(loser);
     }
     // TODO unupdated guilds are returned, what do we want to return?
+
+    await this.warsRepository
+      .createQueryBuilder()
+      .update()
+      .set({ accepted: false })
+      .where({ id: warId })
+      .execute();
+
     return war.guilds;
+  }
+
+  async updateWarWinReq(warId: string) {
+    await this.warsRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        points_requesting: () => 'points_requesting + 1',
+      })
+      .where({ id: warId })
+      .execute();
+  }
+
+  async updateWarWinAccept(warId: string) {
+    await this.warsRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        points_accepting: () => 'points_accepting + 1',
+      })
+      .where({ id: warId })
+      .execute();
   }
 }

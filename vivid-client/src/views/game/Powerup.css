@@ -1,0 +1,120 @@
+.powerup-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.powerup-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #303444;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 2rem;
+  position: relative;
+  color: #d8ec52;
+  font-size: 2.5em;
+  transition: background-color 100ms ease-in-out, transform 100ms ease-in-out;
+}
+
+.powerup-icon-wrapper:hover {
+  transform: scale(1.1);
+  background-color: #393e50;
+}
+
+.powerup-icon-wrapper.rotate .icon {
+  transform: rotate(180deg);
+}
+
+.powerup-icon-wrapper.yellow {
+  color: #d8ec52;
+}
+
+.powerup-icon-wrapper.cyan {
+  color: #52e7ec;
+}
+
+.powerup-icon-wrapper.pink {
+  color: #ef75d3;
+}
+
+.powerup-subicon {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  background-color: #484c5f;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 1rem;
+  top: 0;
+  right: 0;
+  font-size: 0.4em;
+}
+
+.powerup-subicon svg {
+  transform: translate(1px, 1px);
+}
+
+.powerup-center {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.powerup-icon-text {
+  color: white;
+  margin: 2rem 0 1rem 0;
+  height: 1rem;
+}
+
+.progressbar {
+  width: 15rem;
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #2d3348;
+  overflow: hidden;
+}
+
+.progressbar .progressbar-inside {
+  transition: width 10ms linear;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  background-color: #5b78e1;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.powerup-icon-wrapper .powerup-countdown-text {
+  font-weight: bold;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.addon-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 17rem;
+  margin: 0 -0.1rem;
+}
+
+.addon-list .addon-list-item {
+  display: inline-block;
+  background-color: #303444;
+  font-size: 0.8rem;
+  color: #959bb4;
+  font-weight: normal;
+  padding: 0.2rem 0.4rem;
+  margin: 0.1rem;
+  border-radius: 3px;
+}
