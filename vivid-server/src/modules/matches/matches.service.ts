@@ -18,7 +18,7 @@ export class MatchesService {
     return await this.matchesRepository
       .createQueryBuilder()
       .where('user_acpt = :id OR user_req = :id', { id: userId })
-      .orderBy({ game_ended: 'ASC' }) // TODO correct order
+      .orderBy({ game_ended: 'DESC' })
       .getMany();
   }
 

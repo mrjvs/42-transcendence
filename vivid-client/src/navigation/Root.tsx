@@ -46,7 +46,7 @@ function SideBarRouter() {
           Play a game
         </SidebarLink>
         <SidebarLink link="/history">
-          <Icon type="crown" />
+          <Icon type="trophy" />
           Match history
         </SidebarLink>
         <SidebarLink link="/stats">

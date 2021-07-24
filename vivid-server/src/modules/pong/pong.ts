@@ -241,9 +241,9 @@ function updateBallLocation(state: IGameState): string | null {
     state.ball.x + radius >= state.settings.fieldWidth
   ) {
     attackingPlayer.score += 1;
-    if (attackingPlayer.score === 11) {
-      return attackingPlayer.userId;
-    }
+    // if (attackingPlayer.score === 11) {
+    //   return attackingPlayer.userId;
+    // }
     resetBall(state);
     return null;
   }

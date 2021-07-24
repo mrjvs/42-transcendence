@@ -6,7 +6,7 @@ import { Icon } from './Icon';
 import './UserDropdown.css';
 import { useFetch } from '../../hooks/useFetch';
 
-export function UserDropdown() {
+export function UserDropdown(props: { color?: string }) {
   const [open, setOpen] = React.useState(false);
   const userData = React.useContext(UserContext);
 
@@ -22,7 +22,7 @@ export function UserDropdown() {
   return (
     <div className={'userDropdown ' + (open ? 'open' : '')}>
       <div className="cont" onClick={() => setOpen((p) => !p)}>
-        <Avatar user={userData?.user} small />
+        <Avatar user={userData?.user} small color={props.color} />
         <div className="name">
           <p>{userData?.user?.name || 'Unknown user'}</p>
           <Icon className="icon" type="chevron" />

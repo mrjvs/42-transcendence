@@ -52,6 +52,7 @@ export function drawGame(
   gameState: IGameState | null,
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D | null,
+  mirrored = false,
 ) {
   if (!context) return;
   const gameWidth = gameState?.settings.fieldWidth || 1920;
@@ -93,11 +94,11 @@ export function drawGame(
 
   // scale/shrink game to canvas size
   context.setTransform(
-    canvas.width / gameWidthPadded,
+    (canvas.width / gameWidthPadded) * (mirrored ? -1 : 1),
     0,
     0,
     canvas.height / gameHeight,
-    0,
+    mirrored ? canvas.width : 0,
     0,
   );
 

@@ -10,6 +10,7 @@ interface CanvasProps {
   gameId: string;
   loading: boolean;
   gameState: IGameState | null;
+  mirrored: boolean;
 }
 
 const keyMap = {
@@ -27,11 +28,17 @@ const keyMap = {
   },
 };
 
-export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
+export function PongGameCanvas({
+  gameId,
+  loading,
+  gameState,
+  mirrored,
+}: CanvasProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { client } = React.useContext(SocketContext);
   const gameStateReal = React.useRef<IGameState | null>(null);
   const countdownNum = React.useRef<number>(-1);
+  const mirrorRef = React.useRef(false);
   const [showing, setShowing] = React.useState(false);
   const history = useHistory();
 
@@ -60,6 +67,10 @@ export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
       timeout && clearTimeout(timeout);
     };
   }, [countdownNum.current]);
+
+  React.useEffect(() => {
+    mirrorRef.current = mirrored;
+  }, [mirrored]);
 
   // grab context on render
   React.useEffect(() => {
@@ -97,7 +108,7 @@ export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
       if (ctx.stop) {
         return;
       }
-      drawGame(gameStateReal.current, canvas, context);
+      drawGame(gameStateReal.current, canvas, context, mirrorRef.current);
       render(ctx);
     });
   }
