@@ -1,12 +1,6 @@
-import {
-  AfterLoad,
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { IUser, UserEntity } from '@/user.entity';
-import { ERank, LadderEntity } from '@/ladder.entity';
+import { LadderEntity } from '@/ladder.entity';
 
 @Entity('ladder_user')
 export class LadderUserEntity {

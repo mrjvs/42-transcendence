@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { UserModule } from '$/users/user.module';
 import { EventGateway } from './event.gateway';
 import { PongModule } from '$/pong/pong.module';

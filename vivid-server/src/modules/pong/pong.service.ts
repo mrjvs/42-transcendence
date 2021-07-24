@@ -16,7 +16,6 @@ import { UserEntity } from '~/models/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LadderService } from '../ladder/ladder.service';
-import { EventGateway } from '../websocket/event.gateway';
 import { setUserStatus, Status } from '../websocket/statuses';
 
 interface IClientGameMap {
@@ -317,7 +316,7 @@ export class PongService {
       if (state.gameProgress !== GameProgress.CANCELLED) {
         this.matchService
           .saveMatchResults(state, new Date(), type)
-          .catch(() => {});
+          .catch(() => true);
 
         if (type === 'ranked') {
           this.ladderService
@@ -327,7 +326,7 @@ export class PongService {
               ladderId,
               state.winner,
             )
-            .catch(() => {});
+            .catch(() => true);
         }
       }
 

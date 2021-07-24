@@ -202,7 +202,7 @@ export class EventGateway implements OnGatewayConnection {
           });
         }
       })
-      .catch(() => {});
+      .catch(() => true);
   }
 
   @SubscribeMessage('keydown')

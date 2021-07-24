@@ -10,7 +10,6 @@ import {
   BadRequestException,
   Param,
   Body,
-  Put,
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import {

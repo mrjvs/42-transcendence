@@ -1,13 +1,6 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  Not,
-  Repository,
-  Between,
-  Connection,
-} from 'typeorm';
+import { Repository, Between, Connection } from 'typeorm';
 
 import {
   ERank,

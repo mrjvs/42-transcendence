@@ -1,12 +1,10 @@
 import {
-  ArrayContains,
   IsArray,
   IsDate,
   IsNotEmpty,
   IsOptional,
   IsString,
   registerDecorator,
-  ValidationArguments,
   ValidationOptions,
 } from 'class-validator';
 import {
@@ -73,7 +71,7 @@ export class MessageDto {
 }
 
 export function IsAddonList(validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+  return function (object: unknown, propertyName: string) {
     registerDecorator({
       name: 'isAddonList',
       target: object.constructor,
