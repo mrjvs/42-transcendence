@@ -82,6 +82,10 @@ export function GameMatchView() {
       </MainLayout>
     );
 
+  React.useEffect(() => {
+    console.log('LADDERS', ladderMatch.done, ladderMatch?.data?.data);
+  }, [ladderMatch.done]);
+
   return (
     <MainLayout title="" background="#1b1f31">
       <div className="GameMatchView">
