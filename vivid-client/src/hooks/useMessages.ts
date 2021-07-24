@@ -98,13 +98,14 @@ export function useMessages(channel: string) {
     setMessages([...getChannelMessages(channel)]);
   }, [messages]);
 
-  function sendMessage(text: string, type: boolean) {
+  function sendMessage(text: string, type: boolean, extraData?: any) {
     if (type) {
       fetch(
         `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages/duel`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(extraData),
           credentials: 'include',
         },
       )

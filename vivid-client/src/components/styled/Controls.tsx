@@ -13,6 +13,7 @@ export const Controls = React.memo(function Controls() {
         <div className="waiting-key">S</div>
         <div className="waiting-key fade">D</div>
       </div>
+      <div className="waiting-key wide">Space</div>
     </div>
   );
 });

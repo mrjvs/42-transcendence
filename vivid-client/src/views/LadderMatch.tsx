@@ -4,6 +4,7 @@ import { SocketContext } from '../hooks/useWebsocket';
 import { Button } from '../components/styled/Button';
 import { Icon } from '../components/styled/Icon';
 import '../components/styled/LoadingScreen.css';
+import { ControlsModal } from '../components/styled/modals/ControlsModal';
 
 const matchmakingInterval = 5000;
 
@@ -20,7 +21,6 @@ function statusToText(str: string) {
   }
 }
 
-// TODO bug: second time joinging match view will not understand "alreadyin"
 export function LadderMatchView() {
   const { id }: any = useParams();
   const history = useHistory();
@@ -54,7 +54,7 @@ export function LadderMatchView() {
     else if (obj?.status === 'game') {
       history.push(`/pong/${obj?.gameId}`);
     }
-    // if alreadyin & was loading as first step
+    // if alreadyin and is first result
     else if (obj?.status === 'alreadyin') {
       if (statusRef.current === 'loading') setStatus('alreadyin');
     } else if (obj?.status === 'error') {
@@ -168,9 +168,17 @@ export function LadderMatchView() {
           <h1 className="loading-match-heading">Looking for an opponent</h1>
           <p className="loading-match-text">This could take a while</p>
           <p className="loading-match-status">{statusToText(status)}</p>
-          <Button type="danger" more_padding onclick={() => history.push('/')}>
-            Cancel
-          </Button>
+          <div className="loading-match-buttons">
+            <Button
+              type="danger"
+              more_padding
+              margin_right
+              onclick={() => history.push('/')}
+            >
+              Cancel
+            </Button>
+            <ControlsModal />
+          </div>
         </div>
       </div>
     </div>

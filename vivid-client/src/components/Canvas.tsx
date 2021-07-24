@@ -148,14 +148,15 @@ export function PongGameCanvas({
         }`}
       >
         <div className="pong-waiting">
-          <div className="waiting-left">
-            <Controls />
-          </div>
           <div className="waiting-right">
             <div className="loading-icon-rotate small" />
             <h2>Waiting for opponent</h2>
             <p>Lovely day isn&apos;t it?</p>
-            <Button type="danger" onclick={() => history.push('/')}>
+            <Button
+              type="danger"
+              more_padding
+              onclick={() => history.push('/')}
+            >
               cancel
             </Button>
           </div>

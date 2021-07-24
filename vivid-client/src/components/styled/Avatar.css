@@ -66,6 +66,10 @@
   background-color: #55b86f;
 }
 
+.userAvatar .status-bubble.status-INGAME {
+  background-color: #f59c37;
+}
+
 .userAvatar {
   position: relative;
 }

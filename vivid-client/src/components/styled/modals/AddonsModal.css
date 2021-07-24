@@ -1,0 +1,9 @@
+.addons-modal-wrapper {
+  text-align: left;
+}
+
+.addons-modal-wrapper ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

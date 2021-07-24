@@ -20,6 +20,7 @@ import { DmChannelView } from '../views/DmChannelView';
 import { GameMatchView } from '../views/GameMatch';
 import { LadderMatchView } from '../views/LadderMatch';
 import { MatchHistoryView } from '../views/MatchHistoryView';
+import { StatisticsView } from '../views/StatisticsView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
@@ -77,6 +78,9 @@ function SideBarRouter() {
           </Route>
           <Route exact path="/history">
             <MatchHistoryView />
+          </Route>
+          <Route exact path="/stats">
+            <StatisticsView />
           </Route>
           <Route exact path="/channel/:id">
             <ChannelView />

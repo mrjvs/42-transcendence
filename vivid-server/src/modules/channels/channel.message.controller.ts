@@ -18,6 +18,7 @@ import {
   getUserRolesFromChannel,
 } from '~/middleware/guards/channel.guards';
 import {
+  AddonDto,
   IMessage,
   IMessageInput,
   MessageDto,
@@ -86,6 +87,7 @@ export class ChannelMessageController {
     return this.messageService.postMessage(user, input);
   }
 
+  // TODO add dto
   @Post('/duel')
   @ChannelRoleAuth(
     {
@@ -102,10 +104,11 @@ export class ChannelMessageController {
     },
   )
   createDuelMessage(
+    @Body() body: AddonDto,
     @User() user: UserEntity,
     @Param('id') channelId: string,
   ): Promise<IMessage> {
-    const gameId = this.pongService.createGame('duel');
+    const gameId = this.pongService.createGame('duel', null, body.addons);
     this.pongService.joinGame(user.id, gameId);
     const input: IMessageInput = {
       content: '',

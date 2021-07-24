@@ -4,6 +4,8 @@ import { Icon } from '../components/styled/Icon';
 import { useFetch } from '../hooks/useFetch';
 import { MainLayout } from './layouts/MainLayout';
 import './GameMatch.css';
+import { Button } from '../components/styled/Button';
+import { ControlsModal } from '../components/styled/modals/ControlsModal';
 
 function LadderCard(props: {
   id: string;

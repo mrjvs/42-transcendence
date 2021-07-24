@@ -10,6 +10,7 @@ import moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';
 import { AddonData, AddonList } from './game/Powerup';
 import { Icon } from '../components/styled/Icon';
+import { ControlsModal } from '../components/styled/modals/ControlsModal';
 
 momentDurationFormatSetup(moment as any);
 
@@ -220,13 +221,14 @@ export function PongView() {
             show={!!gameState && gameState.settings.addons.length > 0}
           />
         )}
-        <p className="pong-spectators topleft">
+        <p className="pong-spectators bottomleft">
           {playerData.spectators == 0
             ? 'Nobody is spectating'
             : `${playerData.spectators} spectator${
                 playerData.spectators != 1 ? 's' : ''
               }`}
         </p>
+        <ControlsModal className="bottomright" />
       </div>
     </div>
   );

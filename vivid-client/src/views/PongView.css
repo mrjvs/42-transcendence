@@ -88,10 +88,17 @@
   text-align: center;
   margin: 1.5rem 0 0 0;
 }
-.pong-wrapper .pong-spectators.topleft {
+.pong-wrapper .bottomright {
   position: fixed;
-  left: 1rem;
-  bottom: 1rem;
+  right: 2rem;
+  bottom: 2rem;
+  text-align: left;
+  margin: 0;
+}
+.pong-wrapper .bottomleft {
+  position: fixed;
+  left: 2rem;
+  bottom: 2rem;
   text-align: left;
   margin: 0;
 }

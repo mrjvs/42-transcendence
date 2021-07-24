@@ -1,6 +1,9 @@
 import { GameProgress, IGameState } from '~/models/game.interface';
 
-export function createGameState(gameId: string): IGameState {
+export function createGameState(
+  gameId: string,
+  enabledAddons: string[] = [],
+): IGameState {
   const initPlayer = {
     client: null,
     userId: null,
@@ -35,7 +38,7 @@ export function createGameState(gameId: string): IGameState {
     settings: {
       fieldWidth: 1920,
       fieldHeight: 1080,
-      addons: ['bigpad', 'bigball', 'fastball', 'fastpad', 'sticky'],
+      addons: [...enabledAddons],
       ticksPerMs: fps,
     },
     players: [

@@ -34,7 +34,11 @@ export class LadderUserEntity {
           (this.points <= rank.topLimit || rank.topLimit == -1),
       );
       return rank;
-    }
+    } else if (ladderObj.type === 'casual')
+      return {
+        name: 0,
+        invalidRank: true,
+      };
     return null;
   }
 }

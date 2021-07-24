@@ -2,7 +2,8 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ERank, IRank, LadderEntity } from '~/models/ladder.entity';
+import { addons } from '~/constants';
+import { IRank } from '~/models/ladder.entity';
 import { LadderUserEntity } from '~/models/ladder_user.entity';
 import { PongService } from '../pong/pong.service';
 
@@ -74,12 +75,13 @@ export class MatchMakingService {
 
     client.emit('matchmakingStatus', {
       status: 'matching',
-      rank: user.getRank()
-        ? {
-            ...user.getRank(),
-            icon: user.ladder.details.icon,
-          }
-        : null,
+      rank:
+        user.getRank() && !user.getRank().invalidRank
+          ? {
+              ...user.getRank(),
+              icon: user.ladder.details.icon,
+            }
+          : null,
     });
 
     playerPool[user.user] = {
@@ -98,16 +100,18 @@ export class MatchMakingService {
 
   leavePool(client: any) {
     if (!client || !client.auth) return;
-    console.log('removing client from pool:', client.auth);
-    if (playerPool[client.auth]) delete playerPool[client.auth];
+    if (
+      playerPool[client.auth] &&
+      playerPool[client.auth].socket.id === client.id
+    ) {
+      delete playerPool[client.auth];
+    }
   }
 
   matchMake(): boolean {
     if (Object.keys(playerPool).length < 1) {
       return false;
     }
-
-    console.log('does matching, players:', Object.keys(playerPool).length);
 
     for (const [playerIdA, playerA] of Object.entries(playerPool)) {
       for (const [playerIdB, playerB] of Object.entries(playerPool)) {
@@ -116,6 +120,7 @@ export class MatchMakingService {
           const gameId = this.pongService.createGame(
             playerA.ladder.type,
             playerA.ladder.id,
+            addons,
           );
           this.pongService.joinGame(playerIdA, gameId);
           this.pongService.joinGame(playerIdB, gameId);

@@ -16,6 +16,8 @@ import { UserEntity } from '~/models/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LadderService } from '../ladder/ladder.service';
+import { EventGateway } from '../websocket/event.gateway';
+import { setUserStatus, Status } from '../websocket/statuses';
 
 interface IClientGameMap {
   [clientId: string]: string; // [clientId] = gameId
@@ -45,8 +47,12 @@ export class GameState {
   #interval: NodeJS.Timeout | null;
   #callback: (game: IGameState) => void;
 
-  constructor(gameId: string, onFinish: (game: IGameState) => void) {
-    this.#state = createGameState(gameId);
+  constructor(
+    gameId: string,
+    enabledAddons: string[],
+    onFinish: (game: IGameState) => void,
+  ) {
+    this.#state = createGameState(gameId, enabledAddons);
     this.#interval = null;
     this.#callback = onFinish;
   }
@@ -304,9 +310,9 @@ export class PongService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  createGame(type: string, ladderId?: string) {
+  createGame(type: string, ladderId?: string, enabledAddons?: string[]) {
     const gameId: string = uuid();
-    states[gameId] = new GameState(gameId, (state) => {
+    states[gameId] = new GameState(gameId, enabledAddons, (state) => {
       // save if game occured and not cancelled
       if (state.gameProgress !== GameProgress.CANCELLED) {
         this.matchService
@@ -327,6 +333,7 @@ export class PongService {
 
       // remove clients from maps
       state.players.forEach((v) => {
+        setUserStatus(v.userId, Status.ONLINE, true);
         // remove states from maps
         if (clientUserMap[v.userId]) clientUserMap[v.userId] = undefined;
         if (v.client && clientGameMap[v.client.id])
@@ -422,6 +429,7 @@ export class PongService {
     }
 
     if (res === 'playing') {
+      setUserStatus(client.auth, Status.INGAME, true);
       clientUserMap[client.auth] = gameId;
     }
     clientGameMap[client.id] = gameId;

@@ -23,6 +23,11 @@
   opacity: 0;
 }
 
+.waiting-key.wide {
+  margin-top: 1.5rem;
+  width: calc((5 * 3rem) + 10px);
+}
+
 .waiting-key.fade {
   display: flex;
   align-items: center;

@@ -180,3 +180,9 @@
   text-transform: uppercase;
   font-weight: bold;
 }
+
+.loading-screen .loading-match .loading-match-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
