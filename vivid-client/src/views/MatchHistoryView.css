@@ -1,0 +1,76 @@
+.matches-view-wrapper {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 4rem;
+}
+
+.matches-view-wrapper .matches-card {
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+  width: auto;
+}
+
+.matches-view-wrapper .matches-text {
+  color: #9da6c4;
+  text-align: center;
+}
+
+.matches-view-wrapper ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.matches-view-wrapper .match-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.matches-view-wrapper li:nth-child(2n + 1) .match-row {
+  background: #21263a;
+  border-radius: 5px;
+}
+
+.matches-view-wrapper .match-icon {
+  display: flex;
+  align-items: center;
+  width: 5rem;
+}
+
+.matches-view-wrapper .match-row > .matches-text {
+  width: 5rem;
+}
+
+.matches-view-wrapper .match-icon > p {
+  font-weight: bold;
+}
+
+.matches-view-wrapper .match-icon span {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.matches-view-wrapper .match-icon p:first-letter {
+  text-transform: capitalize;
+}
+
+.matches-view-wrapper .match-icon .icon-red {
+  color: #e45655;
+}
+
+.matches-view-wrapper .match-icon .icon-yellow {
+  color: #f2ec4a;
+}
+
+.matches-view-wrapper .match-icon .icon-blue {
+  color: #4191ee;
+}
+
+.matches-view-wrapper .match-scores {
+  font-weight: bold;
+  width: 4rem;
+  tex
+}
