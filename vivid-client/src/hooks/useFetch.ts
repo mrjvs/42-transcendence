@@ -47,7 +47,7 @@ export function useFetch(options: {
       })
       .then((data) => {
         if (shouldCancel) return;
-        if (data.res.status < 200 || data.res.status > 299) throw data;
+        if (data.res.status >= 400) throw data;
         setData(data);
         setLoading(false);
         setDone(true);
