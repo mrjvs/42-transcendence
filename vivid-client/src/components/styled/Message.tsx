@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { Icon } from './Icon';
 import { GameEventContext } from '../../hooks/useGameEvents';
+import TrackVisibility from '../base/TrackVisibility';
 
 function DuelMessage(props: { message: any; channelId: string; user: any }) {
   const history = useHistory();
@@ -69,33 +70,31 @@ function DuelMessage(props: { message: any; channelId: string; user: any }) {
   else status = texts.unknown;
 
   return (
-    <div className="messageInvite-wrapper-wrapper">
-      <div className={`messageInvite-wrapper ${status[3]}`}>
-        <div className={`messageInvite-accent ${status[2]}`} />
-        {status[0] === 'loading' ? (
-          <div className="messageInvite-content">loading...</div>
-        ) : (
-          <div className="messageInvite-content">
-            <div className="messageInvite-user">
-              <Avatar user={props.user} small />
-              {props.user.name}
-            </div>
-            <p className="text">{status[0]}</p>
-            <Button
-              type={status[4]}
-              loading={gameFetch.loading}
-              onclick={() => runDuelAccept(props.message.id)}
-            >
-              {status[1]}
-            </Button>
-            {gameFetch.error ? (
-              <p className="error">Something went wrong, try again later.</p>
-            ) : null}
-            <div className="red-cube"></div>
-            <div className="dark-cube"></div>
+    <div className={`messageInvite-wrapper ${status[3]}`}>
+      <div className={`messageInvite-accent ${status[2]}`} />
+      {status[0] === 'loading' ? (
+        <div className="messageInvite-content">loading...</div>
+      ) : (
+        <div className="messageInvite-content">
+          <div className="messageInvite-user">
+            <Avatar user={props.user} small />
+            {props.user.name}
           </div>
-        )}
-      </div>
+          <p className="text">{status[0]}</p>
+          <Button
+            type={status[4]}
+            loading={gameFetch.loading}
+            onclick={() => runDuelAccept(props.message.id)}
+          >
+            {status[1]}
+          </Button>
+          {gameFetch.error ? (
+            <p className="error">Something went wrong, try again later.</p>
+          ) : null}
+          <div className="red-cube"></div>
+          <div className="dark-cube"></div>
+        </div>
+      )}
     </div>
   );
 }
@@ -187,11 +186,22 @@ export function Message(props: {
                       <span className="bg-overlay bg-layers">
                         <DeleteButton msgId={v.id} />
                       </span>
-                      <DuelMessage
-                        user={props.user}
-                        message={v}
-                        channelId={props.channelId}
-                      />
+                      <div className="messageDuelMessageContainer">
+                        <TrackVisibility
+                          className="messageInvite-wrapper-wrapper"
+                          partialVisibility
+                        >
+                          {({ isVisible }: { isVisible: boolean }) =>
+                            isVisible && (
+                              <DuelMessage
+                                user={props.user}
+                                message={v}
+                                channelId={props.channelId}
+                              />
+                            )
+                          }
+                        </TrackVisibility>
+                      </div>
                     </div>
                   );
                 else if (v.type == 2) {

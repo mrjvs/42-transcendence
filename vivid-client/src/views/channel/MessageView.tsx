@@ -85,7 +85,7 @@ export function MessageView(props: { channelId: string; messageData: any }) {
   return (
     <div className="messageViewWrapper">
       <div className="channelScrollWrapper">
-        <div className="channelContent">
+        <div id="scroll-area" className="channelContent">
           {messageData.messageState.done ? (
             <>
               <NoMessage />
