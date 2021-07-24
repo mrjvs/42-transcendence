@@ -201,6 +201,7 @@ export class LadderService {
       where: { ladder: ladderId, user: user2 },
     });
 
+    // TODO bug?
     const P1 = LadderService.calculateProbability(u1.points, u1.points);
     const P2 = LadderService.calculateProbability(u2.points, u2.points);
     const K = 100;
