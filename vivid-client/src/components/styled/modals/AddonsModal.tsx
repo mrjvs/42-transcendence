@@ -1,18 +1,15 @@
 import React from 'react';
 import './AddonsModal.css';
-import { TextInput } from '../TextInput';
 import { ModalBase } from './ModalBase';
 import { Button } from '../Button';
-import { ToggleButton } from '../Toggle';
-
-const supportedAddons = ['bigpad', 'bigball', 'fastball', 'fastpad', 'sticky'];
+import { ToggleButton } from '../ToggleButton';
+import { powerupMap, addons as addonList } from '../../../views/game/Powerup';
 
 export function AddonsModal(props: {
   open: boolean;
   onSubmit: (v: any) => void;
   close: () => void;
 }) {
-  const [error, setError] = React.useState(false);
   const [addons, setAddons] = React.useState<string[]>([]);
 
   function setter(str: string, on: boolean) {
@@ -24,27 +21,27 @@ export function AddonsModal(props: {
   }
 
   React.useEffect(() => {
-    if (props.open) setAddons([]);
+    if (props.open) setAddons([...addonList]);
   }, [props.open]);
 
   return (
     <ModalBase isOpen={props.open} width={450} onBackPress={props.close}>
       <div className="addons-modal-wrapper">
-        <h2>Enable/Disable addons</h2>
-        <ul>
-          {supportedAddons.map((v: any) => (
-            <li key={v}>
-              <ToggleButton
-                checked={addons.includes(v)}
-                setChecked={(b) => setter(v, b)}
-              >
-                {v}
-              </ToggleButton>
-            </li>
+        <h2>Select addons</h2>
+        <div className="addon-modal-list">
+          {addonList.map((v: any) => (
+            <ToggleButton
+              key={v}
+              checked={addons.includes(v)}
+              setter={(b) => setter(v, b)}
+            >
+              {powerupMap[v].display}
+            </ToggleButton>
           ))}
-        </ul>
-        <Button onclick={() => props.onSubmit(addons)}>Enable</Button>
-        {error ? <p>Something went wrong, please try again later</p> : null}
+        </div>
+        <Button onclick={() => props.onSubmit(addons)}>
+          Send duel request
+        </Button>
       </div>
     </ModalBase>
   );

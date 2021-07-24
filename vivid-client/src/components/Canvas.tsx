@@ -4,7 +4,6 @@ import { IGameState } from '../views/game/Constants';
 import { SocketContext } from '../hooks/useWebsocket';
 import { Button } from './styled/Button';
 import { useHistory } from 'react-router-dom';
-import { Controls } from './styled/Controls';
 
 interface CanvasProps {
   gameId: string;
