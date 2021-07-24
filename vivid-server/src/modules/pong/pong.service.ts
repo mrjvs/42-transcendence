@@ -15,6 +15,7 @@ import { IMatch } from '~/models/matches.entity';
 import { UserEntity } from '~/models/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { LadderService } from '../ladder/ladder.service';
 
 interface IClientGameMap {
   [clientId: string]: string; // [clientId] = gameId
@@ -297,18 +298,31 @@ export class PongService {
     private matchService: MatchesService,
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
+    @Inject(forwardRef(() => LadderService))
+    private ladderService: LadderService,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  createGame() {
+  createGame(type: string, ladderId?: string) {
     const gameId: string = uuid();
     states[gameId] = new GameState(gameId, (state) => {
       // save if game occured and not cancelled
       if (state.gameProgress !== GameProgress.CANCELLED) {
         this.matchService
-          .saveMatchResults(state, new Date(), 'DUEL')
+          .saveMatchResults(state, new Date(), type)
           .catch(() => {});
+
+        if (type === 'ranked') {
+          this.ladderService
+            .adjustRating(
+              state.players[0].userId,
+              state.players[1].userId,
+              ladderId,
+              state.winner,
+            )
+            .catch(() => {});
+        }
       }
 
       // remove clients from maps

@@ -10,7 +10,6 @@ interface CanvasProps {
   gameId: string;
   loading: boolean;
   gameState: IGameState | null;
-  selfIndex?: number;
 }
 
 const keyMap = {
@@ -28,12 +27,7 @@ const keyMap = {
   },
 };
 
-export function PongGameCanvas({
-  gameId,
-  loading,
-  gameState,
-  selfIndex,
-}: CanvasProps) {
+export function PongGameCanvas({ gameId, loading, gameState }: CanvasProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { client } = React.useContext(SocketContext);
   const gameStateReal = React.useRef<IGameState | null>(null);

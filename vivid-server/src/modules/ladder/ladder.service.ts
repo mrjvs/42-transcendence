@@ -15,6 +15,7 @@ import {
   LadderDto,
   LadderEntity,
   LadderPaginationDto,
+  RankMap,
 } from '@/ladder.entity';
 import { ILadderUser, LadderUserEntity } from '@/ladder_user.entity';
 
@@ -39,6 +40,12 @@ export class LadderService {
         type: 'casual',
         special_id: 'casual',
         ranks: [],
+        details: {
+          title: 'Casual match',
+          description: 'Just a normal match with random people',
+          color: 'blue',
+          icon: 'gamepad',
+        },
       });
     } catch (err) {
       if (err.code !== '23505') {
@@ -51,6 +58,12 @@ export class LadderService {
       await this.ladderRepository.insert({
         type: 'ranked',
         special_id: 'ranked',
+        details: {
+          title: 'Competitive match',
+          description: 'Fight to the best of your ability against your foes',
+          color: 'yellow',
+          icon: 'bolt',
+        },
         ranks: [
           {
             name: ERank.BRONZE,
@@ -77,7 +90,10 @@ export class LadderService {
             topLimit: -1,
             bottomLimit: 2400,
           },
-        ],
+        ].map((v) => ({
+          ...v,
+          ...RankMap[v.name],
+        })),
       });
     } catch (err) {
       if (err.code !== '23505') {
@@ -158,7 +174,15 @@ export class LadderService {
     return this.ladderUserRepository.findOne({
       where: {
         ladder: ladderId,
-        id: userId,
+        user: userId,
+      },
+    });
+  }
+
+  getUserLadders(userId: string): Promise<LadderUserEntity[]> {
+    return this.ladderUserRepository.find({
+      where: {
+        user: userId,
       },
     });
   }
@@ -171,28 +195,47 @@ export class LadderService {
   }
 
   // adjust rating
-  // it will get the match id for info
-  // for now it gets two user ids
   async adjustRating(
-    ladder: ILadder,
-    user1: ILadderUser,
-    user2: ILadderUser,
-    user1_won: boolean,
+    user1: string,
+    user2: string,
+    ladderId: string,
+    winner: string,
   ): Promise<ILadderUser[]> {
-    const P1 = LadderService.calculateProbability(user1.points, user2.points);
-    const P2 = LadderService.calculateProbability(user2.points, user1.points);
+    const u1 = await this.ladderUserRepository.findOne({
+      where: { ladder: ladderId, user: user1 },
+    });
+    const u2 = await this.ladderUserRepository.findOne({
+      where: { ladder: ladderId, user: user2 },
+    });
+
+    const P1 = LadderService.calculateProbability(u1.points, u1.points);
+    const P2 = LadderService.calculateProbability(u2.points, u2.points);
     const K = 100;
 
     let user1_points;
     let user2_points;
-    if (user1_won) {
-      user1_points = Math.ceil(user2.points + K * (1 - P1));
-      user2_points = Math.ceil(user1.points + K * (0 - P2));
+    if (user1 === winner) {
+      user1_points = Math.ceil(u2.points + K * (1 - P1));
+      user2_points = Math.ceil(u1.points + K * (0 - P2));
     } else {
-      user1_points = Math.ceil(user2.points + K * (0 - P1));
-      user2_points = Math.ceil(user1.points + K * (1 - P2));
+      user1_points = Math.ceil(u2.points + K * (0 - P1));
+      user2_points = Math.ceil(u1.points + K * (1 - P2));
     }
 
+    console.log('rank adjustment', {
+      user1Id: user1,
+      before1: u1.points,
+      points1: user1_points,
+      rank1: u1.getRank(),
+
+      user2Id: user2,
+      before2: u2.points,
+      points2: user2_points,
+      rank2: u2.getRank(),
+
+      winner: winner,
+      ladder: (u1.ladder as any).type,
+    });
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -203,9 +246,10 @@ export class LadderService {
         .createQueryBuilder()
         .update()
         .set({
-          points: () => `points = ${user1_points}`,
+          points: () => `points + :p`,
         })
-        .where({ ladder: ladder, id: user1.id })
+        .setParameter('p', user1_points)
+        .where({ id: u1.id })
         .returning('*')
         .execute()
         .then((response) => {
@@ -217,9 +261,10 @@ export class LadderService {
         .createQueryBuilder()
         .update()
         .set({
-          points: () => `points = ${user2_points}`,
+          points: () => `points + :p`,
         })
-        .where({ ladder: ladder, id: user1.id })
+        .setParameter('p', user2_points)
+        .where({ id: u2.id })
         .returning('*')
         .execute()
         .then((response) => {

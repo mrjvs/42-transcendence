@@ -1,4 +1,4 @@
-import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
+import { Route, Switch, useHistory } from 'react-router-dom';
 import React from 'react';
 import './Root.css';
 import { Heading } from '../components/styled/Heading';
@@ -19,6 +19,7 @@ import { NotFoundView } from '../views/NotFoundView';
 import { DmChannelView } from '../views/DmChannelView';
 import { GameMatchView } from '../views/GameMatch';
 import { LadderMatchView } from '../views/LadderMatch';
+import { MatchHistoryView } from '../views/MatchHistoryView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
@@ -73,6 +74,9 @@ function SideBarRouter() {
         <Switch>
           <Route exact path="/">
             <GameMatchView />
+          </Route>
+          <Route exact path="/history">
+            <MatchHistoryView />
           </Route>
           <Route exact path="/channel/:id">
             <ChannelView />

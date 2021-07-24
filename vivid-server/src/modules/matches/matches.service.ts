@@ -14,8 +14,12 @@ export class MatchesService {
     private userService: UserService,
   ) {}
 
-  async findAll(): Promise<MatchesEntity[]> {
-    return await this.matchesRepository.createQueryBuilder().select().execute();
+  async findUserMatches(userId: string): Promise<MatchesEntity[]> {
+    return await this.matchesRepository
+      .createQueryBuilder()
+      .where('user_acpt = :id OR user_req = :id', { id: userId })
+      .orderBy({ game_ended: 'ASC' }) // TODO correct order
+      .getMany();
   }
 
   async createGame(game: IGame): Promise<UpdateResult> {

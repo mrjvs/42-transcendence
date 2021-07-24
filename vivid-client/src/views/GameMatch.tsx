@@ -7,7 +7,7 @@ import './GameMatch.css';
 function LadderCard(props: {
   id: string;
   title: string;
-  rank?: string;
+  rank?: { name: string; color: string };
   description: string;
   icon: string;
   color: string;
@@ -23,7 +23,13 @@ function LadderCard(props: {
     >
       <Icon type={props.icon} className="ladderCard-deco" />
       <Icon type={props.icon} className="ladderCard-icon" />
-      {props.rank ? <p className="ladderCard-rank">{props.rank}</p> : null}
+      {props.rank ? (
+        <p
+          className={`ladderCard-rank ladderCard-rank-color-${props.rank.color}`}
+        >
+          {props.rank.name}
+        </p>
+      ) : null}
       <h2 className="ladderCard-title">{props.title}</h2>
       <p className="ladderCard-description">{props.description}</p>
     </div>
@@ -34,14 +40,25 @@ function LadderCardSkeleton() {
   return <div className="ladderCardSkeleton" />;
 }
 
-// TODO show details from ladders
-// TODO show current rank on ladder
+function getLadderRank(ladder: string, ladderUsers: any[]) {
+  const found = ladderUsers.find((v) => v.ladder.id === ladder);
+  if (!found) return { name: 'unranked', color: '' };
+  return {
+    name: found.rank.displayName,
+    color: found.rank.color,
+  };
+}
+
+// TODO show current rank on ladder (BUGGED)
 export function GameMatchView() {
   const ladderMatch = useFetch({
     runOnLoad: true,
-    url: `/api/v1/ladder`,
+    url: `/api/v1/ladder/all`,
     method: 'GET',
   });
+
+  const ladders = ladderMatch.data?.data?.ladders;
+  const ladderUsers = ladderMatch.data?.data?.ladderUsers;
 
   if (ladderMatch.error)
     return (
@@ -69,24 +86,23 @@ export function GameMatchView() {
         What type of match do you want to play?
       </h1>
       <div className="GameMatchView-cards">
-        {ladderMatch.data?.data?.map((v: any) => (
+        {ladders?.map((v: any) => (
           <LadderCard
-            title="Casual match"
-            description="Just a normal match with random people"
-            icon="gamepad"
-            color="blue"
+            title={v.details?.title || 'Play a match'}
+            description={
+              v.details?.description || 'Just a normal match with random people'
+            }
+            icon={v.details?.icon || 'gamepad'}
+            color={v.details?.color || 'blue'}
+            rank={
+              v?.type === 'ranked'
+                ? getLadderRank(v.id, ladderUsers)
+                : undefined
+            }
             id={v.id}
             key={v.id}
           />
         ))}
-        {/* <LadderCard
-          title="Competitive match"
-          description="Fight to the best of your ability against your foes"
-          icon="bolt"
-          color="yellow"
-          rank="Gold"
-          id="competitive"
-        /> */}
       </div>
     </div>
   );

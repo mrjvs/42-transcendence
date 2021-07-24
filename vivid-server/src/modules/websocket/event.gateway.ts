@@ -61,8 +61,15 @@ export class EventGateway implements OnGatewayConnection {
   }
 
   async handleDisconnect(socket: Socket) {
-    disconnectClient(socket.id);
-    this.pongService.onDisconnect(socket);
+    try {
+      disconnectClient(socket.id);
+    } catch (err) {}
+    try {
+      this.pongService.onDisconnect(socket);
+    } catch (err) {}
+    try {
+      this.matchmakingService.leavePool(socket);
+    } catch (err) {}
   }
 
   /* STATUSES */
@@ -240,5 +247,10 @@ export class EventGateway implements OnGatewayConnection {
     try {
       await this.matchmakingService.joinPool(client, body.ladderId);
     } catch (err) {}
+  }
+  @SubscribeMessage('matchmakingLeave')
+  async leaveMatchmaking(@ConnectedSocket() client: Socket) {
+    if (!client || !client.auth) return;
+    this.matchmakingService.leavePool(client);
   }
 }

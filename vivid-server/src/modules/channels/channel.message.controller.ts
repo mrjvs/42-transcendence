@@ -105,7 +105,7 @@ export class ChannelMessageController {
     @User() user: UserEntity,
     @Param('id') channelId: string,
   ): Promise<IMessage> {
-    const gameId = this.pongService.createGame();
+    const gameId = this.pongService.createGame('duel');
     this.pongService.joinGame(user.id, gameId);
     const input: IMessageInput = {
       content: '',

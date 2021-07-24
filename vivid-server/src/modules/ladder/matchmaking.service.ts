@@ -1,26 +1,24 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ERank } from '~/models/ladder.entity';
-import { ILadderUser, LadderUserEntity } from '~/models/ladder_user.entity';
+import { ERank, IRank, LadderEntity } from '~/models/ladder.entity';
+import { LadderUserEntity } from '~/models/ladder_user.entity';
 import { PongService } from '../pong/pong.service';
 
 type UnmatchedPlayer = {
   id: string;
   timeJoined: Date;
-  rank: ERank;
+  rank: IRank;
 };
 
 interface IMatchingPlayer {
   player: UnmatchedPlayer;
   socket: any;
-  ladderId: string;
+  ladder: {
+    id: string;
+    type: string;
+  };
 }
 
 interface IPlayerPool {
@@ -29,7 +27,7 @@ interface IPlayerPool {
 
 const playerPool: IPlayerPool = {};
 
-const MAX_TIME_IN_QUEUE = 2 * 1000; // 2s
+const MAX_TIME_IN_QUEUE = 10 * 60 * 1000; // 10m
 
 @Injectable()
 export class MatchMakingService {
@@ -43,32 +41,64 @@ export class MatchMakingService {
   async joinPool(client: any, ladderId: string) {
     if (!client || !client.auth) return;
     const isUserAlreadyInPool = !!playerPool[client.auth];
-    if (isUserAlreadyInPool) return;
-
-    let user = await this.ladderUserRepository.findOne({
-      where: { ladder: ladderId, user: client.auth },
-    });
-    if (!user) {
-      user = await this.ladderUserRepository.save({
-        ladder: ladderId,
-        user: client.auth,
-        points: 0,
+    if (isUserAlreadyInPool) {
+      client.emit('matchmakingStatus', {
+        status: 'alreadyin',
       });
+      return;
     }
+
+    let user;
+    try {
+      user = await this.ladderUserRepository.findOne({
+        where: { ladder: ladderId, user: client.auth },
+        relations: ['ladder'],
+      });
+      if (!user) {
+        user = await this.ladderUserRepository.save({
+          ladder: ladderId,
+          user: client.auth,
+          points: 0,
+        });
+        user = await this.ladderUserRepository.findOneOrFail({
+          where: { id: user.id },
+          relations: ['ladder'],
+        });
+      }
+    } catch (err) {
+      client.emit('matchmakingStatus', {
+        status: 'error',
+      });
+      return;
+    }
+
+    client.emit('matchmakingStatus', {
+      status: 'matching',
+      rank: user.getRank()
+        ? {
+            ...user.getRank(),
+            icon: user.ladder.details.icon,
+          }
+        : null,
+    });
 
     playerPool[user.user] = {
       player: {
         id: user.user,
         timeJoined: new Date(),
-        rank: user.rank,
+        rank: user.getRank(),
       },
       socket: client,
-      ladderId,
+      ladder: {
+        id: ladderId,
+        type: (user.ladder as any).type,
+      },
     };
   }
 
   leavePool(client: any) {
     if (!client || !client.auth) return;
+    console.log('removing client from pool:', client.auth);
     if (playerPool[client.auth]) delete playerPool[client.auth];
   }
 
@@ -83,7 +113,10 @@ export class MatchMakingService {
       for (const [playerIdB, playerB] of Object.entries(playerPool)) {
         if (this.isMatch(playerA, playerB)) {
           // create game and join them
-          const gameId = this.pongService.createGame();
+          const gameId = this.pongService.createGame(
+            playerA.ladder.type,
+            playerA.ladder.id,
+          );
           this.pongService.joinGame(playerIdA, gameId);
           this.pongService.joinGame(playerIdB, gameId);
 
@@ -96,8 +129,6 @@ export class MatchMakingService {
 
           delete playerPool[playerIdA];
           delete playerPool[playerIdB];
-
-          // TODO save match and adjust player ratings
         }
       }
     }
@@ -118,10 +149,10 @@ export class MatchMakingService {
     return true;
   }
 
-  // TODO check if this is all correct
   isMatch(player1: IMatchingPlayer, player2: IMatchingPlayer): boolean {
     if (player1 === player2) return false;
-    if (player1.ladderId !== player2.ladderId) return false;
+    if (player1.ladder.id !== player2.ladder.id) return false;
+    if (player1.ladder.type !== player2.ladder.type) return false;
 
     let diff = 0;
     if (
@@ -135,14 +166,9 @@ export class MatchMakingService {
     ) {
       diff = 4;
     }
-    const rankDiff = Math.abs(player1.player.rank - player2.player.rank);
-
-    console.log({
-      player1: player1.player.rank, // for some reason rank is undefined (issues on ladderUserEntity)
-      player2: player2.player.rank,
-      rankDiff: rankDiff,
-      matchMakingDiff: diff,
-    });
+    const rankDiff = Math.abs(
+      player1.player.rank.name - player2.player.rank.name,
+    );
 
     if (rankDiff > diff) return false;
 

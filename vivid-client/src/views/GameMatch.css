@@ -7,7 +7,7 @@
   flex-direction: column;
   text-align: center;
   overflow-y: auto;
-  padding: 4rem;
+  padding: 4rem 1rem;
   box-sizing: border-box;
 }
 
@@ -21,12 +21,23 @@
 
 .GameMatchView .GameMatchView-cards {
   display: flex;
-  width: 70rem;
-  max-width: 100%;
   flex-wrap: wrap;
+  width: 100%;
   align-items: center;
   justify-content: center;
   margin: -0.5rem;
+  box-sizing: border-box;
+}
+
+.ladderCardSkeleton {
+  background-color: #15192a;
+  border-radius: 10px;
+  display: flex;
+  height: 15rem;
+  width: 100%;
+  max-width: 30rem;
+  min-width: 25rem;
+  margin: 0.5rem;
 }
 
 .ladderCard {
@@ -34,7 +45,9 @@
   border-radius: 10px;
   display: flex;
   height: 15rem;
-  width: 30rem;
+  width: 100%;
+  max-width: 30rem;
+  min-width: 25rem;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-end;
@@ -76,10 +89,10 @@
   margin: 0 0 1rem 0;
 }
 
-.ladderCard .ladderCard-rank {
+.ladderCard-rank {
   font-size: 1rem;
   font-weight: bold;
-  color: white;
+  color: #6c6381;
   margin: 0 0 0.5rem 0;
 }
 
@@ -98,15 +111,14 @@
   font-size: 2em;
 }
 
+/* colors */
 .ladderCard.ladderCard-color-blue .ladderCard-icon,
-.ladderCard.ladderCard-color-blue:hover .ladderCard-deco,
-.ladderCard.ladderCard-color-blue .ladderCard-rank {
+.ladderCard.ladderCard-color-blue:hover .ladderCard-deco {
   color: #4191ee;
 }
 
 .ladderCard.ladderCard-color-yellow .ladderCard-icon,
-.ladderCard.ladderCard-color-yellow:hover .ladderCard-deco,
-.ladderCard.ladderCard-color-yellow .ladderCard-rank {
+.ladderCard.ladderCard-color-yellow:hover .ladderCard-deco {
   color: #f2ec4a;
 }
 .ladderCard.ladderCard.ladderCard-color-yellow .ladderCard-deco {
@@ -117,4 +129,26 @@
 }
 .ladderCard.ladderCard.ladderCard-color-yellow:hover .ladderCard-deco {
   transform: rotate(15deg);
+}
+
+/* rank colors */
+.ladderCard-rank-color-bronze {
+  color: #b9755a;
+}
+
+.ladderCard-rank-color-silver {
+  color: #bcb8c5;
+}
+
+.ladderCard-rank-color-yellow {
+  color: #f2ec4a;
+}
+
+.ladderCard-rank-color-blue {
+  color: #4db7e0;
+}
+
+.ladderCard-rank-color-sparkles {
+  color: #f05f7e;
+  text-shadow: 0 0 15px rgb(226, 78, 140);
 }

@@ -4,7 +4,7 @@ import './SidebarLink.css';
 
 export function SidebarLink(props: { link: string; children: any }) {
   return (
-    <NavLink className="sidebar-link" to={props.link}>
+    <NavLink className="sidebar-link" to={props.link} exact>
       {props.children}
     </NavLink>
   );

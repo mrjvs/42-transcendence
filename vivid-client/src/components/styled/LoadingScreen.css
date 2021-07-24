@@ -94,6 +94,14 @@
   margin-top: 6.5rem;
 }
 
+.loading-screen .icon-wrapper .icon.bigload {
+  margin-top: 18.5rem;
+}
+
+.loading-screen .icon-wrapper .icon.hidden {
+  opacity: 0;
+}
+
 .loading-icon-rotate.small {
   height: 2rem;
   width: 2rem;
@@ -121,4 +129,54 @@
   100% {
     transform: rotate(765deg);
   }
+}
+
+/* loading matches */
+.loading-screen .loading-match {
+  display: flex;
+  height: 5rem;
+  text-align: center;
+  line-height: 1.5;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  margin-top: 2rem;
+  height: 15rem;
+}
+
+.loading-screen .loading-match-rank {
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-height: 1.5rem;
+}
+
+.loading-screen .loading-match-rank .loading-match-icon {
+  font-size: 1.1rem;
+  margin-right: 0.3rem;
+}
+
+.loading-screen .loading-match .loading-match-heading {
+  font-size: 1.3rem;
+  margin: 0.7rem 0 0.5rem 0;
+  color: white;
+}
+
+.loading-screen .loading-match .loading-match-text {
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  color: #9da6c4;
+}
+
+.loading-screen .loading-match .loading-match-text.bigmargin {
+  margin: 0 0 2rem 0;
+}
+
+.loading-screen .loading-match .loading-match-status {
+  font-size: 0.7rem;
+  margin: 0 0 3rem 0;
+  color: #424d72;
+  text-transform: uppercase;
+  font-weight: bold;
 }

@@ -15,6 +15,6 @@ import { LadderUserEntity } from '~/models/ladder_user.entity';
   ],
   providers: [LadderService, MatchMakingService],
   controllers: [LadderController],
-  exports: [MatchMakingService],
+  exports: [MatchMakingService, LadderService],
 })
 export class LadderModule {}

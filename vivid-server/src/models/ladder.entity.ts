@@ -8,7 +8,6 @@ import {
   Unique,
 } from 'typeorm';
 import {
-  IsBoolean,
   IsDate,
   IsJSON,
   IsNotEmpty,
@@ -28,11 +27,15 @@ export class LadderEntity {
   @Column({ default: null, nullable: true })
   special_id: string | null;
 
+  // "casual" or "ranked"
   @Column()
   type: string;
 
   @Column({ type: 'json' })
   ranks: IRank[];
+
+  @Column({ type: 'json' })
+  details: ILadderDetails;
 
   @OneToMany(() => LadderUserEntity, (user) => user.ladder)
   users: LadderUserEntity[];
@@ -51,6 +54,15 @@ export interface IRank {
   name: ERank;
   topLimit: number;
   bottomLimit: number;
+  displayName: string;
+  color: string;
+}
+
+export interface ILadderDetails {
+  title: string;
+  description: string;
+  color: string;
+  icon: string;
 }
 
 export interface ILadder {
@@ -83,12 +95,35 @@ export class LadderDto {
 }
 
 export enum ERank {
-  BRONZE,
-  SILVER,
-  GOLD,
-  DIAMOND,
-  MASTER,
+  BRONZE = 0,
+  SILVER = 1,
+  GOLD = 2,
+  DIAMOND = 3,
+  MASTER = 4,
 }
+
+export const RankMap = {
+  0: {
+    displayName: 'Bronze',
+    color: 'bronze',
+  },
+  1: {
+    displayName: 'Silver',
+    color: 'silver',
+  },
+  2: {
+    displayName: 'Gold',
+    color: 'yellow',
+  },
+  3: {
+    displayName: 'Diamond',
+    color: 'blue',
+  },
+  4: {
+    displayName: 'Master',
+    color: 'sparkles',
+  },
+};
 
 export class LadderPaginationDto {
   @IsOptional()
