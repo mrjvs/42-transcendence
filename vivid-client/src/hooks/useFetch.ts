@@ -44,7 +44,6 @@ export function useFetch(options: {
         });
       })
       .then((data) => {
-        console.log('DATA', data);
         if (shouldCancel) return;
         if (data.res.status >= 400) throw data;
         setData(data);
