@@ -60,6 +60,10 @@ export function GameMatchView() {
   const ladders = ladderMatch.data?.data?.ladders;
   const ladderUsers = ladderMatch.data?.data?.ladderUsers;
 
+  React.useEffect(() => {
+    console.log('LADDERS', ladderMatch.done, ladderMatch?.data?.data);
+  }, [ladderMatch.done]);
+
   if (ladderMatch.error)
     return (
       <div className="GameMatchView">
@@ -81,10 +85,6 @@ export function GameMatchView() {
         </div>
       </MainLayout>
     );
-
-  React.useEffect(() => {
-    console.log('LADDERS', ladderMatch.done, ladderMatch?.data?.data);
-  }, [ladderMatch.done]);
 
   return (
     <MainLayout title="" background="#1b1f31">
