@@ -37,11 +37,10 @@ export function useFetch(options: {
     })
       .then((res) => {
         return res.text().then((text) => {
-          if (text.length == 0)
-            return new Promise<any>((resolve) => {
-              resolve({});
-            }).then((data) => ({ data, res }));
-          return res.json().then((data) => ({ data, res }));
+          return {
+            data: text.length > 0 ? JSON.parse(text) : {},
+            res,
+          };
         });
       })
       .then((data) => {
