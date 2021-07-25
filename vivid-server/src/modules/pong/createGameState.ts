@@ -1,4 +1,4 @@
-import { GameProgress, IGameState } from '~/models/game.interface';
+import { GameProgress, IGameState } from '$/pong/game.interface';
 
 export function createGameState(
   gameId: string,

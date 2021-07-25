@@ -1,5 +1,5 @@
-import { IPlayer } from '@/game.interface';
-import { IGameState } from '@/game.interface';
+import { IPlayer } from '$/pong/game.interface';
+import { IGameState } from '$/pong/game.interface';
 
 const constants = {
   ballStartSpeed: 20,

@@ -26,7 +26,7 @@ import { join } from 'path';
 import { unlink } from 'fs';
 import { Request } from 'express';
 import { formatObject } from '~/utils/format';
-import { MatchesService } from '../matches/matches.service';
+import { MatchesService } from '$/matches/matches.service';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
@@ -79,14 +79,6 @@ export class UserController {
     return {
       status: true,
     };
-  }
-
-  @Post('join_guild/:anagram')
-  async join_guild(
-    @User() user: UserEntity,
-    @Param('anagram') anagram: string,
-  ): Promise<UserEntity> {
-    return this.userService.joinGuild(user.id, anagram);
   }
 
   @Post(':id/avatar')

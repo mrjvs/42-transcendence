@@ -25,12 +25,6 @@ export class MatchesEntity {
   @Column()
   user_acpt_score: number;
 
-  @Column({ nullable: true, default: null })
-  points_req: number;
-
-  @Column({ nullable: true, default: null })
-  points_acpt: number;
-
   @Column('varchar', { default: null })
   addons: string;
 
@@ -42,9 +36,6 @@ export class MatchesEntity {
 
   @Column()
   time_elapsed: number;
-
-  @Column({ nullable: true, default: null })
-  war_id?: string;
 }
 
 export interface IMatch {

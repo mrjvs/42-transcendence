@@ -1,12 +1,12 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChannelEntity } from '~/models/channel.entity';
-import { JoinedChannelEntity } from '~/models/joined_channels.entity';
-import { MatchesEntity } from '~/models/matches.entity';
-import { MessageEntity } from '~/models/messages.entity';
-import { TypeORMSession } from '~/models/session.entity';
-import { UserEntity } from '~/models/user.entity';
-import { MatchesModule } from '../matches/matches.module';
+import { ChannelEntity } from '@/channel.entity';
+import { JoinedChannelEntity } from '@/joined_channels.entity';
+import { MatchesEntity } from '@/matches.entity';
+import { MessageEntity } from '@/messages.entity';
+import { TypeORMSession } from '@/session.entity';
+import { UserEntity } from '@/user.entity';
+import { MatchesModule } from '$/matches/matches.module';
 import { StatsController } from './stats.controller';
 import { StatsService } from './stats.service';
 

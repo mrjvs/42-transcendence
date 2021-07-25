@@ -9,12 +9,9 @@ import {
 import { Server, Socket } from 'socket.io';
 import { IMessage } from '@/messages.entity';
 import { UserService } from '$/users/user.service';
-import {
-  IJoinedChannel,
-  JoinedChannelEntity,
-} from '~/models/joined_channels.entity';
-import { UserEntity } from '~/models/user.entity';
-import { PongService } from '../pong/pong.service';
+import { IJoinedChannel, JoinedChannelEntity } from '@/joined_channels.entity';
+import { UserEntity } from '@/user.entity';
+import { PongService } from '$/pong/pong.service';
 import {
   connectClient,
   disconnectClient,
@@ -22,8 +19,8 @@ import {
   registerCallback,
   UserStatus,
 } from './statuses';
-import { ChannelEntity } from '~/models/channel.entity';
-import { MatchMakingService } from '../ladder/matchmaking.service';
+import { ChannelEntity } from '@/channel.entity';
+import { MatchMakingService } from '$/ladder/matchmaking.service';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {

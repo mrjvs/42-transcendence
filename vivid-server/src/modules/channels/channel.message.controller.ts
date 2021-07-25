@@ -8,7 +8,6 @@ import {
   Body,
   BadRequestException,
   NotFoundException,
-  // Query,
 } from '@nestjs/common';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { User } from '~/middleware/decorators/login.decorator';
@@ -23,12 +22,11 @@ import {
   IMessageInput,
   MessageDto,
   MessageEntity,
-  // PaginationDto,
 } from '@/messages.entity';
 import { UserEntity } from '@/user.entity';
 import { ChannelMessageService } from './channel.message.service';
 import { Observable } from 'rxjs';
-import { PongService } from '../pong/pong.service';
+import { PongService } from '$/pong/pong.service';
 
 @Controller('channels/:id/messages')
 @UseGuards(AuthenticatedGuard)
@@ -50,7 +48,6 @@ export class ChannelMessageController {
     },
   )
   getMessageHistory(
-    // @Query() paginationDto: PaginationDto,
     @Param('id') channelId: string,
   ): Observable<MessageEntity[]> {
     return this.messageService.getMessages(channelId, null);

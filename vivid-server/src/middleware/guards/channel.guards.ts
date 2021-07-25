@@ -5,9 +5,9 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ChannelEntity } from '~/models/channel.entity';
-import { JoinedChannelEntity } from '~/models/joined_channels.entity';
-import { UserEntity } from '~/models/user.entity';
+import { ChannelEntity } from '@/channel.entity';
+import { JoinedChannelEntity } from '@/joined_channels.entity';
+import { UserEntity } from '@/user.entity';
 
 export enum ChannelRoles {
   USER,

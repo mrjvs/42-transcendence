@@ -13,11 +13,7 @@ import {
   UserParam,
 } from '~/middleware/decorators/login.decorator';
 import { AccountNotSetupGuard } from '~/middleware/guards/auth.guards';
-import {
-  FullDetailsUser,
-  UserEntity,
-  UsernameChangeDto,
-} from '~/models/user.entity';
+import { FullDetailsUser, UserEntity, UsernameChangeDto } from '@/user.entity';
 import { formatObject } from '~/utils/format';
 import { UserService } from './user.service';
 
@@ -39,8 +35,10 @@ export class UserSetupController {
   @Patch('/:id/name')
   async changeName(
     @UserParam('id') user: IUserParam,
+    @User() usr: UserEntity,
     @Body() newName: UsernameChangeDto,
   ): Promise<any> {
+    if (!user.isSelf && !usr.isSiteAdmin()) throw new ForbiddenException();
     const res = await this.userService.updateName(user.id, newName.username);
     return {
       id: res.id,

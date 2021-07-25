@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { UserService } from '$/users/user.service';
 import { authenticator } from 'otplib';
-import { UserEntity } from '~/models/user.entity';
-import { decryptUserData } from '../users/userEncrypt';
+import { UserEntity } from '@/user.entity';
+import { decryptUserData } from '$/users/userEncrypt';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

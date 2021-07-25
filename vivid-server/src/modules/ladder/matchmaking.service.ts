@@ -3,9 +3,9 @@ import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { addons } from '~/constants';
-import { IRank } from '~/models/ladder.entity';
-import { LadderUserEntity } from '~/models/ladder_user.entity';
-import { PongService } from '../pong/pong.service';
+import { IRank } from '@/ladder.entity';
+import { LadderUserEntity } from '@/ladder_user.entity';
+import { PongService } from '$/pong/pong.service';
 
 type UnmatchedPlayer = {
   id: string;

@@ -18,9 +18,9 @@ import {
 import { EventGateway } from '$/websocket/event.gateway';
 import { ChannelService } from './channel.service';
 import { UserEntity } from '@/user.entity';
-import { ChannelTypes } from '~/models/channel.entity';
-import { FriendsService } from '../friends/friends.service';
-import { UserService } from '../users/user.service';
+import { ChannelTypes } from '@/channel.entity';
+import { FriendsService } from '$/friends/friends.service';
+import { UserService } from '$/users/user.service';
 
 @Injectable()
 export class ChannelMessageService {

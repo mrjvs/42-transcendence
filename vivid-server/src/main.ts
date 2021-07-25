@@ -5,7 +5,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import { getSessionStore } from '$/auth/auth-session';
-import { LadderService } from './modules/ladder/ladder.service';
+import { LadderService } from '$/ladder/ladder.service';
 
 async function bootstrap() {
   if (!process.env.CORS) process.env.CORS = '';

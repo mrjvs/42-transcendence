@@ -1,15 +1,12 @@
-import { JoinedChannelEntity } from './joined_channels.entity';
+import { JoinedChannelEntity } from '@/joined_channels.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
   CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
   BaseEntity,
 } from 'typeorm';
-import { GuildsEntity } from './guilds.entity';
 import { LadderUserEntity } from '@/ladder_user.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Exclude, Expose, Transform } from 'class-transformer';
@@ -43,13 +40,6 @@ export class UserEntity extends BaseEntity {
 
   @Column({ default: null })
   avatar: string;
-
-  @JoinColumn({ name: 'guild' })
-  @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
-    onDelete: 'SET NULL',
-  })
-  @JoinColumn({ name: 'guild' })
-  guild: GuildsEntity;
 
   @OneToMany(() => BlocksEntity, (blocks) => blocks.user_id)
   blocks: BlocksEntity[];

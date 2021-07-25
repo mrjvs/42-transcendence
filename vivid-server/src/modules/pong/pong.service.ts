@@ -4,19 +4,19 @@ import {
   GameProgress,
   IGameState,
   IPlayer,
-} from '@/game.interface';
+} from '$/pong/game.interface';
 import { v4 as uuid } from 'uuid';
 import { Socket } from 'socket.io';
-import { createGameState } from './create_gamestate';
+import { createGameState } from './createGameState';
 import { gameLoop as renderGameLoop, resetField } from './pong';
 import { MatchesService } from '$/matches/matches.service';
-import { UserService } from '../users/user.service';
-import { IMatch } from '~/models/matches.entity';
-import { UserEntity } from '~/models/user.entity';
+import { UserService } from '$/users/user.service';
+import { IMatch } from '@/matches.entity';
+import { UserEntity } from '@/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LadderService } from '../ladder/ladder.service';
-import { setUserStatus, Status } from '../websocket/statuses';
+import { LadderService } from '$/ladder/ladder.service';
+import { setUserStatus, Status } from '$/websocket/statuses';
 
 interface IClientGameMap {
   [clientId: string]: string; // [clientId] = gameId

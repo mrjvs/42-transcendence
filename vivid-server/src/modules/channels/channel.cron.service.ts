@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ChannelEntity } from '~/models/channel.entity';
-import { JoinedChannelEntity } from '~/models/joined_channels.entity';
-import { EventGateway } from '../websocket/event.gateway';
+import { ChannelEntity } from '@/channel.entity';
+import { JoinedChannelEntity } from '@/joined_channels.entity';
+import { EventGateway } from '$/websocket/event.gateway';
 
 @Injectable()
 export class ChannelTaskService {

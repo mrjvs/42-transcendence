@@ -1,20 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ChannelEntity } from '~/models/channel.entity';
-import { JoinedChannelEntity } from '~/models/joined_channels.entity';
-import { MatchesEntity } from '~/models/matches.entity';
-import { MessageEntity } from '~/models/messages.entity';
-import { TypeORMSession } from '~/models/session.entity';
-import { UserEntity } from '~/models/user.entity';
+import { ChannelEntity } from '@/channel.entity';
+import { JoinedChannelEntity } from '@/joined_channels.entity';
+import { MatchesEntity } from '@/matches.entity';
+import { TypeORMSession } from '@/session.entity';
+import { UserEntity } from '@/user.entity';
 
 @Injectable()
 export class StatsService {
   constructor(
     @InjectRepository(JoinedChannelEntity)
     private joinedChannelsRepository: Repository<JoinedChannelEntity>,
-    @InjectRepository(MessageEntity)
-    private messagesRepository: Repository<MessageEntity>,
     @InjectRepository(MatchesEntity)
     private matchesRepository: Repository<MatchesEntity>,
     @InjectRepository(TypeORMSession)

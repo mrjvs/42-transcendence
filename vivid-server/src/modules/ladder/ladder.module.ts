@@ -5,8 +5,8 @@ import { LadderEntity } from '@/ladder.entity';
 import { LadderService } from '$/ladder/ladder.service';
 import { LadderController } from '$/ladder/ladder.controller';
 import { MatchMakingService } from './matchmaking.service';
-import { PongModule } from '../pong/pong.module';
-import { LadderUserEntity } from '~/models/ladder_user.entity';
+import { PongModule } from '$/pong/pong.module';
+import { LadderUserEntity } from '@/ladder_user.entity';
 
 @Module({
   imports: [

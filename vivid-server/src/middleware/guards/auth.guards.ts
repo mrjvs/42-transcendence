@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
-import { UserEntity } from '~/models/user.entity';
+import { UserEntity } from '@/user.entity';
 
 @Injectable()
 export class IntraAuthGuard extends AuthGuard('intra-oauth') {

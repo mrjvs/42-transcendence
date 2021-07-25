@@ -137,31 +137,6 @@ export class LadderService {
     });
   }
 
-  // list all users in specific rank
-  async listRank(
-    ladderId: string,
-    rankId: string,
-    ladderPagination?: LadderPaginationDto,
-  ): Promise<ILadderUser[]> {
-    if (!ladderPagination) {
-      return await this.ladderUserRepository.find({
-        where: { ladder: ladderId, rank: rankId },
-        order: { points: 'DESC' },
-      });
-    }
-    return await this.ladderUserRepository.find({
-      where: {
-        ladder: ladderId,
-        rank: rankId,
-        points: Between(
-          ladderPagination.topLimit,
-          ladderPagination.bottomLimit,
-        ),
-      },
-      order: { points: 'DESC' },
-    });
-  }
-
   // list one user
   getUser(ladderId: string, userId: string): Promise<ILadderUser> {
     return this.ladderUserRepository.findOne({

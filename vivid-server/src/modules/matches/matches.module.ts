@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MatchesEntity } from '~/models/matches.entity';
-import { UserModule } from '../users/user.module';
+import { MatchesEntity } from '@/matches.entity';
+import { UserModule } from '$/users/user.module';
 import { MatchesController } from './matches.controller';
 import { MatchesService } from './matches.service';
 

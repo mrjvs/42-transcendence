@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChannelEntity } from '~/models/channel.entity';
 import { JoinedChannelEntity } from '~/models/joined_channels.entity';
-import { ChannelService } from '../channels/channel.service';
-import { FriendsService } from '../friends/friends.service';
+import { ChannelService } from '$/channels/channel.service';
+import { FriendsService } from '$/friends/friends.service';
 
 @Injectable()
 export class DmService {

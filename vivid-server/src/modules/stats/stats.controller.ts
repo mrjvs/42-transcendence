@@ -12,8 +12,8 @@ import {
   UserParam,
 } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { UserEntity } from '~/models/user.entity';
-import { MatchesService } from '../matches/matches.service';
+import { UserEntity } from '@/user.entity';
+import { MatchesService } from '$/matches/matches.service';
 import { StatsService } from './stats.service';
 
 @Controller('stats')
