@@ -8,6 +8,7 @@ import { useFetch } from '../../hooks/useFetch';
 import { Icon } from './Icon';
 import { GameEventContext } from '../../hooks/useGameEvents';
 import TrackVisibility from '../base/TrackVisibility';
+import partyParrot from '../../assets/partyparrot.gif';
 
 function DuelMessage(props: { message: any; channelId: string; user: any }) {
   const history = useHistory();
@@ -179,7 +180,17 @@ export function Message(props: {
                       {v.content}
                     </p>
                   );
-                else if (v.type == 1)
+                else if (v.type == 42) {
+                  return (
+                    <p key={v.id} className="messageContent messageMessage">
+                      <span className="bg-underlay bg-layers" />
+                      <span className="bg-overlay bg-layers">
+                        <DeleteButton msgId={v.id} />
+                      </span>
+                      <img className="partyparrot" src={partyParrot} />
+                    </p>
+                  );
+                } else if (v.type == 1)
                   return (
                     <div key={v.id} className="messageMessage">
                       <span className="bg-underlay bg-layers" />

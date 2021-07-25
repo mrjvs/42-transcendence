@@ -38,6 +38,10 @@
   padding-bottom: 0.8rem;
 }
 
+.messageWrapper .messageContent .partyparrot {
+  height: 3rem;
+}
+
 .messageWrapper .message-special {
   color: #6c738b;
 }

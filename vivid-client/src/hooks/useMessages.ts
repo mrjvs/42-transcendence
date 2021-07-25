@@ -116,8 +116,10 @@ export function useMessages(channel: string) {
             history.push(`/pong/${data.aux_content.invite_game_id}`);
         });
     } else {
+      let extra = '';
+      if (text.trim() === 'partyparrot') extra = '/secret';
       fetch(
-        `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,
+        `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages${extra}`,
         {
           method: 'POST',
           body: JSON.stringify({

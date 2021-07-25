@@ -87,6 +87,35 @@ export class ChannelMessageController {
     return this.messageService.postMessage(user, input);
   }
 
+  @Post('/secret')
+  @ChannelRoleAuth(
+    {
+      role: ChannelRoles.USER,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.BANNED,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.MUTED,
+      channelParam: 'id',
+    },
+  )
+  createSecretMessage(
+    @User() user: UserEntity,
+    @Param('id') channelId: string,
+  ): Promise<IMessage> {
+    const input: IMessageInput = {
+      content: '',
+      aux_content: null,
+      message_type: 42,
+      user: user.id,
+      channel: channelId,
+    };
+    return this.messageService.postMessage(user, input);
+  }
+
   // TODO add dto
   @Post('/duel')
   @ChannelRoleAuth(
