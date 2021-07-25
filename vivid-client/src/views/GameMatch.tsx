@@ -4,6 +4,7 @@ import { Icon } from '../components/styled/Icon';
 import { useFetch } from '../hooks/useFetch';
 import { MainLayout } from './layouts/MainLayout';
 import './GameMatch.css';
+import { UserContext } from '../hooks/useUser';
 
 function LadderCard(props: {
   id: string;
@@ -51,11 +52,16 @@ function getLadderRank(ladder: string, ladderUsers: any[]) {
 }
 
 export function GameMatchView() {
+  const userData = React.useContext(UserContext);
   const ladderMatch = useFetch({
     runOnLoad: true,
     url: `/api/v1/ladder/all`,
     method: 'GET',
   });
+
+  React.useEffect(() => {
+    ladderMatch.run();
+  }, [userData.user.name]);
 
   const ladders = ladderMatch.data?.data?.ladders;
   const ladderUsers = ladderMatch.data?.data?.ladderUsers;

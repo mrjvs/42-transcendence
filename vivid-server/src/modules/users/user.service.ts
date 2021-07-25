@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,6 +16,9 @@ import { authenticator } from 'otplib';
 import * as cryptoRandomString from 'secure-random-string';
 import { TypeORMSession } from '@/session.entity';
 import { encryptUserData } from './userEncrypt';
+import { JoinedChannelEntity } from '~/models/joined_channels.entity';
+import { FriendsEntity } from '~/models/friends.entity';
+import { EventGateway } from '../websocket/event.gateway';
 
 const colors = [
   '#29419F',
@@ -38,7 +43,13 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(JoinedChannelEntity)
+    private joinChannelRepository: Repository<JoinedChannelEntity>,
+    @InjectRepository(FriendsEntity)
+    private friendsRepository: Repository<FriendsEntity>,
     private configService: ConfigService,
+    @Inject(forwardRef(() => EventGateway))
+    private readonly eventGateway: EventGateway,
   ) {}
 
   // find user, optional resolving
@@ -65,18 +76,40 @@ export class UserService {
 
   // delete user, invalidates sessions and disconnects from websocket
   async deleteUser(id: string): Promise<void> {
-    // TODO disconnect websocket connections
-    // TODO leave guild, remove blocks, remove friends, leave channels
-    await this.killSessions(id);
-    await this.userRepository
+    // TODO popup with "you are still an owner of a channel, transfer ownership first"
+    // delete friends
+    await this.friendsRepository
       .createQueryBuilder()
       .delete()
+      .andWhere(`user_1 = :id OR user_2 = :id`, {
+        id,
+      })
+      .execute();
+    // leave channels
+    await this.joinChannelRepository
+      .createQueryBuilder()
+      .delete()
+      .andWhere(`user = :id`, {
+        id,
+      })
+      .execute();
+    // logout everywhere
+    await this.killSessions(id);
+    await this.eventGateway.logoutUser(id);
+    // anonymize user and make it unable to login
+    await this.userRepository
+      .createQueryBuilder()
+      .update()
       .where({ id: id })
+      .set({
+        oauth_id: null,
+        name: null,
+      })
       .returning('*')
       .execute()
       .then((response) => {
         return <UserEntity>response.raw[0];
-      }); // TODO check empty result
+      });
   }
 
   async findUserMatches(id: string): Promise<UserEntity> {

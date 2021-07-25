@@ -29,7 +29,7 @@ export class UserEntity extends BaseEntity {
   @OneToMany(() => LadderUserEntity, (ladder_user) => ladder_user.user)
   ranks: LadderUserEntity[];
 
-  @Column()
+  @Column({ nullable: true })
   oauth_id: string;
 
   @Column({ default: false })

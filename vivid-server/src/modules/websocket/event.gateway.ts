@@ -21,6 +21,7 @@ import {
 } from './statuses';
 import { ChannelEntity } from '@/channel.entity';
 import { MatchMakingService } from '$/ladder/matchmaking.service';
+import { forwardRef, Inject } from '@nestjs/common';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -28,6 +29,7 @@ export class EventGateway implements OnGatewayConnection {
   server: Server;
 
   constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly pongService: PongService,
     private readonly matchmakingService: MatchMakingService,
@@ -69,8 +71,21 @@ export class EventGateway implements OnGatewayConnection {
     } catch (err) {}
   }
 
+  async logoutUser(id: string) {
+    if (!this.server) return;
+    const sockets = this.server.sockets.connected;
+    for (const socketId in sockets) {
+      const client = sockets[socketId];
+      if (!client.auth) continue; // skip user if not authed
+      if (client.auth !== id) continue; // skip if not the user
+      client.emit('logout');
+      client.disconnect();
+    }
+  }
+
   /* STATUSES */
   statusCallback(status: UserStatus) {
+    if (!this.server) return;
     this.server.emit('status_update', status);
   }
 
@@ -82,6 +97,7 @@ export class EventGateway implements OnGatewayConnection {
 
   /* CHANNELS */
   _sendToChannelMembers(event: string, data: any, members: IJoinedChannel[]) {
+    if (!this.server) return;
     const sockets = this.server.sockets.connected;
     const mappedJoins = members.reduce((a, v: IJoinedChannel) => {
       if (v.user.constructor === String) a[v.user as string] = true;
