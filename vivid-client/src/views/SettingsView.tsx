@@ -256,7 +256,7 @@ function SecurityCard(props: { userData: any }) {
   });
 
   React.useEffect(() => {
-    if (deleteUser.done) window.location.href = '/'; // TODO redirect to home page
+    if (deleteUser.done) window.location.href = '/';
   }, [deleteUser.done]);
 
   return (

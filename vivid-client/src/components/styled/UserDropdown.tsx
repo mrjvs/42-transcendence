@@ -16,7 +16,7 @@ export function UserDropdown(props: { color?: string }) {
   });
 
   React.useEffect(() => {
-    if (logout.done) window.location.href = '/'; // TODO redirect to homepage
+    if (logout.done) window.location.href = '/';
   }, [logout.done]);
 
   return (
