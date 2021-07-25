@@ -196,8 +196,11 @@ export class GameState {
 
   disconnectClient(client: any) {
     if (!client) return false;
-    const player = this.#state.players.find((v) => v.client === client);
-    if (!player) return false;
+    const player = this.#state.players.findIndex((v) => v.client === client);
+    if (player == -1) return false;
+
+    // set winner to other player
+    this.#state.winner = this.#state.players[player == 0 ? 1 : 0].userId;
 
     // stop game because of disconnect
     this.stopGame(EndReasons.RAGEQUIT);

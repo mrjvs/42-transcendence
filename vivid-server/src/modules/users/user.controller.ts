@@ -81,7 +81,6 @@ export class UserController {
     };
   }
 
-  // TODO returns full user
   @Post('join_guild/:anagram')
   async join_guild(
     @User() user: UserEntity,

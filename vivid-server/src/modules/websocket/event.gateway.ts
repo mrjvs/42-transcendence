@@ -74,7 +74,6 @@ export class EventGateway implements OnGatewayConnection {
 
   /* STATUSES */
   statusCallback(status: UserStatus) {
-    // TODO only send status updates if user is related to client
     this.server.emit('status_update', status);
   }
 

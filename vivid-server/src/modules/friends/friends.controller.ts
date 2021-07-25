@@ -25,12 +25,6 @@ export class FriendsController {
     private userService: UserService,
   ) {}
 
-  // TODO @MustbeAdmin()
-  @Get('all')
-  findAll(): Promise<FriendsEntity[]> {
-    return this.friendsService.findAll();
-  }
-
   // Send friend request
   @Post('add/:friend_id')
   async friendRequest(

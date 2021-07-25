@@ -38,7 +38,6 @@ export class ChannelMessageController {
     private pongService: PongService,
   ) {}
 
-  // TODO time based pagination (make it better)
   @Get('/')
   @ChannelRoleAuth(
     {
@@ -116,7 +115,6 @@ export class ChannelMessageController {
     return this.messageService.postMessage(user, input);
   }
 
-  // TODO add dto
   @Post('/duel')
   @ChannelRoleAuth(
     {

@@ -25,7 +25,6 @@ import { UserEntity } from '@/user.entity';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { ChannelRoles } from '~/middleware/guards/channel.guards';
 
-// TODO only show sensitive info if joined (like other users or passwords)
 @Controller('channels')
 @UseGuards(AuthenticatedGuard)
 export class ChannelController {

@@ -255,7 +255,6 @@ export class UserService {
     if (result.affected != 1) throw new NotFoundException();
   }
 
-  // TODO check
   async joinGuild(userId: string, anagram: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({ id: userId });
     const guild = await this.guildsService.findGuild(anagram);

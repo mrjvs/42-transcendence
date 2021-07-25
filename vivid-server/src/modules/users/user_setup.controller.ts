@@ -26,7 +26,6 @@ import { UserService } from './user.service';
 export class UserSetupController {
   constructor(private userService: UserService) {}
 
-  // TODO private vs public data
   @Get(':id')
   async findUser(
     @UserParam('id') usr: IUserParam,

@@ -25,12 +25,6 @@ export class GuildrequestController {
     private userService: UserService,
   ) {}
 
-  // TODO @MustbeAdmin()
-  @Get('all')
-  findAll(): Promise<GuildRequestEntity[]> {
-    return this.guildRequestService.findAll();
-  }
-
   @Get('requests')
   findRequests(@User() user: UserEntity): Promise<GuildRequestEntity[]> {
     return this.guildRequestService.findAllGuildRequests(user.id);

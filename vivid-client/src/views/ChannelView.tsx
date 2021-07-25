@@ -47,7 +47,6 @@ export function ChannelView() {
 
   React.useEffect(() => {
     if (leaveChannelFetch.done) {
-      // TODO update joined channel list
       leaveChannelFetch.reset();
     }
   }, [leaveChannelFetch.done]);

@@ -184,7 +184,10 @@ export class LadderService {
     rating1: number,
     rating2: number,
   ): number {
-    return 1.0 / (1.0 + Math.pow(10, (rating2 - rating1) / 400));
+    const p = 1.0 / (1.0 + Math.pow(10, (rating2 - rating1) / 400));
+    if (p < 0.001) return 0.01;
+    if (p >= 1) return 0.99;
+    return p;
   }
 
   // adjust rating
@@ -201,35 +204,37 @@ export class LadderService {
       where: { ladder: ladderId, user: user2 },
     });
 
-    // TODO bug?
-    const P1 = LadderService.calculateProbability(u1.points, u1.points);
-    const P2 = LadderService.calculateProbability(u2.points, u2.points);
+    const P1 = LadderService.calculateProbability(u1.points, u2.points);
+    const P2 = LadderService.calculateProbability(u2.points, u1.points);
     const K = 100;
 
     let user1_points;
     let user2_points;
     if (user1 === winner) {
-      user1_points = Math.ceil(u2.points + K * (1 - P1));
-      user2_points = Math.ceil(u1.points + K * (0 - P2));
+      user1_points = Math.ceil(u1.points + K * (1 - P1));
+      user2_points = Math.ceil(u2.points + K * (0 - P2));
     } else {
-      user1_points = Math.ceil(u2.points + K * (0 - P1));
-      user2_points = Math.ceil(u1.points + K * (1 - P2));
+      user1_points = Math.ceil(u1.points + K * (0 - P1));
+      user2_points = Math.ceil(u2.points + K * (1 - P2));
     }
 
-    console.log('rank adjustment', {
-      user1Id: user1,
-      before1: u1.points,
-      points1: user1_points,
-      rank1: u1.getRank(),
-
-      user2Id: user2,
-      before2: u2.points,
-      points2: user2_points,
-      rank2: u2.getRank(),
-
-      winner: winner,
-      ladder: (u1.ladder as any).type,
+    console.log({
+      user1: {
+        newpoints: user1_points,
+        oldpoints: u1.points,
+        diffpoints: user1_points - u1.points,
+        user: u1.user,
+        prob: P1,
+      },
+      user2: {
+        newpoints: user2_points,
+        oldpoints: u2.points,
+        diffpoints: user2_points - u2.points,
+        user: u2.user,
+        prob: P2,
+      },
     });
+
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -240,9 +245,8 @@ export class LadderService {
         .createQueryBuilder()
         .update()
         .set({
-          points: () => `points + :p`,
+          points: user1_points,
         })
-        .setParameter('p', user1_points)
         .where({ id: u1.id })
         .returning('*')
         .execute()
@@ -255,9 +259,8 @@ export class LadderService {
         .createQueryBuilder()
         .update()
         .set({
-          points: () => `points + :p`,
+          points: user2_points,
         })
-        .setParameter('p', user2_points)
         .where({ id: u2.id })
         .returning('*')
         .execute()
