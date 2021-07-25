@@ -51,7 +51,7 @@ export function PongView() {
       v.toString().padStart(2, '0'),
     );
     const spectators = newState?.spectators.length || 0;
-    const isSpectating = newState?.spectators.find((v) => v === user.id);
+    const isSpectating = newState?.spectators.find((v) => v === client.id);
     const self = rightPlayer.userId === user.id ? rightPlayer : leftPlayer;
     const isMirrored = self.index === 1;
     return {
@@ -186,8 +186,6 @@ export function PongView() {
     );
   }
 
-  // TODO go back instead of home all the time
-  // TODO spectator if same userid
   return (
     <div className="pong-wrapper">
       <div className="pong-game-view">

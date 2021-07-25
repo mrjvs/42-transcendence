@@ -112,7 +112,7 @@ export class GameState {
         ...this.#state.ball,
       },
       gameProgress: this.#state.gameProgress,
-      spectators: this.#state.spectators.map((v) => v.client.auth),
+      spectators: this.#state.spectators.map((v) => v.client.id),
       subscribers: [],
       countdownNum: this.#state.countdownNum,
       countdownTicks: this.#state.countdownTicks,
