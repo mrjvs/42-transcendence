@@ -16,6 +16,13 @@
   flex: 1;
 }
 
+.match-list-container .matches-text.text-centered {
+  text-align: center !important;
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 .match-list-wrapper ul {
   list-style: none;
   margin: 0;

@@ -49,6 +49,22 @@ function MatchRow(props: { currentUser: string; matchData: any }) {
 }
 
 export function MatchList(props: { currentUser: string; matchList: any }) {
+  if (props.matchList.length == 0) {
+    return (
+      <div className="match-list-container">
+        <div className="match-list-wrapper">
+          <ul>
+            <li>
+              <div className="match-row">
+                <p className="matches-text text-centered">No matches found</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="match-list-container">
       <div className="match-list-wrapper">
