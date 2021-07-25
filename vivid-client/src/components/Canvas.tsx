@@ -167,8 +167,6 @@ export function PongGameCanvas({
 
   return (
     <div className={`pong-canvas-wrapper ${loading ? 'loading' : ''}`}>
-      <audio src="audio_file.mp3"></audio>
-
       <div className={`pong-countdown-overlay ${showing ? 'showing' : ''}`}>
         <p className="pong-countdown-text">{countdownNum.current}</p>
       </div>
