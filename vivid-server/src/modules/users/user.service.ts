@@ -99,12 +99,6 @@ export class UserService {
           'joined_channels.channel',
           'guild',
           'guild.users',
-          'matches_req',
-          'matches_req.user_req',
-          'matches_req.user_acpt',
-          'matches_acpt',
-          'matches_acpt.user_req',
-          'matches_acpt.user_acpt',
         ],
         where: {
           id,

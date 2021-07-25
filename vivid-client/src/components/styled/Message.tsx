@@ -171,7 +171,7 @@ export function Message(props: {
               {props.messages.map((v) => {
                 if (v.type == 0)
                   return (
-                    <p key={v.id} className="messageMessage">
+                    <p key={v.id} className="messageContent messageMessage">
                       <span className="bg-underlay bg-layers" />
                       <span className="bg-overlay bg-layers">
                         <DeleteButton msgId={v.id} />
@@ -206,7 +206,10 @@ export function Message(props: {
                   );
                 else if (v.type == 2) {
                   return (
-                    <p key={v.id} className="messageMessage message-special">
+                    <p
+                      key={v.id}
+                      className="messageContent messageMessage message-special"
+                    >
                       <span className="bg-underlay bg-layers" />
                       <span className="bg-overlay bg-layers">
                         <DeleteButton msgId={v.id} />
@@ -219,7 +222,10 @@ export function Message(props: {
                   );
                 } else if (v.type == 3) {
                   return (
-                    <p key={v.id} className="messageMessage message-special">
+                    <p
+                      key={v.id}
+                      className="messageContent messageMessage message-special"
+                    >
                       <span className="bg-underlay bg-layers" />
                       <span className="bg-overlay bg-layers">
                         <DeleteButton msgId={v.id} />

@@ -7,9 +7,15 @@ import { ConfigService } from '@nestjs/config';
 import { UserSetupController } from './user_setup.controller';
 import { GuildsModule } from '../guilds/guilds.module';
 import { WarsModule } from '../wars/wars.module';
+import { MatchesModule } from '../matches/matches.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity]), GuildsModule, WarsModule],
+  imports: [
+    TypeOrmModule.forFeature([UserEntity]),
+    GuildsModule,
+    WarsModule,
+    MatchesModule,
+  ],
   providers: [UserService, ConfigService],
   controllers: [UserController, UserSetupController],
   exports: [UserService],

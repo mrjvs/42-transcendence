@@ -31,7 +31,7 @@
   align-items: flex-start;
 }
 
-.messageWrapper p {
+.messageWrapper .messageContent {
   margin: 0;
   padding: 0;
   color: white;
@@ -57,11 +57,12 @@
   padding-top: 0.1rem;
   padding-bottom: 0.5rem;
   color: #9da6c4;
+  margin: 0;
   padding-right: 0.5rem;
 }
 
 .messageWrapper.blocked .messageUserNamem,
-.messageWrapper.blocked p {
+.messageWrapper.blocked .messageContent {
   color: #7c849f;
 }
 
@@ -143,6 +144,7 @@
   width: 35%;
   line-height: 1.2;
   padding-bottom: 2rem;
+  color: white;
 }
 
 .messageInvite-content .button-new {

@@ -42,16 +42,13 @@ function SideBarRouter() {
           <Heading size="small">Vivid</Heading>
         </div>
         <ActionRow label="Games" />
-        <SidebarLink link="/">
-          <Icon type="crown" />
+        <SidebarLink link="/" icon="crown">
           Play a game
         </SidebarLink>
-        <SidebarLink link="/history">
-          <Icon type="trophy" />
+        <SidebarLink link="/history" icon="trophy">
           Match history
         </SidebarLink>
-        <SidebarLink link="/stats">
-          <Icon type="stats" />
+        <SidebarLink link="/stats" icon="stats">
           Statistics
         </SidebarLink>
         <ActionRow label="channel">
@@ -65,6 +62,24 @@ function SideBarRouter() {
             New
           </Button>
         </ActionRow>
+        {joinedChannels.length === 0 ? (
+          <>
+            <SidebarLink
+              click={() => alert('join')}
+              icon="users"
+              description="Make your life awesome by making a team"
+            >
+              Join a channel
+            </SidebarLink>
+            <SidebarLink
+              click={() => alert('create')}
+              icon="user_friends"
+              description="Be the leader of the pack!"
+            >
+              Create a channel
+            </SidebarLink>
+          </>
+        ) : null}
         {joinedChannels.map((v: any) => (
           <SidebarLink key={v.id} link={`/channel/${v.id}`}>
             {v.title}
