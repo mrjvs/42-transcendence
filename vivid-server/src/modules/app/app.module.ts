@@ -20,6 +20,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { DmModule } from '$/dm/dm.module';
+import { StatsModule } from '../stats/stats.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -59,6 +60,7 @@ const config = ConfigModule.forRoot({
     LadderModule,
     MatchesModule,
     DmModule,
+    StatsModule,
 
     // static
     ServeStaticModule.forRoot({

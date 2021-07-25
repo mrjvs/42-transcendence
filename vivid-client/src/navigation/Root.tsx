@@ -15,7 +15,7 @@ import { SettingsView } from '../views/SettingsView';
 import { GameView } from '../views/GameView';
 import { ChannelSettingsView } from '../views/ChannelSettingsView';
 import { ChannelsContext } from '../hooks/useChannels';
-import { NotFoundView } from '../views/NotFoundView';
+import { LoadingView } from '../views/LoadingView';
 import { DmChannelView } from '../views/DmChannelView';
 import { GameMatchView } from '../views/GameMatch';
 import { LadderMatchView } from '../views/LadderMatch';
@@ -108,7 +108,7 @@ function SideBarRouter() {
             <GameView />
           </Route>
           <Route path="*">
-            <NotFoundView>Not Found</NotFoundView>
+            <LoadingView>Not Found</LoadingView>
           </Route>
         </Switch>
       </div>

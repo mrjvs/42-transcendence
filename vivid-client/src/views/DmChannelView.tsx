@@ -4,12 +4,17 @@ import { useMessages } from '../hooks/useMessages';
 import { MainLayout } from './layouts/MainLayout';
 import './ChannelView.css';
 import { useFetch } from '../hooks/useFetch';
-import { NotFoundView } from './NotFoundView';
+import { LoadingView } from './LoadingView';
 import { MessageView } from './channel/MessageView';
 
 function ChannelViewLoading(props: { loading: boolean }) {
-  if (props.loading) return <p>Loading...</p>;
-  else return <NotFoundView>Couldn&apos;t find this dm channel</NotFoundView>;
+  if (props.loading)
+    return (
+      <LoadingView icon fadein>
+        Loading channel
+      </LoadingView>
+    );
+  return <LoadingView>Couldn&apos;t find this channel</LoadingView>;
 }
 
 export function DmChannelView() {

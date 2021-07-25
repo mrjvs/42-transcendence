@@ -4,6 +4,11 @@ import { IGameState } from '../views/game/Constants';
 import { SocketContext } from '../hooks/useWebsocket';
 import { Button } from './styled/Button';
 import { useHistory } from 'react-router-dom';
+import useSound from 'use-sound';
+// @ts-ignore
+import beepSfx from '../assets/sounds/beep.mp3';
+// @ts-ignore
+import boopSfx from '../assets/sounds/boop.mp3';
 
 interface CanvasProps {
   gameId: string;
@@ -36,10 +41,18 @@ export function PongGameCanvas({
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { client } = React.useContext(SocketContext);
   const gameStateReal = React.useRef<IGameState | null>(null);
-  const countdownNum = React.useRef<number>(-1);
+  const countdownNum = React.useRef<number | string>(-1);
   const mirrorRef = React.useRef(false);
   const [showing, setShowing] = React.useState(false);
   const history = useHistory();
+
+  // sounds
+  const [playBeep] = useSound(beepSfx, {
+    volume: 0.2,
+  });
+  const [playBoop] = useSound(boopSfx, {
+    volume: 0.2,
+  });
 
   let canvas: HTMLCanvasElement;
   let context: CanvasRenderingContext2D | null;
@@ -49,14 +62,30 @@ export function PongGameCanvas({
     if (
       gameStateReal.current?.countdownNum &&
       gameStateReal.current?.countdownNum !== countdownNum.current
-    )
-      countdownNum.current = gameStateReal.current.countdownNum;
+    ) {
+      if (gameStateReal.current.countdownNum === 4) {
+        countdownNum.current = 'Get ready';
+      } else if (
+        gameStateReal.current.countdownNum >= 0 &&
+        gameStateReal.current.countdownNum <= 3
+      ) {
+        countdownNum.current = gameStateReal.current.countdownNum;
+      }
+    }
   }, [gameState]);
 
   React.useEffect(() => {
     let timeout: any = null;
-    if (countdownNum.current >= 0) {
+    if (
+      countdownNum.current >= 0 ||
+      countdownNum.current.constructor === String
+    ) {
       setShowing(true);
+      // play sound
+      if (countdownNum.current == 1) setTimeout(() => playBoop(), 100);
+      else if (countdownNum.current == 2 || countdownNum.current == 3)
+        setTimeout(() => playBeep(), 100);
+
       timeout = setTimeout(() => {
         setShowing(false);
         timeout = null;
@@ -138,6 +167,8 @@ export function PongGameCanvas({
 
   return (
     <div className={`pong-canvas-wrapper ${loading ? 'loading' : ''}`}>
+      <audio src="audio_file.mp3"></audio>
+
       <div className={`pong-countdown-overlay ${showing ? 'showing' : ''}`}>
         <p className="pong-countdown-text">{countdownNum.current}</p>
       </div>
