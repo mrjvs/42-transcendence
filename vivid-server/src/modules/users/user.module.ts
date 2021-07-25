@@ -9,10 +9,16 @@ import { MatchesModule } from '$/matches/matches.module';
 import { JoinedChannelEntity } from '@/joined_channels.entity';
 import { FriendsEntity } from '@/friends.entity';
 import { EventModule } from '../websocket/event.module';
+import { ChannelEntity } from '@/channel.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, JoinedChannelEntity, FriendsEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      JoinedChannelEntity,
+      FriendsEntity,
+      ChannelEntity,
+    ]),
     MatchesModule,
     EventModule,
   ],

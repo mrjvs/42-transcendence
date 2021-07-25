@@ -19,6 +19,7 @@ import { encryptUserData } from './userEncrypt';
 import { JoinedChannelEntity } from '~/models/joined_channels.entity';
 import { FriendsEntity } from '~/models/friends.entity';
 import { EventGateway } from '../websocket/event.gateway';
+import { ChannelEntity } from '~/models/channel.entity';
 
 const colors = [
   '#29419F',
@@ -45,6 +46,8 @@ export class UserService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(JoinedChannelEntity)
     private joinChannelRepository: Repository<JoinedChannelEntity>,
+    @InjectRepository(ChannelEntity)
+    private channelsRepository: Repository<ChannelEntity>,
     @InjectRepository(FriendsEntity)
     private friendsRepository: Repository<FriendsEntity>,
     private configService: ConfigService,
@@ -76,7 +79,13 @@ export class UserService {
 
   // delete user, invalidates sessions and disconnects from websocket
   async deleteUser(id: string): Promise<void> {
-    // TODO popup with "you are still an owner of a channel, transfer ownership first"
+    // check if user is still owner of a channel
+    const result = await this.channelsRepository
+      .createQueryBuilder()
+      .where({ owner: id })
+      .getMany();
+    if (result.length > 0) throw new BadRequestException();
+
     // delete friends
     await this.friendsRepository
       .createQueryBuilder()

@@ -291,10 +291,18 @@ function SecurityCard(props: { userData: any }) {
         >
           Logout all devices
         </Button>
-        {deleteUser.error || logoutAll.error ? (
-          <p>Something went wrong, try again later</p>
-        ) : null}
+        {logoutAll.error ? <p>Something went wrong, try again later</p> : null}
         {logoutAll.done ? <p>Logged out all devices!</p> : null}
+        {deleteUser.error ? (
+          deleteUser.error.data?.statusCode === 400 ? (
+            <p>
+              Please transfer ownership of all your channels before you delete
+              your account
+            </p>
+          ) : (
+            <p>Something went wrong, try again later</p>
+          )
+        ) : null}
       </div>
     </div>
   );
