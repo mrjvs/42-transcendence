@@ -1,0 +1,39 @@
+.user-profile {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 0.5rem;
+}
+
+.user-profile.avatar {
+  transform: scale(0.6);
+}
+
+.user-profile:hover {
+  background-color: #354161;
+}
+
+.user-profile.user-name {
+  flex-grow: 0.95;
+}
+
+hr.solid {
+  margin-top: 4%;
+  height: 1.5px;
+  background-color: #354161;
+  border: none;
+}
+
+.search-friend {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4%;
+}
+
+.text-input {
+  flex-grow: 1;
+}
+
+/* .search-button {
+  margin-top: 50%;
+} */

@@ -18,7 +18,7 @@ import { FriendsModal } from '../components/styled/modals/Friends.modal';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
-  const [state, setState] = React.useState(false);
+  const [friendsOpen, setFriendsOpen] = React.useState(false);
 
   return (
     <div className="wrapper">
@@ -60,13 +60,17 @@ function SideBarRouter() {
           </SidebarLink>
         ))}
         <ActionRow label="friends">
-          <Button small={true} type="secondary" onclick={() => setState(true)}>
+          <Button
+            small={true}
+            type="secondary"
+            onclick={() => setFriendsOpen(true)}
+          >
             Friends
           </Button>
           <FriendsModal
-            open={state}
+            open={friendsOpen}
             userData={userData}
-            close={() => setState(false)}
+            close={() => setFriendsOpen(false)}
           />
           <Icon type="plus" />
         </ActionRow>

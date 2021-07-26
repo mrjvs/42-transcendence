@@ -5,6 +5,7 @@ import { Button } from '../Button';
 import { useFetch } from '../../../hooks/useFetch';
 import { UserContext } from '../../../hooks/useUser';
 import { SocketContext } from '../../../hooks/useWebsocket';
+import { Icon } from '../Icon';
 
 export function UserProfileModal(props: {
   user: any;
@@ -19,11 +20,11 @@ export function UserProfileModal(props: {
       width={450}
       onBackPress={() => props.close()}
     >
-      <div className="user-profile-card">
+      <>
         <h2>{props.user.name}</h2>
         <BlockAction userData={userData} userId={props.user.id} />
         <FriendAction userData={userData} friendId={props.user.id} />
-      </div>
+      </>
     </ModalBase>
   );
 }
@@ -174,8 +175,8 @@ export function FriendAction(props: { userData: any; friendId: string }) {
     } else {
       if (friendship.requested_by === props.friendId) {
         method = acceptFriend;
-        buttonText = 'Accept Friend Request';
-        buttonType = 'secondary';
+        buttonText = <Icon type="accept" />;
+        buttonType = 'accept';
         twoButtons = true;
       } else {
         method = unFriend;
@@ -189,18 +190,25 @@ export function FriendAction(props: { userData: any; friendId: string }) {
     <>
       <Button
         loading={method.loading}
-        type={buttonType === 'danger' ? 'danger' : 'secondary'}
+        type={
+          buttonType === 'danger'
+            ? 'danger'
+            : buttonType === 'secondary'
+            ? 'secondary'
+            : 'accept'
+        }
         onclick={() => method.run()}
+        margin_right={true}
       >
         {buttonText}
       </Button>
       {twoButtons ? (
         <Button
           loading={unFriend.loading}
-          type={'danger'}
+          type={'decline'}
           onclick={() => unFriend.run()}
         >
-          Decline Friend Request
+          <Icon type="decline" />
         </Button>
       ) : null}
     </>

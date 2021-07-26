@@ -8,6 +8,10 @@ import { TextInput } from '../TextInput';
 import { useFetch } from '../../../hooks/useFetch';
 import { FriendAction } from './UserProfile.modal';
 import { SocketContext } from '../../../hooks/useWebsocket';
+import { TabsModal } from './Tabs.modal';
+import { Icon } from '../Icon';
+
+import './UserProfileModal.css';
 
 export function FindUsers(props: { userData: any }) {
   const [userName, setUserName] = React.useState('');
@@ -26,27 +30,31 @@ export function FindUsers(props: { userData: any }) {
 
   return (
     <div>
-      <TextInput
-        value={userName}
-        set={setUserName}
-        placeholder="John Doe"
-        label="User Name"
-      />
-      <Button small={false} type="secondary" onclick={() => findUser.run()}>
-        Search
-      </Button>
+      <div className="search-friend">
+        <div className="text-input">
+          <TextInput
+            value={userName}
+            set={setUserName}
+            placeholder="John Doe"
+            label="User Name"
+          />
+        </div>
+        <div className="search-button">
+          <Button small={false} type="secondary" onclick={() => findUser.run()}>
+            <Icon type="search" />
+          </Button>
+        </div>
+      </div>
       {foundUsers
-        ? foundUsers.map((v: any) => {
-            return (
-              <div key={v.id}>
-                <SidebarLink link="">
-                  <Avatar isClickable user={v} small={true} />
-                  <span>{v.name}</span>
-                  <FriendAction userData={props.userData} friendId={v.id} />
-                </SidebarLink>
+        ? foundUsers.map((v: any) => (
+            <div className="user-profile" key={v.id}>
+              <div className="user-profile avatar">
+                <Avatar isClickable user={v} small={true} />
               </div>
-            );
-          })
+              <span className="user-profile user-name">{v.name}</span>
+              <FriendAction userData={props.userData} friendId={v.id} />
+            </div>
+          ))
         : null}
     </div>
   );
@@ -57,15 +65,12 @@ function FriendRequests(props: { requests: any; userData: any }) {
     const potentialFriend =
       v.user_1.id === props.userData.user.id ? v.user_2 : v.user_1;
     return (
-      <div key={v.id}>
-        <SidebarLink link="">
+      <div className="user-profile" key={v.id}>
+        <div className="user-profile avatar">
           <Avatar isClickable user={potentialFriend} small={true} />
-          <span>{potentialFriend.name}</span>
-          <FriendAction
-            userData={props.userData}
-            friendId={potentialFriend.id}
-          />
-        </SidebarLink>
+        </div>
+        <span className="user-profile user-name">{potentialFriend.name}</span>
+        <FriendAction userData={props.userData} friendId={potentialFriend.id} />
       </div>
     );
   });
@@ -76,7 +81,7 @@ export function FriendsModal(props: {
   open: boolean;
   close: () => void;
 }) {
-  const [state, setState] = React.useState('requests');
+  const [modalTab, setModalTab] = React.useState('requests');
   const [friendRequests, setFriendRequests] = React.useState([]);
   const { client } = React.useContext(SocketContext);
 
@@ -132,18 +137,20 @@ export function FriendsModal(props: {
       width={450}
       onBackPress={() => props.close()}
     >
-      <Button
-        badge={friendRequests.length}
-        small={true}
-        type="secondary"
-        onclick={() => setState('requests')}
-      >
-        Friend Requests
-      </Button>
-      <Button small={true} type="secondary" onclick={() => setState('add')}>
-        Add friends
-      </Button>
-      {state === 'requests' ? (
+      <TabsModal
+        set={setModalTab}
+        value={modalTab}
+        tabs={[
+          {
+            name: 'Friend requests',
+            value: 'requests',
+            badge: friendRequests.length,
+          },
+          { name: 'Add friend', value: 'add' },
+        ]}
+      />
+      <hr className="solid"></hr>
+      {modalTab === 'requests' ? (
         <FriendRequests requests={friendRequests} userData={props.userData} />
       ) : (
         <FindUsers userData={props.userData} />

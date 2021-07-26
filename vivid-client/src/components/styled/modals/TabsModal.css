@@ -1,3 +1,8 @@
+.tabs-wrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .button-new {
   line-height: initial;
   position: relative;
@@ -13,6 +18,7 @@
   cursor: pointer;
 }
 
+/* 
 .button-new > .loader {
   height: 1.5rem;
   width: 1.5rem;
@@ -67,23 +73,6 @@
 
 .button-new.button-danger {
   background: #9c3446;
-  color: white;
-}
-
-.button-new.button-decline {
-  height: 1.3rem;
-  width: 1.3rem;
-  justify-content: center;
-  border-radius: 50%;
-  background: #9c3446;
-  color: white;
-}
-
-.button-new.button-accept {
-  height: 1.3rem;
-  width: 1.3rem;
-  border-radius: 50%;
-  background: #90ee90;
   color: white;
 }
 
@@ -145,4 +134,4 @@
 
 .button-new.small > *:first-child {
   margin-right: 0.2rem;
-}
+} */
