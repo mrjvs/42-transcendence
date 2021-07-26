@@ -2,11 +2,11 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import { IMessage } from '@/messages.entity';
 import { UserService } from '$/users/user.service';
 import { IJoinedChannel, JoinedChannelEntity } from '@/joined_channels.entity';
@@ -24,11 +24,10 @@ import { MatchMakingService } from '$/ladder/matchmaking.service';
 import { forwardRef, Inject } from '@nestjs/common';
 import { FriendsEntity } from '~/models/friends.entity';
 
-@WebSocketGateway({ path: '/api/v1/events' })
-export class EventGateway implements OnGatewayConnection {
-  @WebSocketServer()
-  server: Server;
+let server;
 
+@WebSocketGateway({ path: '/api/v1/events' })
+export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
@@ -53,6 +52,8 @@ export class EventGateway implements OnGatewayConnection {
   }
 
   async handleConnection(socket: Socket) {
+    if (!server) server = socket.server;
+
     // get logged in user
     await this.putUserInSocket(socket);
 
@@ -73,8 +74,8 @@ export class EventGateway implements OnGatewayConnection {
   }
 
   async logoutUser(id: string) {
-    if (!this.server) return;
-    const sockets = this.server.sockets.connected;
+    if (!server) return;
+    const sockets = server.sockets.connected;
     for (const socketId in sockets) {
       const client = sockets[socketId];
       if (!client.auth) continue; // skip user if not authed
@@ -86,8 +87,8 @@ export class EventGateway implements OnGatewayConnection {
 
   /* STATUSES */
   statusCallback(status: UserStatus) {
-    if (!this.server) return;
-    this.server.emit('status_update', status);
+    if (!server) return;
+    server.emit('status_update', status);
   }
 
   @SubscribeMessage('status_request')
@@ -98,8 +99,8 @@ export class EventGateway implements OnGatewayConnection {
 
   /* CHANNELS */
   _sendToChannelMembers(event: string, data: any, members: IJoinedChannel[]) {
-    if (!this.server) return;
-    const sockets = this.server.sockets.connected;
+    if (!server) return;
+    const sockets = server.sockets.connected;
     const mappedJoins = members.reduce((a, v: IJoinedChannel) => {
       if (v.user.constructor === String) a[v.user as string] = true;
       else a[(v.user as any).id] = true;
@@ -269,9 +270,9 @@ export class EventGateway implements OnGatewayConnection {
 
   /* FRIENDSHIPS */
   updateFriendships(friend: FriendsEntity) {
-    if (!this.server) return;
+    if (!server) return;
     const ids = [(friend.user_1 as any).id, (friend.user_2 as any).id];
-    const sockets = this.server.sockets.connected;
+    const sockets = server.sockets.connected;
     for (const socketId in sockets) {
       const client = sockets[socketId];
       if (!client.auth) continue; // skip user if not authed
@@ -280,9 +281,9 @@ export class EventGateway implements OnGatewayConnection {
     }
   }
   removeFriendships(friend: FriendsEntity) {
-    if (!this.server) return;
+    if (!server) return;
     const ids = [(friend.user_1 as any).id, (friend.user_2 as any).id];
-    const sockets = this.server.sockets.connected;
+    const sockets = server.sockets.connected;
     for (const socketId in sockets) {
       const client = sockets[socketId];
       if (!client.auth) continue; // skip user if not authed
