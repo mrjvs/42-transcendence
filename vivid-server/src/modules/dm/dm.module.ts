@@ -4,8 +4,8 @@ import { JoinedChannelEntity } from '@/joined_channels.entity';
 import { ConfigService } from '@nestjs/config';
 import { DmService } from './dm.service';
 import { DmController } from './dm.controller';
-import { ChannelModule } from '../channels/channel.module';
-import { FriendsModule } from '../friends/friends.module';
+import { ChannelModule } from '$/channels/channel.module';
+import { FriendsModule } from '$/friends/friends.module';
 
 @Module({
   imports: [

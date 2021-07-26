@@ -85,7 +85,7 @@ export function MessageView(props: { channelId: string; messageData: any }) {
   return (
     <div className="messageViewWrapper">
       <div className="channelScrollWrapper">
-        <div className="channelContent">
+        <div id="scroll-area" className="channelContent">
           {messageData.messageState.done ? (
             <>
               <NoMessage />
@@ -114,8 +114,8 @@ export function MessageView(props: { channelId: string; messageData: any }) {
           <MessageBox
             placeholder="Type your message here..."
             disabled={!messageData.messageState.done}
-            onSend={(obj: { text: string; type: boolean }) =>
-              messageData.sendMessage(obj.text, obj.type)
+            onSend={(obj: { text: string; type: boolean; extraData?: any }) =>
+              messageData.sendMessage(obj.text, obj.type, obj.extraData)
             }
           />
         ) : (

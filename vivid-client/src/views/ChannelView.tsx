@@ -5,12 +5,17 @@ import { MainLayout } from './layouts/MainLayout';
 import './ChannelView.css';
 import { Icon } from '../components/styled/Icon';
 import { useFetch } from '../hooks/useFetch';
-import { NotFoundView } from './NotFoundView';
 import { MessageView } from './channel/MessageView';
+import { LoadingView } from './LoadingView';
 
 function ChannelViewLoading(props: { loading: boolean }) {
-  if (props.loading) return <p>Loading...</p>;
-  else return <NotFoundView>Couldn&apos;t find this channel</NotFoundView>;
+  if (props.loading)
+    return (
+      <LoadingView icon fadein>
+        Loading channel
+      </LoadingView>
+    );
+  return <LoadingView>Couldn&apos;t find this channel</LoadingView>;
 }
 
 function ChannelLeaveIcon(props: { onClick?: () => void }) {
@@ -42,7 +47,6 @@ export function ChannelView() {
 
   React.useEffect(() => {
     if (leaveChannelFetch.done) {
-      // TODO update joined channel list
       leaveChannelFetch.reset();
     }
   }, [leaveChannelFetch.done]);

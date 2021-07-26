@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards, Param } from '@nestjs/common';
 import { User } from '~/middleware/decorators/login.decorator';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
-import { UserEntity } from '~/models/user.entity';
+import { UserEntity } from '@/user.entity';
 import { DmService } from './dm.service';
-import { ChannelEntity } from '~/models/channel.entity';
+import { ChannelEntity } from '@/channel.entity';
 
 @Controller('dms')
 @UseGuards(AuthenticatedGuard)

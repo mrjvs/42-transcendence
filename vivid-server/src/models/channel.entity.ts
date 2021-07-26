@@ -6,7 +6,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { IJoinedChannel, JoinedChannelEntity } from './joined_channels.entity';
+import { IJoinedChannel, JoinedChannelEntity } from '@/joined_channels.entity';
 
 export enum ChannelTypes {
   TEXT = 0,

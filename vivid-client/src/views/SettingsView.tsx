@@ -15,7 +15,7 @@ export function SettingsView() {
 
   return (
     <div className="settings-view-wrapper">
-      <Button type="secondary" onclick={() => history.push('/')}>
+      <Button type="secondary-small" onclick={() => history.push('/')}>
         <Icon type="left_arrow" />
         Back home
       </Button>
@@ -256,7 +256,7 @@ function SecurityCard(props: { userData: any }) {
   });
 
   React.useEffect(() => {
-    if (deleteUser.done) window.location.href = '/'; // TODO redirect to home page
+    if (deleteUser.done) window.location.href = '/';
   }, [deleteUser.done]);
 
   return (
@@ -291,10 +291,18 @@ function SecurityCard(props: { userData: any }) {
         >
           Logout all devices
         </Button>
-        {deleteUser.error || logoutAll.error ? (
-          <p>Something went wrong, try again later</p>
-        ) : null}
+        {logoutAll.error ? <p>Something went wrong, try again later</p> : null}
         {logoutAll.done ? <p>Logged out all devices!</p> : null}
+        {deleteUser.error ? (
+          deleteUser.error.data?.statusCode === 400 ? (
+            <p>
+              Please transfer ownership of all your channels before you delete
+              your account
+            </p>
+          ) : (
+            <p>Something went wrong, try again later</p>
+          )
+        ) : null}
       </div>
     </div>
   );

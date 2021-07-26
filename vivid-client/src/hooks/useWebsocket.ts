@@ -31,6 +31,11 @@ export function useWebsocket() {
       }
     });
 
+    sclient.on('logout', () => {
+      // TODO to login screen
+      window.location.href = '/';
+    });
+
     sclient.on('disconnect', () => {
       setClientState('DISCONNECTED');
     });

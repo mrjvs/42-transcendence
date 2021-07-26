@@ -32,11 +32,21 @@ export function getAllStatuses(): UserStatus[] {
 }
 
 // set status of specific user
-export function setUserStatus(userId: string, status: Status): void {
+export function setUserStatus(
+  userId: string,
+  status: Status,
+  game = false,
+): void {
   if ([Status.OFFLINE].includes(status)) return;
   const found = clientStatuses.find((v) => v.userId === userId);
   if (!found) return;
   if (found.status === status) return;
+  if (!game && found.status === Status.INGAME) return;
+  if (
+    (found.status === Status.OFFLINE && status === Status.INGAME && game) ||
+    (found.status === Status.OFFLINE && status === Status.ONLINE && game)
+  )
+    return; // dont allow ingame while offline or setting to online from game
   found.status = status;
   sendStatus(found.userId, found.status);
 }

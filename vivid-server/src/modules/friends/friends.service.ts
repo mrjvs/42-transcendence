@@ -21,11 +21,6 @@ export class FriendsService {
     private friendsRepository: Repository<FriendsEntity>,
   ) {}
 
-  // Admin only, find all FriendsEntity's
-  findAll(): Promise<FriendsEntity[]> {
-    return this.friendsRepository.find();
-  }
-
   // Add FriendEntity to database (=> send friend request)
   async sendFriendRequest(
     user_1: string,

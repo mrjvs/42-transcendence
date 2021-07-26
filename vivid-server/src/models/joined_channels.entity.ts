@@ -6,8 +6,8 @@ import {
   Column,
 } from 'typeorm';
 import { IsBoolean, IsNotEmpty, IsOptional, IsPositive } from 'class-validator';
-import { ChannelEntity } from './channel.entity';
-import { IUser, UserEntity } from './user.entity';
+import { ChannelEntity } from '@/channel.entity';
+import { IUser, UserEntity } from '@/user.entity';
 
 @Unique('USER_JOIN', ['user', 'channel'])
 @Entity('joined_channels')

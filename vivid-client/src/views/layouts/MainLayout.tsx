@@ -7,15 +7,21 @@ export function MainLayout(props: {
   children: any;
   title: string;
   actions?: any;
+  background?: string;
 }) {
   return (
     <div className="contentContainer">
-      <div className="contentHeader">
+      <div
+        className={`contentHeader`}
+        style={{
+          backgroundColor: props.background,
+        }}
+      >
         <div className="items">
           <Heading size="small">{props.title}</Heading>
           {props.actions ? <span>{props.actions}</span> : null}
         </div>
-        <UserDropdown />
+        <UserDropdown color={props.background} />
       </div>
       <div className="channelWrapper">{props.children}</div>
     </div>

@@ -9,12 +9,9 @@ import {
 import { Server, Socket } from 'socket.io';
 import { IMessage } from '@/messages.entity';
 import { UserService } from '$/users/user.service';
-import {
-  IJoinedChannel,
-  JoinedChannelEntity,
-} from '~/models/joined_channels.entity';
-import { UserEntity } from '~/models/user.entity';
-import { PongService } from '../pong/pong.service';
+import { IJoinedChannel, JoinedChannelEntity } from '@/joined_channels.entity';
+import { UserEntity } from '@/user.entity';
+import { PongService } from '$/pong/pong.service';
 import {
   connectClient,
   disconnectClient,
@@ -22,7 +19,9 @@ import {
   registerCallback,
   UserStatus,
 } from './statuses';
-import { ChannelEntity } from '~/models/channel.entity';
+import { ChannelEntity } from '@/channel.entity';
+import { MatchMakingService } from '$/ladder/matchmaking.service';
+import { forwardRef, Inject } from '@nestjs/common';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -30,8 +29,10 @@ export class EventGateway implements OnGatewayConnection {
   server: Server;
 
   constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly pongService: PongService,
+    private readonly matchmakingService: MatchMakingService,
   ) {
     registerCallback((s: UserStatus) => this.statusCallback(s));
   }
@@ -59,12 +60,32 @@ export class EventGateway implements OnGatewayConnection {
   }
 
   async handleDisconnect(socket: Socket) {
-    disconnectClient(socket.id);
+    try {
+      disconnectClient(socket.id);
+    } catch (err) {}
+    try {
+      this.pongService.onDisconnect(socket);
+    } catch (err) {}
+    try {
+      this.matchmakingService.leavePool(socket);
+    } catch (err) {}
+  }
+
+  async logoutUser(id: string) {
+    if (!this.server) return;
+    const sockets = this.server.sockets.connected;
+    for (const socketId in sockets) {
+      const client = sockets[socketId];
+      if (!client.auth) continue; // skip user if not authed
+      if (client.auth !== id) continue; // skip if not the user
+      client.emit('logout');
+      client.disconnect();
+    }
   }
 
   /* STATUSES */
   statusCallback(status: UserStatus) {
-    // TODO only send status updates if user is related to client
+    if (!this.server) return;
     this.server.emit('status_update', status);
   }
 
@@ -76,6 +97,7 @@ export class EventGateway implements OnGatewayConnection {
 
   /* CHANNELS */
   _sendToChannelMembers(event: string, data: any, members: IJoinedChannel[]) {
+    if (!this.server) return;
     const sockets = this.server.sockets.connected;
     const mappedJoins = members.reduce((a, v: IJoinedChannel) => {
       if (v.user.constructor === String) a[v.user as string] = true;
@@ -175,54 +197,72 @@ export class EventGateway implements OnGatewayConnection {
 
   /* GAME EVENTS */
   @SubscribeMessage('ready')
-  readyEvent(@ConnectedSocket() client: Socket) {
+  readyEvent(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
     if (!client.auth) return;
-    this.pongService.readyEvent(client);
-  }
-
-  @SubscribeMessage('pauseGame')
-  pauseEvent(@ConnectedSocket() client: Socket) {
-    if (!client.auth) return;
-    this.pongService.pauseGame(client);
+    if (!body?.gameId) return;
+    this.pongService
+      .readyEvent(client, body.gameId)
+      .then((result) => {
+        if (result.constructor !== String) {
+          client.emit('readyReturn', {
+            status: 'finished',
+            match: result.match,
+          });
+        } else {
+          client.emit('readyReturn', {
+            status: result,
+          });
+        }
+      })
+      .catch(() => true);
   }
 
   @SubscribeMessage('keydown')
-  handleKeydown(
+  handleKeydown(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+    this.pongService.handleKeydown(client, body.key);
+  }
+
+  @SubscribeMessage('keyup')
+  handleKeyup(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+    this.pongService.handleKeyup(client, body.key);
+  }
+
+  @SubscribeMessage('keypress')
+  handlePress(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+    this.pongService.handlePress(client, body.key);
+  }
+
+  @SubscribeMessage('gameleave')
+  leaveGameEvent(@ConnectedSocket() client: Socket) {
+    if (!client.auth) return;
+    this.pongService.onDisconnect(client);
+  }
+
+  @SubscribeMessage('subscribeGame')
+  subscribeGameEvent(
     @ConnectedSocket() client: Socket,
-    @MessageBody() move: number,
+    @MessageBody() gameId: string,
   ) {
     if (!client.auth) return;
-    this.pongService.handleKeydown(client, move);
+    if (!gameId) return;
+    this.pongService.subscribeEvent(client, gameId);
   }
 
-  @SubscribeMessage('addons')
-  handleAddOns(
+  /* MATCHMAKING */
+  @SubscribeMessage('matchmaking')
+  async joinMatchmaking(
     @ConnectedSocket() client: Socket,
-    @MessageBody() spacebar: number,
+    @MessageBody() body: any,
   ) {
-    if (!client.auth) return;
-    this.pongService.handleAddOns(client, spacebar);
+    if (!client || !client.auth) return;
+    if (!body || !body?.ladderId) return;
+    try {
+      await this.matchmakingService.joinPool(client, body.ladderId);
+    } catch (err) {}
   }
-
-  @SubscribeMessage('shoot')
-  handleShoot(@ConnectedSocket() client: Socket, @MessageBody() shoot: number) {
-    if (!client.auth) return;
-    this.pongService.handleShoot(client, shoot);
-  }
-
-  @SubscribeMessage('start')
-  startGameInterval(@MessageBody() roomName: string) {
-    const clients = this.server.sockets.in(roomName);
-    if (!clients) return;
-    this.pongService.startGameInterval(clients, roomName);
-  }
-
-  @SubscribeMessage('mouseMove')
-  handleMouseMove(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() move: number,
-  ) {
-    if (!client.auth) return;
-    this.pongService.handleMouseMove(client, move);
+  @SubscribeMessage('matchmakingLeave')
+  async leaveMatchmaking(@ConnectedSocket() client: Socket) {
+    if (!client || !client.auth) return;
+    this.matchmakingService.leavePool(client);
   }
 }

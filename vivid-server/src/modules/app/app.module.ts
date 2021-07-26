@@ -1,24 +1,22 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import configuration from '~/config/configuration';
+import { TypeORMSession } from '@/session.entity';
+
 import { UserModule } from '$/users/user.module';
-import { WarsModule } from '~/modules/wars/wars.module';
 import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
 import { EventModule } from '$/websocket/event.module';
-import { TypeORMSession } from '@/session.entity';
 import { FriendsModule } from '$/friends/friends.module';
 import { BlocksModule } from '$/blocks/blocks.module';
-import { GuildsModule } from '$/guilds/guilds.module';
-import { GuildrequestModule } from '$/guildrequest/guildrequest.module';
-import { MatchesModule } from '../matches/matches.module';
-import { ScheduleModule } from '@nestjs/schedule';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { LadderModule } from '$/ladder/ladder.module';
+import { MatchesModule } from '$/matches/matches.module';
 import { DmModule } from '$/dm/dm.module';
+import { StatsModule } from '$/stats/stats.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -51,12 +49,10 @@ const config = ConfigModule.forRoot({
     EventModule,
     FriendsModule,
     BlocksModule,
-    WarsModule,
-    GuildsModule,
-    WarsModule,
-    GuildrequestModule,
+    LadderModule,
     MatchesModule,
     DmModule,
+    StatsModule,
 
     // static
     ServeStaticModule.forRoot({
@@ -64,8 +60,8 @@ const config = ConfigModule.forRoot({
       serveRoot: '/cdn/avatars',
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
   exports: [ConfigModule],
 })
 export class AppModule {}

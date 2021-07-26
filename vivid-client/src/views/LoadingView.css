@@ -1,0 +1,60 @@
+.loading-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 0.8rem;
+  color: white;
+  flex-direction: column;
+  margin-left: 5rem;
+  margin-right: 5rem;
+}
+
+.loading-view.fadein {
+  animation: loading-fadein 4s ease-out 0s 1;
+  opacity: 1;
+}
+
+.loading-view .icon {
+  background: linear-gradient(to bottom right, #29419f, #a34fec);
+  transform: rotate(45deg);
+  height: 5rem;
+  width: 5rem;
+  border-radius: 10px;
+  animation: loading-rotate-again 2.2s cubic-bezier(0.57, 0.01, 0.35, 1) 0.2s
+    infinite;
+  margin-bottom: 3rem;
+  margin-top: 6.5rem;
+}
+
+.loading-view h1 {
+  text-align: center;
+  font-weight: 400;
+  line-height: 1;
+  font-weight: bold;
+  font-size: 2em;
+}
+
+@keyframes loading-rotate-again {
+  0% {
+    transform: rotate(45deg);
+  }
+  90% {
+    transform: rotate(765deg);
+  }
+  100% {
+    transform: rotate(765deg);
+  }
+}
+
+@keyframes loading-fadein {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

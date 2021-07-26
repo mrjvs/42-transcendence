@@ -8,7 +8,6 @@ import {
   Body,
   BadRequestException,
   NotFoundException,
-  // Query,
 } from '@nestjs/common';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { User } from '~/middleware/decorators/login.decorator';
@@ -18,16 +17,16 @@ import {
   getUserRolesFromChannel,
 } from '~/middleware/guards/channel.guards';
 import {
+  AddonDto,
   IMessage,
   IMessageInput,
   MessageDto,
   MessageEntity,
-  // PaginationDto,
 } from '@/messages.entity';
 import { UserEntity } from '@/user.entity';
 import { ChannelMessageService } from './channel.message.service';
 import { Observable } from 'rxjs';
-import { PongService } from '../pong/pong.service';
+import { PongService } from '$/pong/pong.service';
 
 @Controller('channels/:id/messages')
 @UseGuards(AuthenticatedGuard)
@@ -37,7 +36,6 @@ export class ChannelMessageController {
     private pongService: PongService,
   ) {}
 
-  // TODO time based pagination (make it better)
   @Get('/')
   @ChannelRoleAuth(
     {
@@ -50,7 +48,6 @@ export class ChannelMessageController {
     },
   )
   getMessageHistory(
-    // @Query() paginationDto: PaginationDto,
     @Param('id') channelId: string,
   ): Observable<MessageEntity[]> {
     return this.messageService.getMessages(channelId, null);
@@ -86,6 +83,35 @@ export class ChannelMessageController {
     return this.messageService.postMessage(user, input);
   }
 
+  @Post('/secret')
+  @ChannelRoleAuth(
+    {
+      role: ChannelRoles.USER,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.BANNED,
+      channelParam: 'id',
+    },
+    {
+      notRole: ChannelRoles.MUTED,
+      channelParam: 'id',
+    },
+  )
+  createSecretMessage(
+    @User() user: UserEntity,
+    @Param('id') channelId: string,
+  ): Promise<IMessage> {
+    const input: IMessageInput = {
+      content: '',
+      aux_content: null,
+      message_type: 42,
+      user: user.id,
+      channel: channelId,
+    };
+    return this.messageService.postMessage(user, input);
+  }
+
   @Post('/duel')
   @ChannelRoleAuth(
     {
@@ -102,10 +128,11 @@ export class ChannelMessageController {
     },
   )
   createDuelMessage(
+    @Body() body: AddonDto,
     @User() user: UserEntity,
     @Param('id') channelId: string,
   ): Promise<IMessage> {
-    const gameId = this.pongService.createGame();
+    const gameId = this.pongService.createGame('duel', null, body.addons);
     this.pongService.joinGame(user.id, gameId);
     const input: IMessageInput = {
       content: '',
@@ -147,6 +174,7 @@ export class ChannelMessageController {
       user.id,
       message.aux_content.invite_game_id,
     );
+    if (!game) return { gameId: message.aux_content.invite_game_id };
     return {
       gameId: game.gameId,
     };

@@ -98,13 +98,14 @@ export function useMessages(channel: string) {
     setMessages([...getChannelMessages(channel)]);
   }, [messages]);
 
-  function sendMessage(text: string, type: boolean) {
+  function sendMessage(text: string, type: boolean, extraData?: any) {
     if (type) {
       fetch(
         `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages/duel`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(extraData),
           credentials: 'include',
         },
       )
@@ -115,8 +116,10 @@ export function useMessages(channel: string) {
             history.push(`/pong/${data.aux_content.invite_game_id}`);
         });
     } else {
+      let extra = '';
+      if (text.trim() === 'partyparrot') extra = '/secret';
       fetch(
-        `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages`,
+        `${window._env_.VIVID_BASE_URL}/api/v1/channels/${channel}/messages${extra}`,
         {
           method: 'POST',
           body: JSON.stringify({

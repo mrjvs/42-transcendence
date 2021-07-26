@@ -73,7 +73,10 @@ export function ChannelSettingsView() {
 
   return (
     <div className="channel-settings-view">
-      <Button type="secondary" onclick={() => history.push(`/channel/${id}`)}>
+      <Button
+        type="secondary-small"
+        onclick={() => history.push(`/channel/${id}`)}
+      >
         <Icon type="left_arrow" />
         Back to channel
       </Button>
