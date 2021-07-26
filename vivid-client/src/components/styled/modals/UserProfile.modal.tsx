@@ -33,6 +33,11 @@ function UserProfile(props: {
             userData={props.userData}
             friendId={props.profileData?.user?.id}
           />
+          {props.userData?.user?.id === props.profileData?.user?.id ? (
+            <p style={{ color: '#9DA6C4', textAlign: 'center' }}>
+              Can&apos;t friend yourself :P
+            </p>
+          ) : null}
         </div>
       )}
     </div>
