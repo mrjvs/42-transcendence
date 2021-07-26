@@ -7,6 +7,7 @@ import { Icon } from '../components/styled/Icon';
 import { useFetch } from '../hooks/useFetch';
 import { MessageView } from './channel/MessageView';
 import { LoadingView } from './LoadingView';
+import { UserContext } from '../hooks/useUser';
 
 function ChannelViewLoading(props: { loading: boolean }) {
   if (props.loading)
@@ -39,6 +40,7 @@ export function ChannelView() {
   const history = useHistory();
   const messageData = useMessages(id);
   const { currentChannelUser } = messageData;
+  const userData = React.useContext(UserContext);
 
   const leaveChannelFetch = useFetch({
     url: '',
@@ -47,6 +49,11 @@ export function ChannelView() {
 
   React.useEffect(() => {
     if (leaveChannelFetch.done) {
+      userData.updateUser({
+        joined_channels: userData.user.joined_channels.filter(
+          (v: any) => v.channel.id !== id,
+        ),
+      });
       leaveChannelFetch.reset();
     }
   }, [leaveChannelFetch.done]);
