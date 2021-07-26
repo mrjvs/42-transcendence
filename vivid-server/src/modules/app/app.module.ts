@@ -1,13 +1,22 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import configuration from '~/config/configuration';
+import { TypeORMSession } from '@/session.entity';
 
 import { UserModule } from '$/users/user.module';
 import { ChannelModule } from '$/channels/channel.module';
 import { AuthModule } from '$/auth/auth.module';
+import { EventModule } from '$/websocket/event.module';
+import { FriendsModule } from '$/friends/friends.module';
+import { BlocksModule } from '$/blocks/blocks.module';
+import { LadderModule } from '$/ladder/ladder.module';
+import { MatchesModule } from '$/matches/matches.module';
+import { DmModule } from '$/dm/dm.module';
+import { StatsModule } from '$/stats/stats.module';
 
 const config = ConfigModule.forRoot({
   load: [configuration],
@@ -18,7 +27,7 @@ const config = ConfigModule.forRoot({
     // config & database
     config,
     TypeOrmModule.forRootAsync({
-      imports: [config],
+      imports: [config, ScheduleModule.forRoot()],
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('db.host'),
@@ -27,6 +36,7 @@ const config = ConfigModule.forRoot({
         password: configService.get('db.password'),
         database: configService.get('db.database'),
         autoLoadEntities: true,
+        entities: [TypeORMSession],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -36,9 +46,22 @@ const config = ConfigModule.forRoot({
     UserModule,
     ChannelModule,
     AuthModule,
+    EventModule,
+    FriendsModule,
+    BlocksModule,
+    LadderModule,
+    MatchesModule,
+    DmModule,
+    StatsModule,
+
+    // static
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', '..', 'uploads'),
+      serveRoot: '/cdn/avatars',
+    }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
   exports: [ConfigModule],
 })
 export class AppModule {}

@@ -1,0 +1,12 @@
+.matches-view-wrapper {
+  color: white;
+  display: block;
+  padding: 4rem 1rem;
+}
+
+.matches-view-container {
+  max-width: 40rem;
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+}

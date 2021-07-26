@@ -1,0 +1,11 @@
+.addons-modal-wrapper {
+  text-align: left;
+}
+
+.addons-modal-wrapper .addon-modal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}

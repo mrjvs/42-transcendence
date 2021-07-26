@@ -1,0 +1,307 @@
+.pong-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #121521;
+  padding: 2rem;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.pong-wrapper .pong-game-view {
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.pong-wrapper .pong-canvas-wrapper {
+  height: 100%;
+  max-height: 25rem;
+  width: 150rem;
+  max-width: 100%;
+  display: block;
+  position: relative;
+}
+
+.pong-wrapper .pong-canvas {
+  overflow: hidden;
+  border-radius: 10px;
+  margin: 0 auto;
+  display: block;
+}
+
+.pong-wrapper .pong-canvas-wrapper.loading .pong-canvas {
+  background-color: #1a1f31;
+}
+
+.pong-wrapper .pong-score {
+  display: flex;
+  margin: 0 2rem 3rem 2rem;
+  user-select: none;
+}
+
+.pong-wrapper .pong-score .right-align {
+  text-align: right;
+  justify-content: flex-end;
+  margin-right: 1rem;
+}
+.pong-wrapper .pong-score .left-align {
+  justify-content: flex-start;
+  text-align: left;
+  margin-left: 1rem;
+}
+.pong-wrapper .pong-score .pong-score-points {
+  font-weight: bold;
+  font-size: 5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  height: 4rem;
+  width: 6rem;
+  transform: translateY(-0.3rem);
+}
+.pong-wrapper .pong-score .pong-score-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #8ba6e5;
+  display: flex;
+  align-items: center;
+}
+.pong-wrapper .pong-score .pong-score-name.red {
+  color: #e386af;
+}
+.pong-wrapper .pong-score .pong-score-name.gray {
+  color: #435077;
+  font-weight: normal;
+}
+.pong-wrapper .pong-score .pong-score-name {
+  flex: 1;
+}
+.pong-wrapper .pong-score .pong-score-dash {
+  height: 4px;
+  width: 2.5rem;
+  background-color: #2a3453;
+  border-radius: 2px;
+  margin: auto 1rem;
+}
+.pong-wrapper .pong-spectators {
+  color: #8892b2;
+  text-align: center;
+  margin: 1.5rem 0 0 0;
+}
+.pong-wrapper .bottomright {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  text-align: left;
+  margin: 0;
+}
+.pong-wrapper .bottomleft {
+  position: fixed;
+  left: 2rem;
+  bottom: 2rem;
+  text-align: left;
+  margin: 0;
+}
+
+.pong-wrapper .pong-countdown-overlay {
+  position: absolute;
+  display: flex;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(18, 21, 33, 0);
+  transition: background-color 100ms ease-in-out;
+  pointer-events: none;
+}
+
+.pong-countdown-overlay.showing {
+  background-color: rgba(18, 21, 33, 0.404);
+}
+
+.pong-countdown-overlay.showing.invisible {
+  background-color: rgba(18, 21, 33, 0);
+}
+
+.pong-wrapper .pong-countdown-overlay.showing .pong-waiting {
+  display: flex;
+}
+
+.pong-wrapper .pong-waiting {
+  width: 35rem;
+  display: none;
+  flex-direction: row;
+  text-align: center;
+  align-items: center;
+  pointer-events: all;
+}
+
+.pong-wrapper .pong-waiting h2 {
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.pong-wrapper .pong-waiting p {
+  color: #8892b2;
+}
+
+.pong-wrapper .pong-countdown-text {
+  font-weight: bold;
+  color: white;
+  font-size: 4rem;
+  opacity: 0;
+}
+
+.pong-wrapper .pong-countdown-overlay.showing .pong-countdown-text {
+  animation: countdown-anim ease-in-out 800ms;
+}
+
+@keyframes countdown-anim {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* pong endcard */
+.pong-endcard {
+  width: 30rem;
+  max-width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  align-items: center;
+}
+
+.pong-endcard .pong-endcard-title {
+  font-weight: bold;
+  font-size: 2rem;
+  color: white;
+  text-align: center;
+  margin-bottom: 5rem;
+  flex: 1;
+}
+
+.pong-endcard .pong-endcard-scores {
+  display: flex;
+  margin: 0 -5rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.pong-endcard .pong-endcard-crown {
+  position: absolute;
+  color: #c9f65c;
+  font-size: 1.8rem;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -3rem);
+}
+
+.pong-endcard .pong-endcard-crown.hide {
+  display: none;
+}
+
+.pong-endcard .pong-endcard-score {
+  position: relative;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background-color: #1a1f31;
+  margin: 0 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pong-endcard .pong-endcard-score-num {
+  padding: 0.5rem;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 5rem;
+  color: white;
+  text-align: center;
+  margin: 0;
+}
+
+.pong-endcard .pong-endcard-score-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #8ba6e5;
+  text-align: center;
+}
+
+.pong-endcard .pong-endcard-score-name.red {
+  color: #e386af;
+}
+
+.pong-endcard .pong-endcard-keyvalue {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 0.75rem;
+  box-sizing: border-box;
+}
+.pong-endcard .pong-key {
+  flex: 1;
+  color: #8892b2;
+}
+.pong-endcard .pong-value {
+  color: white;
+  font-weight: bold;
+}
+
+.pong-endcard .pong-marginbottom {
+  margin-bottom: 5rem;
+}
+
+/* waiting screen */
+.waiting-left,
+.waiting-right {
+  flex: 1;
+  padding: 3rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}
+
+.waiting-header {
+  font-weight: bold;
+  font-size: 1.6rem;
+  margin: 0 0 3rem 0;
+  color: white;
+}
+
+.waiting-color.blue {
+  background-color: #3253bf;
+}
+
+.waiting-color.red {
+  background-color: #9b403f;
+}
+
+.waiting-color {
+  padding: 0.1rem 0.5rem;
+  font-size: 1rem;
+  border-radius: 2px;
+  color: white;
+  margin-left: 0.5rem;
+}

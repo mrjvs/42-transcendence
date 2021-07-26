@@ -1,0 +1,251 @@
+.noMessageIcon,
+.noMessageHeading {
+  font-size: 2rem;
+  color: white;
+  line-height: 1.1;
+  max-width: 300px;
+}
+
+.noMessageIcon {
+  margin-top: 10rem;
+}
+
+.noMessageParagraph {
+  color: #9da6c4;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.noMessageDivider {
+  margin: 3rem 0;
+  height: 1px;
+  background-color: #4a567a;
+  opacity: 0.5;
+  border: none;
+}
+
+.messageWrapper {
+  display: flex;
+  margin-bottom: 1.5rem;
+  position: relative;
+  align-items: flex-start;
+}
+
+.messageWrapper .messageContent {
+  margin: 0;
+  padding: 0;
+  color: white;
+  padding-bottom: 0.8rem;
+}
+
+.messageWrapper .messageContent .partyparrot {
+  height: 3rem;
+}
+
+.messageWrapper .message-special {
+  color: #6c738b;
+}
+
+.messageWrapper .message-special .messageUserNameSpecial {
+  color: #ffffff;
+  font-weight: bold;
+  padding-right: 0.5rem;
+}
+
+.messageWrapper .messageUsernameWrap {
+  display: flex;
+  align-items: center;
+}
+
+.messageWrapper .messageUserName {
+  padding-top: 0.1rem;
+  padding-bottom: 0.5rem;
+  color: #9da6c4;
+  margin: 0;
+  padding-right: 0.5rem;
+}
+
+.messageWrapper.blocked .messageUserNamem,
+.messageWrapper.blocked .messageContent {
+  color: #7c849f;
+}
+
+.messageWrapper.blocked .userAvatar {
+  background: #272c43;
+}
+
+.messageInvite-wrapper-wrapper {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  background: #121727;
+}
+
+.messageWrapper .messageDuelMessageContainer {
+  max-width: 100%;
+  display: flex;
+  width: 500px;
+  min-height: 13rem;
+  padding-bottom: 0.8rem;
+}
+
+.messageInvite-wrapper {
+  border-radius: 5px;
+  width: 100%;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+}
+
+.messageInvite-wrapper .userAvatar .status-bubble {
+  border-color: #121727;
+}
+
+.messageInvite-wrapper.hideCubes .red-cube,
+.messageInvite-wrapper.hideCubes .dark-cube {
+  display: none;
+}
+
+.messageInvite-accent {
+  background: #414867;
+  width: 4px;
+}
+
+.messageInvite-accent.green {
+  background: #35e2a2;
+}
+
+.messageInvite-accent.blue {
+  background: #3baae3;
+}
+
+.messageInvite-content {
+  position: relative;
+  width: 100%;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  flex-direction: column;
+}
+
+.messageInvite-user {
+  font-size: 16px;
+  color: white;
+  padding-bottom: 1rem;
+}
+
+.messageInvite-user .userAvatar {
+  width: 2rem;
+  height: 2rem;
+  margin-right: 1rem;
+}
+
+.messageInvite-content .text {
+  font-weight: bold;
+  width: 35%;
+  line-height: 1.2;
+  padding-bottom: 2rem;
+  color: white;
+}
+
+.messageInvite-content .button-new {
+  padding: 0.7rem 2rem;
+}
+
+.messageInvite-content .error {
+  padding-top: 1rem;
+  color: #d46074;
+}
+
+.messageInvite-user {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1rem;
+}
+
+.messageInvite-content .red-cube,
+.messageInvite-content .dark-cube {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 5rem;
+  width: 5rem;
+  transform: rotate(30deg);
+}
+
+.messageInvite-content .red-cube {
+  background: linear-gradient(to bottom, #e45655, #a13754);
+  height: 8rem;
+  width: 8rem;
+  right: -1.5rem;
+  top: -2rem;
+}
+
+.messageInvite-content .dark-cube {
+  background: #262b41;
+  height: 7rem;
+  width: 7rem;
+  right: -2.5rem;
+  top: 4rem;
+}
+
+.messageMessageContainer {
+  width: 100%;
+}
+
+.messageMessage {
+  position: relative;
+}
+
+.message-delete-button {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  margin-top: -1rem;
+}
+
+.message-delete-button .red-icon {
+  color: #d46074;
+}
+
+.messageWrapper .messageMessage:hover .bg-layers,
+.messageWrapper
+  .messageUserName:hover
+  + .messageMessageContainer
+  .messageMessage:first-child
+  .bg-layers,
+.messageWrapper .messageMessage:hover .bg-layers {
+  opacity: 1;
+}
+
+.messageWrapper .messageMessage:first-child .bg-layers {
+  margin-top: -1.8rem;
+}
+
+.messageWrapper .bg-layers {
+  position: absolute;
+  opacity: 0;
+  left: -5.5rem;
+  right: -1.5rem;
+  top: 0;
+  bottom: 0;
+  margin: -0.1rem 0 0.2rem 0;
+}
+
+.messageWrapper .bg-underlay {
+  background-color: #181b2c;
+  z-index: -6;
+}
+
+.messageMessage .bg-overlay {
+  pointer-events: none;
+}
+
+.messageMessage .bg-overlay > * {
+  pointer-events: all;
+}

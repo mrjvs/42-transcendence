@@ -1,116 +1,87 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import './App.css';
-import { ChannelView } from './views/channel';
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { LoadingScreen } from './components/styled/LoadingScreen';
+import {
+  ChannelClientListener,
+  ChannelsContext,
+  useChannelsContext,
+} from './hooks/useChannels';
+import { FriendProvider } from './hooks/useFriends';
+import { GameEventContext, useGameEvents } from './hooks/useGameEvents';
+import { useMessageContext, MessageContext } from './hooks/useMessages';
+import { StatusContext, useStatusContext } from './hooks/useStatuses';
+import { UserContext, useUser } from './hooks/useUser';
+import { UsersContext, useUsersContext } from './hooks/useUsers';
+import { useWebsocket, SocketContext } from './hooks/useWebsocket';
+import { RootNavigation } from './navigation/Root';
+
+function MessageStoreInit(props: { children: any }) {
+  const messageData = useMessageContext();
+
+  return (
+    <ChannelClientListener>
+      <MessageContext.Provider value={messageData}>
+        <FriendProvider>{props.children}</FriendProvider>
+      </MessageContext.Provider>
+    </ChannelClientListener>
+  );
+}
+
+function StoreInit(props: { children: any }) {
+  const statusData = useStatusContext();
+  const gameEventData = useGameEvents();
+
+  return (
+    <GameEventContext.Provider value={gameEventData}>
+      <StatusContext.Provider value={statusData}>
+        <MessageStoreInit>{props.children}</MessageStoreInit>
+      </StatusContext.Provider>
+    </GameEventContext.Provider>
+  );
+}
+
+function ChannelStoreInit(props: { children: any }) {
+  const channelsData = useChannelsContext();
+
+  return (
+    <ChannelsContext.Provider value={channelsData}>
+      <ClientStoreInit>{props.children}</ClientStoreInit>
+    </ChannelsContext.Provider>
+  );
+}
+
+function PureStoreInit(props: { children: any }) {
+  const usersData = useUsersContext();
+
+  return (
+    <UsersContext.Provider value={usersData}>
+      <ChannelStoreInit>{props.children}</ChannelStoreInit>
+    </UsersContext.Provider>
+  );
+}
+
+function ClientStoreInit(props: { children: any }) {
+  const userData = useUser();
+  const socketData = useWebsocket();
+
+  return (
+    <UserContext.Provider value={userData}>
+      <SocketContext.Provider value={socketData}>
+        <StoreInit>
+          <BrowserRouter>
+            <LoadingScreen userData={userData}>{props.children}</LoadingScreen>
+          </BrowserRouter>
+        </StoreInit>
+      </SocketContext.Provider>
+    </UserContext.Provider>
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <Router>
-        <div>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/about">About</Link>
-              </li>
-            </ul>
-          </nav>
-          <Switch>
-            <Route path="/about">
-              <About />
-            </Route>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route exact path="/channel/:id">
-              <ChannelView />
-            </Route>
-            <Route path="*">
-              <NotFound />
-            </Route>
-          </Switch>
-        </div>
-      </Router>
-    </div>
-  );
-}
-
-interface IChannelList {
-  id: string;
-}
-
-function Home() {
-  const [error, setError] = useState(false);
-  const [channelList, setChannelList] = useState<IChannelList[]>([]);
-  const [isLoading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('http://localhost:8080/api/v1/channels')
-      .then((res) => res.json())
-      .then((result) => {
-        setLoading(false);
-        setChannelList(result);
-      })
-      .catch(() => {
-        setLoading(false);
-        setError(true);
-      });
-  }, []);
-
-  let channelListRender;
-
-  if (isLoading)
-    channelListRender = (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
-  else if (error)
-    channelListRender = (
-      <div>
-        <p>Something went wrong, try again later</p>
-      </div>
-    );
-  else
-    channelListRender = (
-      <div>
-        <ul>
-          {channelList.map((v) => (
-            <li key={v.id}>
-              <Link to={`/channel/${v.id}`}>{v.id}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-
-  return (
-    <header>
-      <h1>Channel list:</h1>
-      {channelListRender}
-    </header>
-  );
-}
-
-function About() {
-  return (
-    <div>
-      <h2>About</h2>
-      <p>Sample text</p>
-    </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <div>
-      <h2>Whoops</h2>
-      <p>We couldn&lsquo;t find that page</p>
-      <Link to="/">Back to home</Link>
-    </div>
+    <PureStoreInit>
+      <RootNavigation />
+    </PureStoreInit>
   );
 }
 

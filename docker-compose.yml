@@ -12,8 +12,12 @@ services:
   backend:
     build: ./vivid-server
     container_name: vivid-server
+    environment:
+      - TZ=Europe/Amsterdam
     env_file:
       - ./config/vivid-server.env
+    volumes:
+      - "uploads-data:/app/uploads"
     links:
       - database
     depends_on:
@@ -23,6 +27,8 @@ services:
   # database
   database:
     image: postgres:13.3
+    environment:
+      - TZ=Europe/Amsterdam
     volumes:
       - "postgres-data:/var/lib/postgresql/data"
     env_file:
@@ -47,7 +53,4 @@ services:
 # persistent data
 volumes:
   postgres-data:
-
-networks:
-  default:
-    name: vivid
+  uploads-data:
