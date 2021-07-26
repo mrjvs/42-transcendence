@@ -51,6 +51,17 @@
   background: linear-gradient(to right, #243a94, #8c40cf);
 }
 
+.button-new.button-secondary {
+  background: #30354d;
+  padding: 0.7rem 3.5rem;
+  color: #c7cddf;
+}
+
+.button-new.button-secondary:hover {
+  background: #424866;
+  color: white;
+}
+
 .button-new.button-duel {
   background: #252a40;
   color: #8892b2;

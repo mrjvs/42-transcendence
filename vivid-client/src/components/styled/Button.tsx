@@ -16,9 +16,10 @@ export function Button(props: {
     | 'secondary'
     | 'duel'
     | 'danger'
+    | 'small-box'
+    | 'secondary-small';
     | 'accept'
     | 'decline'
-    | 'small-box';
 }) {
   const type = props.type || 'primary';
   const button_props = {

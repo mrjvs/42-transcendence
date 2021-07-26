@@ -1,19 +1,66 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
+  HttpException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
-import { UserEntity } from '~/models/user.entity';
+import { UserEntity } from '@/user.entity';
 
 @Injectable()
-export class IntraAuthGuard extends AuthGuard('oauth2') {
+export class IntraAuthGuard extends AuthGuard('intra-oauth') {
+  constructor(private readonly configService: ConfigService) {
+    super();
+  }
+
+  get shouldAllow() {
+    return this.configService.get('oauth.intra.enabled');
+  }
+
   async canActivate(context: ExecutionContext) {
+    if (!this.shouldAllow)
+      throw new ForbiddenException(null, 'Auth not enabled for this method');
     const activate = (await super.canActivate(context)) as boolean;
     const request = context.switchToHttp().getRequest();
     await super.logIn(request);
     return activate;
+  }
+
+  handleRequest(err: any, user: any) {
+    if (err || !user) {
+      throw new HttpException('failed to login', err.status);
+    }
+    return user;
+  }
+}
+
+@Injectable()
+export class DiscordAuthGuard extends AuthGuard('discord-oauth') {
+  constructor(private readonly configService: ConfigService) {
+    super();
+  }
+
+  get shouldAllow() {
+    return this.configService.get('oauth.discord.enabled');
+  }
+
+  async canActivate(context: ExecutionContext) {
+    if (!this.shouldAllow)
+      throw new ForbiddenException(null, 'Auth not enabled for this method');
+    const activate = (await super.canActivate(context)) as boolean;
+    const request = context.switchToHttp().getRequest();
+    await super.logIn(request);
+    return activate;
+  }
+
+  handleRequest(err: any, user: any) {
+    if (err || !user) {
+      throw new HttpException('failed to login', err.status);
+    }
+    return user;
   }
 }
 

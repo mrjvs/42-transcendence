@@ -5,11 +5,23 @@ import { UserEntity } from '@/user.entity';
 import { UserController } from './user.controller';
 import { ConfigService } from '@nestjs/config';
 import { UserSetupController } from './user_setup.controller';
-import { GuildsModule } from '../guilds/guilds.module';
-import { WarsModule } from '../wars/wars.module';
+import { MatchesModule } from '$/matches/matches.module';
+import { JoinedChannelEntity } from '@/joined_channels.entity';
+import { FriendsEntity } from '@/friends.entity';
+import { EventModule } from '../websocket/event.module';
+import { ChannelEntity } from '@/channel.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity]), GuildsModule, WarsModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      UserEntity,
+      JoinedChannelEntity,
+      FriendsEntity,
+      ChannelEntity,
+    ]),
+    MatchesModule,
+    EventModule,
+  ],
   providers: [UserService, ConfigService],
   controllers: [UserController, UserSetupController],
   exports: [UserService],

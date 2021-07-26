@@ -10,9 +10,9 @@ import { ChannelMessageController } from './channel.message.controller';
 import { MessageEntity } from '@/messages.entity';
 import { ConfigService } from '@nestjs/config';
 import { UserModule } from '$/users/user.module';
-import { EventModule } from '../websocket/event.module';
-import { PongModule } from '../pong/pong.module';
-import { FriendsModule } from '../friends/friends.module';
+import { EventModule } from '$/websocket/event.module';
+import { PongModule } from '$/pong/pong.module';
+import { FriendsModule } from '$/friends/friends.module';
 import { ChannelTaskService } from './channel.cron.service';
 
 @Module({

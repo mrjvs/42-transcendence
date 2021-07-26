@@ -31,11 +31,15 @@
   align-items: flex-start;
 }
 
-.messageWrapper p {
+.messageWrapper .messageContent {
   margin: 0;
   padding: 0;
   color: white;
   padding-bottom: 0.8rem;
+}
+
+.messageWrapper .messageContent .partyparrot {
+  height: 3rem;
 }
 
 .messageWrapper .message-special {
@@ -57,11 +61,12 @@
   padding-top: 0.1rem;
   padding-bottom: 0.5rem;
   color: #9da6c4;
+  margin: 0;
   padding-right: 0.5rem;
 }
 
 .messageWrapper.blocked .messageUserNamem,
-.messageWrapper.blocked p {
+.messageWrapper.blocked .messageContent {
   color: #7c849f;
 }
 
@@ -70,16 +75,26 @@
 }
 
 .messageInvite-wrapper-wrapper {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  background: #121727;
+}
+
+.messageWrapper .messageDuelMessageContainer {
+  max-width: 100%;
+  display: flex;
+  width: 500px;
+  min-height: 13rem;
   padding-bottom: 0.8rem;
 }
 
 .messageInvite-wrapper {
-  background: #121727;
-  max-width: 100%;
-  width: 500px;
+  border-radius: 5px;
+  width: 100%;
+  flex: 1;
   position: relative;
   overflow: hidden;
-  border-radius: 5px;
   display: flex;
 }
 
@@ -87,15 +102,33 @@
   border-color: #121727;
 }
 
+.messageInvite-wrapper.hideCubes .red-cube,
+.messageInvite-wrapper.hideCubes .dark-cube {
+  display: none;
+}
+
 .messageInvite-accent {
-  background: #35e2a2;
+  background: #414867;
   width: 4px;
+}
+
+.messageInvite-accent.green {
+  background: #35e2a2;
+}
+
+.messageInvite-accent.blue {
+  background: #3baae3;
 }
 
 .messageInvite-content {
   position: relative;
   width: 100%;
-  padding: 1rem 0 1rem 2rem;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  flex-direction: column;
 }
 
 .messageInvite-user {
@@ -113,7 +146,13 @@
 .messageInvite-content .text {
   font-weight: bold;
   width: 35%;
-  padding-bottom: 0.5rem;
+  line-height: 1.2;
+  padding-bottom: 2rem;
+  color: white;
+}
+
+.messageInvite-content .button-new {
+  padding: 0.7rem 2rem;
 }
 
 .messageInvite-content .error {
@@ -125,7 +164,6 @@
   display: flex;
   align-items: center;
   padding-bottom: 1rem;
-  padding-top: 1rem;
 }
 
 .messageInvite-content .red-cube,

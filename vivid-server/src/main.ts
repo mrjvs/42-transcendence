@@ -1,10 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from '$/app/app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import { getSessionStore } from '$/auth/auth-session';
+import { LadderService } from '$/ladder/ladder.service';
 
 async function bootstrap() {
   if (!process.env.CORS) process.env.CORS = '';
@@ -25,6 +26,7 @@ async function bootstrap() {
     }),
   );
   const configService = app.get(ConfigService);
+  const logger = new Logger('oauth');
 
   app.use(
     session({
@@ -45,6 +47,16 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  const ladderService = app.get(LadderService);
+  await ladderService.generateDefaults();
   await app.listen(configService.get('port'));
+
+  logger.log(
+    `Enabled login methods: ${configService
+      .get('oauth.validLogins')
+      .join(', ')}`,
+  );
+  if (configService.get('oauth.validLogins').length < 1)
+    logger.error(`No enabled login methods!`);
 }
 bootstrap();

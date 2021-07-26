@@ -36,18 +36,16 @@ export function useFetch(options: {
       headers: isJson ? { 'Content-Type': 'application/json' } : {},
     })
       .then((res) => {
-        if (
-          !res.headers.has('content-length') ||
-          res.headers.get('content-length') === '0'
-        )
-          return new Promise<any>((resolve) => {
-            resolve({});
-          }).then((data) => ({ data, res }));
-        return res.json().then((data) => ({ data, res }));
+        return res.text().then((text) => {
+          return {
+            data: text.length > 0 ? JSON.parse(text) : {},
+            res,
+          };
+        });
       })
       .then((data) => {
         if (shouldCancel) return;
-        if (data.res.status < 200 || data.res.status > 299) throw data;
+        if (data.res.status >= 400) throw data;
         setData(data);
         setLoading(false);
         setDone(true);

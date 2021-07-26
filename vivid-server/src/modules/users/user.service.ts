@@ -12,14 +12,14 @@ import { parse } from 'cookie';
 import { getSessionStore } from '$/auth/auth-session';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
-import { GuildsService } from '$/guilds/guilds.service';
-import { IGame } from '~/models/match.interface';
-import { WarEntity } from '~/models/war.entity';
-import { WarsService } from '$/wars/wars.service';
 import { authenticator } from 'otplib';
 import * as cryptoRandomString from 'secure-random-string';
-import { TypeORMSession } from '~/models/session.entity';
+import { TypeORMSession } from '@/session.entity';
 import { encryptUserData } from './userEncrypt';
+import { JoinedChannelEntity } from '~/models/joined_channels.entity';
+import { FriendsEntity } from '~/models/friends.entity';
+import { EventGateway } from '../websocket/event.gateway';
+import { ChannelEntity } from '~/models/channel.entity';
 
 const colors = [
   '#29419F',
@@ -44,11 +44,15 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(JoinedChannelEntity)
+    private joinChannelRepository: Repository<JoinedChannelEntity>,
+    @InjectRepository(ChannelEntity)
+    private channelsRepository: Repository<ChannelEntity>,
+    @InjectRepository(FriendsEntity)
+    private friendsRepository: Repository<FriendsEntity>,
     private configService: ConfigService,
-    @Inject(forwardRef(() => GuildsService))
-    private guildsService: GuildsService,
-    @Inject(forwardRef(() => WarsService))
-    private warsService: WarsService,
+    @Inject(forwardRef(() => EventGateway))
+    private readonly eventGateway: EventGateway,
   ) {}
 
   // find user, optional resolving
@@ -57,8 +61,6 @@ export class UserService {
     resolves: string[] = [
       'joined_channels',
       'joined_channels.channel',
-      'guild',
-      'guild.users',
       'blocks',
       'friends',
       'friends_inverse',
@@ -88,35 +90,52 @@ export class UserService {
 
   // delete user, invalidates sessions and disconnects from websocket
   async deleteUser(id: string): Promise<void> {
-    // TODO disconnect websocket connections
-    // TODO leave guild, remove blocks, remove friends, leave channels
-    await this.killSessions(id);
-    await this.userRepository
+    // check if user is still owner of a channel
+    const result = await this.channelsRepository
+      .createQueryBuilder()
+      .where({ owner: id })
+      .getMany();
+    if (result.length > 0) throw new BadRequestException();
+
+    // delete friends
+    await this.friendsRepository
       .createQueryBuilder()
       .delete()
+      .andWhere(`user_1 = :id OR user_2 = :id`, {
+        id,
+      })
+      .execute();
+    // leave channels
+    await this.joinChannelRepository
+      .createQueryBuilder()
+      .delete()
+      .andWhere(`user = :id`, {
+        id,
+      })
+      .execute();
+    // logout everywhere
+    await this.killSessions(id);
+    await this.eventGateway.logoutUser(id);
+    // anonymize user and make it unable to login
+    await this.userRepository
+      .createQueryBuilder()
+      .update()
       .where({ id: id })
+      .set({
+        oauth_id: null,
+        name: null,
+      })
       .returning('*')
       .execute()
       .then((response) => {
         return <UserEntity>response.raw[0];
-      }); // TODO check empty result
+      });
   }
 
   async findUserMatches(id: string): Promise<UserEntity> {
     return await this.userRepository
       .findOne({
-        relations: [
-          'joined_channels',
-          'joined_channels.channel',
-          'guild',
-          'guild.users',
-          'matches_req',
-          'matches_req.user_req',
-          'matches_req.user_acpt',
-          'matches_acpt',
-          'matches_acpt.user_req',
-          'matches_acpt.user_acpt',
-        ],
+        relations: ['joined_channels', 'joined_channels.channel'],
         where: {
           id,
         },
@@ -159,22 +178,37 @@ export class UserService {
   }
 
   // find by intra id
-  async findIntraUser(intraId: string): Promise<UserEntity> {
+  async findIntraUser(id: string): Promise<UserEntity> {
     return await this.userRepository.findOne({
       where: {
-        intra_id: intraId,
+        oauth_id: `intra-${id}`,
+      },
+    });
+  }
+
+  // find by discord id
+  async findDiscordUser(id: string): Promise<UserEntity> {
+    return await this.userRepository.findOne({
+      where: {
+        oauth_id: `discord-${id}`,
       },
     });
   }
 
   // create a new user
-  async createUser(intraId: string): Promise<UserEntity> {
+  async createUser(oauthId: string): Promise<UserEntity> {
     const user: IUser = {
       name: null,
-      intra_id: intraId,
+      oauth_id: oauthId,
       avatar_colors: generateGradientColors(),
     };
     return await this.userRepository.save(user);
+  }
+  createDiscordUser(discordId: string): Promise<UserEntity> {
+    return this.createUser(`discord-${discordId}`);
+  }
+  createIntraUser(intraId: string): Promise<UserEntity> {
+    return this.createUser(`intra-${intraId}`);
   }
 
   // get user, parsed from cookie string
@@ -257,15 +291,6 @@ export class UserService {
     if (result.affected != 1) throw new NotFoundException();
   }
 
-  // TODO check
-  async joinGuild(userId: string, anagram: string): Promise<UserEntity> {
-    const user = await this.userRepository.findOne({ id: userId });
-    const guild = await this.guildsService.findGuild(anagram);
-    if (!user || !guild) throw new NotFoundException();
-    user.guild = guild;
-    return await this.userRepository.save(user);
-  }
-
   async updateName(userId: string, newName: string): Promise<any> {
     return await this.userRepository
       .save({
@@ -277,43 +302,6 @@ export class UserService {
           throw new BadRequestException({ code: 'inuse' });
         throw err;
       });
-  }
-
-  async getWarId(gamestats: IGame): Promise<WarEntity> {
-    const user_acpt = await this.userRepository.findOne({
-      relations: ['guild', 'guild.current_war'],
-      where: {
-        id: gamestats.user_id_acpt,
-      },
-    });
-
-    const user_req = await this.userRepository.findOne({
-      relations: ['guild', 'guild.current_war'],
-      where: {
-        id: gamestats.user_id_req,
-      },
-    });
-    if (
-      user_acpt.guild &&
-      user_acpt.guild.current_war &&
-      user_req.guild &&
-      user_req.guild.current_war
-    ) {
-      if (
-        user_acpt.guild.current_war.id === user_req.guild.current_war.id &&
-        user_acpt.guild.id !== user_req.guild.id
-      ) {
-        if (gamestats.winner_id === user_req.id)
-          await this.warsService.updateWarWinReq(
-            user_acpt.guild.current_war.id,
-          );
-        else
-          await this.warsService.updateWarWinAccept(
-            user_acpt.guild.current_war.id,
-          );
-        return user_acpt.guild.current_war;
-      }
-    }
   }
 
   async updateAvatarName(userId: string, filename: string): Promise<any> {

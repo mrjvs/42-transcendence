@@ -1,0 +1,33 @@
+.toggle-button {
+  font-size: 0.8rem;
+  color: #9da6c4;
+  border-color: #2a2f47;
+  background-color: #2a2f47;
+  border-width: 2px;
+  border-radius: 3px;
+  padding: 0.3rem 0.6rem;
+  transition: transform 100ms ease-in-out, background-color 100ms ease-in-out,
+    border-color 100ms ease-in-out;
+  display: inline-block;
+  cursor: pointer;
+  margin: 0 0.4rem 0.4rem 0;
+  user-select: none;
+  border-style: solid;
+}
+
+.toggle-button:hover {
+  background-color: #343957;
+  border-color: #343957;
+}
+.toggle-button.checked:hover {
+  border-color: #70b3ff;
+}
+
+.toggle-button:active {
+  transform: scale(1.05);
+}
+
+.toggle-button.checked {
+  border-color: #2e75c7;
+  color: white;
+}

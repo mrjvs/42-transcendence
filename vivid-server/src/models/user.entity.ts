@@ -1,18 +1,15 @@
-import { JoinedChannelEntity } from './joined_channels.entity';
+import { JoinedChannelEntity } from '@/joined_channels.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
   CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
   BaseEntity,
 } from 'typeorm';
-import { GuildsEntity } from './guilds.entity';
+import { LadderUserEntity } from '@/ladder_user.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Exclude, Expose, Transform } from 'class-transformer';
-import { MatchesEntity } from './matches.entity';
 import { BlocksEntity } from '@/blocks.entity';
 import { FriendsEntity } from './friends.entity';
 
@@ -30,8 +27,11 @@ export class UserEntity extends BaseEntity {
   @OneToMany(() => JoinedChannelEntity, (channel) => channel.user)
   joined_channels: JoinedChannelEntity[];
 
-  @Column()
-  intra_id: string;
+  @OneToMany(() => LadderUserEntity, (ladder_user) => ladder_user.user)
+  ranks: LadderUserEntity[];
+
+  @Column({ nullable: true })
+  oauth_id: string;
 
   @Column({ default: false })
   site_admin: boolean;
@@ -42,19 +42,6 @@ export class UserEntity extends BaseEntity {
   @Column({ default: null })
   avatar: string;
 
-  @JoinColumn({ name: 'guild' })
-  @ManyToOne(() => GuildsEntity, (guild) => guild.users, {
-    onDelete: 'SET NULL',
-  })
-  @JoinColumn({ name: 'guild' })
-  guild: GuildsEntity;
-
-  @OneToMany(() => MatchesEntity, (matches) => matches.user_req)
-  matches_req: MatchesEntity[];
-
-  @OneToMany(() => MatchesEntity, (matches) => matches.user_acpt)
-  matches_acpt: MatchesEntity[];
-
   @OneToMany(() => BlocksEntity, (blocks) => blocks.user_id)
   blocks: BlocksEntity[];
 
@@ -63,10 +50,6 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => FriendsEntity, (friends) => friends.user_2)
   friends_inverse: FriendsEntity[];
-
-  //   onDelete: 'SET NULL',
-  // })
-  // guild: GuildsEntity;
 
   @Column({ nullable: true, type: 'text' })
   twofactor: string;
@@ -92,11 +75,11 @@ export class UsernameChangeDto {
 }
 
 export interface INewUser {
-  intra_id: string;
+  oauth_id: string;
 }
 
 export interface IUser {
-  intra_id: string;
+  oauth_id: string;
   name: string;
   avatar_colors: string[];
 }
@@ -109,7 +92,7 @@ export class UnrelatedUser {
 }
 
 export class RelatedUser extends UnrelatedUser {
-  @Expose() intra_id: string;
+  @Expose() oauth_id: string;
   @Expose() site_admin: boolean;
 
   @Expose()

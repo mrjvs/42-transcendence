@@ -11,11 +11,13 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { IUserParam, UserParam } from '~/middleware/decorators/login.decorator';
-import { IUser, UserEntity } from '@/user.entity';
+import { IUser, UnrelatedUser, UserEntity } from '@/user.entity';
 import { User } from '~/middleware/decorators/login.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,11 +25,17 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import { unlink } from 'fs';
 import { Request } from 'express';
+import { formatObject } from '~/utils/format';
+import { MatchesService } from '$/matches/matches.service';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard)
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    @Inject(forwardRef(() => MatchesService))
+    private matchesService: MatchesService,
+  ) {}
 
   @Delete(':id/sessions')
   async deleteSessions(
@@ -39,9 +47,19 @@ export class UserController {
     await this.userService.killSessions(user.id, { except: [req.session.id] });
   }
 
-  @Get('matches/:id')
+  @Get(':id/matches')
   async findUsermatches(@Param('id') id: string): Promise<IUser | void> {
     return await this.userService.findUserMatches(id);
+  }
+
+  @Get(':id/profile')
+  async findUser(@UserParam('id') usr: IUserParam): Promise<any> {
+    const matches = await this.matchesService.findUserMatches(usr.id);
+    const userRet = await this.userService.findUser(usr.id, []);
+    return {
+      matches,
+      user: formatObject(UnrelatedUser, userRet),
+    };
   }
 
   @Patch(':id/2fa')
@@ -61,15 +79,6 @@ export class UserController {
     return {
       status: true,
     };
-  }
-
-  // TODO returns full user
-  @Post('join_guild/:anagram')
-  async join_guild(
-    @User() user: UserEntity,
-    @Param('anagram') anagram: string,
-  ): Promise<UserEntity> {
-    return this.userService.joinGuild(user.id, anagram);
   }
 
   @Post(':id/avatar')

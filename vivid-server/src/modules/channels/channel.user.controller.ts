@@ -24,7 +24,7 @@ import {
   IJoinedChannel,
 } from '@/joined_channels.entity';
 import { ChannelService } from './channel.service';
-import { UserEntity } from '~/models/user.entity';
+import { UserEntity } from '@/user.entity';
 import {
   ChannelRoles,
   getUserRolesFromChannel,

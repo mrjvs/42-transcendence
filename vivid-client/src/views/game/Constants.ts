@@ -1,51 +1,99 @@
 export interface IPlayer {
-  userId: string;
-  playerNumber: number;
+  // connection data
+  client: any | null;
+  userId: string | null;
+  name: string | null;
+  ready: boolean;
+
+  // game state
+  score: number;
+  speed: number;
+  extraSpeed: number;
+
+  // render variables
+  width: number;
+  extraHeight: number;
+  height: number;
   x: number;
   y: number;
-  score: number;
+
+  // control states
+  holdingUp: number;
+  holdingDown: number;
+  lastPressed: null | 'up' | 'down';
   move: number;
   spacebar: number;
-  shoot: number;
-  addOnPoints: number;
+
+  // addons
+  addonUsageCountdown: number; // how long to wait until you get a new addon
+  addonUsageTicks: number;
+  stashedAddon: string | null;
   special: boolean;
-  ready: boolean;
+  activatedTicks: number; // how long its activated for
+  activatedTicksMax: number;
+  sticky: boolean;
 }
 
-export interface IBall {
-  x: number;
-  y: number;
-  radius: number;
-  speed: number;
-  velocityX: number;
-  velocityY: number;
-  color: string;
+export interface ISpectator {
+  client?: any | null;
 }
 
-export interface INet {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
+export enum EndReasons {
+  RAGEQUIT = 'ragequit',
+  FAIRFIGHT = 'fairfight',
+  CANCELLED = 'cancelled',
 }
 
-export interface ISettings {
-  controls: string;
-  multiPlayer: boolean;
-  addon: string;
+export enum GameProgress {
+  WAITING = 'waiting',
+  COUNTDOWN = 'countdown',
+  PLAYING = 'playing',
+  FINISHED = 'finished',
+  CANCELLED = 'cancelled',
 }
 
 export interface IGameState {
+  // id for game
   gameId: string;
-  settings: ISettings;
-  players: IPlayer[];
-  ball: IBall;
-  twoPlayers: boolean;
-  computerLevel: number;
+
+  // player defined settings
+  settings: {
+    fieldWidth: number;
+    fieldHeight: number;
+    addons: string[];
+    ticksPerMs: number;
+  };
+
+  // player entity
+  players: [IPlayer, IPlayer];
+
+  // ball entity
+  ball: {
+    x: number;
+    y: number;
+    radius: number;
+    extraRadiuses: { player: string; factor: number }[];
+    extraSpeeds: { player: string; factor: number }[];
+    speed: number;
+    velocityX: number;
+    velocityY: number;
+    addedSpeed: number;
+  };
+
+  // game states
+  gameProgress: GameProgress;
+  spectators: ISpectator[];
+  subscribers: ISpectator[];
+  countdownNum: number;
+  countdownTicks: number;
+  endReason: EndReasons | null;
+  pastGame: boolean;
+
+  amountOfSeconds: number;
+
+  // game ball speed get's progressively faster
   increaseSpeedAfterContact: number;
-  playerWidth: number;
-  playerHeight: number;
-  playerColor: string;
-  addOnReady: number;
+
+  // game winner
+  winner: string | null;
 }

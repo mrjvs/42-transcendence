@@ -6,6 +6,7 @@ import {
   ChannelsContext,
   useChannelsContext,
 } from './hooks/useChannels';
+import { GameEventContext, useGameEvents } from './hooks/useGameEvents';
 import { useMessageContext, MessageContext } from './hooks/useMessages';
 import { StatusContext, useStatusContext } from './hooks/useStatuses';
 import { UserContext, useUser } from './hooks/useUser';
@@ -27,11 +28,14 @@ function MessageStoreInit(props: { children: any }) {
 
 function StoreInit(props: { children: any }) {
   const statusData = useStatusContext();
+  const gameEventData = useGameEvents();
 
   return (
-    <StatusContext.Provider value={statusData}>
-      <MessageStoreInit>{props.children}</MessageStoreInit>
-    </StatusContext.Provider>
+    <GameEventContext.Provider value={gameEventData}>
+      <StatusContext.Provider value={statusData}>
+        <MessageStoreInit>{props.children}</MessageStoreInit>
+      </StatusContext.Provider>
+    </GameEventContext.Provider>
   );
 }
 

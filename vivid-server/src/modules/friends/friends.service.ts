@@ -15,27 +15,6 @@ export class FriendsService {
     private friendsRepository: Repository<FriendsEntity>,
   ) {}
 
-  // Admin only, find all FriendsEntity's
-  findAll(): Promise<FriendsEntity[]> {
-    return this.friendsRepository.find();
-  }
-
-  async findFriendship(user_1: string, user_2: string): Promise<FriendsEntity> {
-    if (user_2 < user_1) {
-      const tmp = user_1;
-      user_1 = user_2;
-      user_2 = tmp;
-    }
-
-    return await this.friendsRepository.findOne({
-      relations: ['user_1', 'user_2'],
-      where: {
-        user_1,
-        user_2,
-      },
-    });
-  }
-
   async findFriendRequests(userId: string): Promise<FriendsEntity[]> {
     return await this.friendsRepository
       .createQueryBuilder('friends')

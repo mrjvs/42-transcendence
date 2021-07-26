@@ -61,6 +61,8 @@
   display: flex;
   min-height: 100%;
   height: auto;
+  padding: 6rem 0;
+  box-sizing: border-box;
 }
 
 .modal-wrapper .content-wrapper {

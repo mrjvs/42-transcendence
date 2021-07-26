@@ -1,0 +1,38 @@
+.statistics-view {
+  width: 100%;
+  max-width: 50rem;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 4rem 2rem;
+}
+
+.statistics-view .stat-heading {
+  font-size: 2rem;
+  color: white;
+  font-weight: bold;
+  margin: 4rem 0 2rem 0;
+}
+
+.statistics-view .stat-grid {
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.statistics-view .stat-grid .stat-item {
+  background-color: #15192a;
+  border-radius: 5px;
+  padding: 1.1rem 1.5rem;
+}
+
+.statistics-view .stat-grid .stat-item-number {
+  color: white;
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.statistics-view .stat-grid .stat-item-label {
+  color: #4a567a;
+  margin: 0.5rem 0 0 0;
+}

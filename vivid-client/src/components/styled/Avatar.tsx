@@ -3,10 +3,15 @@ import { StatusContext } from '../../hooks/useStatuses';
 import './Avatar.css';
 import { UserProfileModal } from './modals/UserProfile.modal';
 
-function StatusBubble(props: { userId: string }) {
+function StatusBubble(props: { userId: string; color?: string }) {
   const { getStatus } = React.useContext(StatusContext);
   return (
-    <div className={`status-bubble status-${getStatus(props.userId)}`}></div>
+    <div
+      className={`status-bubble status-${getStatus(props.userId)}`}
+      style={{
+        borderColor: props.color,
+      }}
+    ></div>
   );
 }
 
@@ -16,6 +21,7 @@ export function Avatar(props: {
   noStatus?: boolean;
   isClickable?: boolean;
   blocked?: boolean;
+  color?: string;
 }) {
   let background;
   if (!props.user.avatar)
@@ -36,7 +42,9 @@ export function Avatar(props: {
         }}
         onClick={() => setState(true)}
       >
-        {!props.noStatus ? <StatusBubble userId={props.user?.id} /> : null}
+        {!props.noStatus ? (
+          <StatusBubble userId={props.user?.id} color={props.color} />
+        ) : null}
       </div>
       {props.isClickable ? (
         <UserProfileModal

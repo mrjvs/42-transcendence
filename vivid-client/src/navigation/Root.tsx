@@ -17,8 +17,12 @@ import { Friends } from '../components/styled/sidebar/Friends';
 import { FriendsModal } from '../components/styled/modals/Friends.modal';
 import { ChannelSettingsView } from '../views/ChannelSettingsView';
 import { ChannelsContext } from '../hooks/useChannels';
-import { NotFoundView } from '../views/NotFoundView';
+import { LoadingView } from '../views/LoadingView';
 import { DmChannelView } from '../views/DmChannelView';
+import { GameMatchView } from '../views/GameMatch';
+import { LadderMatchView } from '../views/LadderMatch';
+import { MatchHistoryView } from '../views/MatchHistoryView';
+import { StatisticsView } from '../views/StatisticsView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
@@ -40,21 +44,14 @@ function SideBarRouter() {
         <div className="top">
           <Heading size="small">Vivid</Heading>
         </div>
-        <ActionRow label="guild" />
-        <SidebarLink link="/guilds">
-          <Icon type="gear" />
-          Guild Settings
+        <ActionRow label="Games" />
+        <SidebarLink link="/" icon="crown">
+          Play a game
         </SidebarLink>
-        <SidebarLink link="/tournaments">
-          <Icon type="flag" />
-          Tournaments
+        <SidebarLink link="/history" icon="trophy">
+          Match history
         </SidebarLink>
-        <SidebarLink link="/wars">
-          <Icon type="award" />
-          War History
-        </SidebarLink>
-        <SidebarLink link="/stats">
-          <Icon type="stats" />
+        <SidebarLink link="/stats" icon="stats">
           Statistics
         </SidebarLink>
         <ActionRow label="channel">
@@ -68,6 +65,24 @@ function SideBarRouter() {
             New
           </Button>
         </ActionRow>
+        {joinedChannels.length === 0 ? (
+          <>
+            <SidebarLink
+              click={() => alert('join')}
+              icon="users"
+              description="Make your life awesome by making a team"
+            >
+              Join a channel
+            </SidebarLink>
+            <SidebarLink
+              click={() => alert('create')}
+              icon="user_friends"
+              description="Be the leader of the pack!"
+            >
+              Create a channel
+            </SidebarLink>
+          </>
+        ) : null}
         {joinedChannels.map((v: any) => (
           <SidebarLink key={v.id} link={`/channel/${v.id}`}>
             {v.title}
@@ -93,7 +108,13 @@ function SideBarRouter() {
       <div className="content">
         <Switch>
           <Route exact path="/">
-            <p>home</p>
+            <GameMatchView />
+          </Route>
+          <Route exact path="/history">
+            <MatchHistoryView />
+          </Route>
+          <Route exact path="/stats">
+            <StatisticsView />
           </Route>
           <Route exact path="/channel/:id">
             <ChannelView />
@@ -105,12 +126,8 @@ function SideBarRouter() {
             <p>pong</p>
             <GameView />
           </Route>
-          <Route exact path="/pong/:id">
-            <p>pong</p>
-            <PongView />
-          </Route>
           <Route path="*">
-            <NotFoundView>Not Found</NotFoundView>
+            <LoadingView>Not Found</LoadingView>
           </Route>
         </Switch>
       </div>
@@ -137,6 +154,12 @@ function MainRouter() {
         <Switch>
           <Route exact path="/settings">
             <SettingsView />
+          </Route>
+          <Route exact path="/ladder/:id">
+            <LadderMatchView />
+          </Route>
+          <Route exact path="/pong/:id">
+            <PongView />
           </Route>
           <Route exact path="/channel/:id/settings">
             <ChannelSettingsView />

@@ -20,6 +20,7 @@ import {
   UserEntity,
   UsernameChangeDto,
 } from '@/user.entity';
+
 import { formatObject } from '~/utils/format';
 import { UserService } from './user.service';
 
@@ -34,7 +35,6 @@ export class UserSetupController {
     return formatObject(UnrelatedUser, userRet);
   }
 
-  // TODO private vs public data
   @Get(':id')
   async findUser(
     @UserParam('id') usr: IUserParam,
@@ -48,8 +48,10 @@ export class UserSetupController {
   @Patch('/:id/name')
   async changeName(
     @UserParam('id') user: IUserParam,
+    @User() usr: UserEntity,
     @Body() newName: UsernameChangeDto,
   ): Promise<any> {
+    if (!user.isSelf && !usr.isSiteAdmin()) throw new ForbiddenException();
     const res = await this.userService.updateName(user.id, newName.username);
     return {
       id: res.id,

@@ -1,39 +1,49 @@
-.user-profile {
+.user-profile-card .user-profile-section {
+  background-color: #222639;
+  border-radius: 5px;
+  padding: 1rem;
+}
+.user-profile-card .user-profile-section.margined {
+  margin-bottom: 1rem;
+}
+.user-profile-card .user-profile-section.padded {
+  padding: 2rem;
+}
+
+.user-profile-card .hidden {
+  display: none !important;
+}
+
+.user-profile-card .user-profile-avatar {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  border-radius: 0.5rem;
 }
 
-.user-profile.avatar {
-  transform: scale(0.6);
+.user-profile-card .user-profile-avatar h2 {
+  margin: 0 0.5rem;
 }
 
-.user-profile:hover {
-  background-color: #354161;
-}
-
-.user-profile.user-name {
-  flex-grow: 0.95;
-}
-
-hr.solid {
-  margin-top: 4%;
-  height: 1.5px;
-  background-color: #354161;
-  border: none;
-}
-
-.search-friend {
+.user-profile-card .user-profile-grid {
   display: flex;
-  align-items: center;
-  margin-bottom: 4%;
+  margin: 0 -0.3rem;
 }
 
-.text-input {
-  flex-grow: 1;
+.user-profile-card .user-profile-grid > * {
+  flex: 1;
+  margin: 0 0.3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-/* .search-button {
-  margin-top: 50%;
-} */
+.user-profile-card .user-profile-section-heading {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  width: 100%;
+}
+
+.user-profile-card .user-profile-section-heading.center {
+  text-align: center;
+}
