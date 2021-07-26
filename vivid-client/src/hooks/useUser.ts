@@ -63,9 +63,7 @@ export function useUser() {
               setLoading(false);
               setDone(true);
             })
-            .catch((err) => {
-              console.log(err);
-
+            .catch(() => {
               setLoading(false);
               setError(true);
             });
@@ -74,8 +72,7 @@ export function useUser() {
           setDone(true);
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
         setLoading(false);
         setError(true);
       });

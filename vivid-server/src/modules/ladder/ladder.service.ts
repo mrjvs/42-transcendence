@@ -193,23 +193,6 @@ export class LadderService {
       user2_points = Math.ceil(u2.points + K * (1 - P2));
     }
 
-    console.log({
-      user1: {
-        newpoints: user1_points,
-        oldpoints: u1.points,
-        diffpoints: user1_points - u1.points,
-        user: u1.user,
-        prob: P1,
-      },
-      user2: {
-        newpoints: user2_points,
-        oldpoints: u2.points,
-        diffpoints: user2_points - u2.points,
-        user: u2.user,
-        prob: P2,
-      },
-    });
-
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

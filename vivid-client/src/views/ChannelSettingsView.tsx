@@ -245,10 +245,10 @@ function ChannelSettingsCard(props: {
         </Button>
         {updateChannelFetch.error &&
         updateChannelFetch.error?.data?.code === 'inuse' ? (
-          <p>That username is already in use</p>
+          <p>That channel name is already in use</p>
         ) : updateChannelFetch.error &&
           updateChannelFetch.error?.res?.status === 400 ? (
-          <p>Username must be at least 1 character</p>
+          <p>Password must be at least 1 character</p>
         ) : updateChannelFetch.error || props.deleteChannelFetch?.error ? (
           <p>Something went wrong, try again later</p>
         ) : null}

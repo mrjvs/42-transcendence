@@ -57,8 +57,7 @@ export function useMessages(channel: string) {
         setLoading(false);
         setDone(true);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
         setLoading(false);
         setError(true);
         setDone(true);
