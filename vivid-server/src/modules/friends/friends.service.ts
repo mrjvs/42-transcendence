@@ -99,8 +99,6 @@ export class FriendsService {
   }
 
   // find all friends of the user
-  // TODO also filters when accepted = false
-  // TODO Are we using this function?
   async getFriendList(userId: string): Promise<UserEntity[]> {
     return await getConnection()
       .createQueryBuilder()
