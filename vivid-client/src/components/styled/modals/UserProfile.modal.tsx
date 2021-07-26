@@ -7,6 +7,8 @@ import { UserContext } from '../../../hooks/useUser';
 import { Avatar } from '../Avatar';
 import { UsersContext } from '../../../hooks/useUsers';
 import { MatchList } from '../MatchList';
+import { SocketContext } from '../../../hooks/useWebsocket';
+import { Icon } from '../Icon';
 
 function ModalContent(props: {
   userData: any;
@@ -47,6 +49,7 @@ function ModalContent(props: {
             <Button less_padding type="primary">
               Accept friend
             </Button>
+            <FriendAction userData={userData} friendId={props.user.id} />
           </div>
         )}
       </div>
@@ -178,11 +181,136 @@ function BlockAction(props: { userData: any; userId: string }) {
   );
 }
 
-// avatar
-// name
-// online/offline
-// channel role
-// send friend request
-// block
-// dm
-// ladder placement
+export function FriendAction(props: { userData: any; friendId: string }) {
+  const { client } = React.useContext(SocketContext);
+
+  const friendUser = useFetch({
+    url: `/api/v1/friends/add/${props.friendId}`,
+    method: 'POST',
+  });
+
+  const unFriend = useFetch({
+    url: `/api/v1/friends/unfriend/${props.friendId}`,
+    method: 'DELETE',
+  });
+
+  const acceptFriend = useFetch({
+    url: `/api/v1/friends/accept/${props.friendId}`,
+    method: 'PATCH',
+  });
+
+  React.useEffect(() => {
+    if (friendUser.done) {
+      const friendship = friendUser.data.data;
+      friendUser.reset();
+
+      const friend =
+        friendship.user_1 === props.friendId
+          ? friendship.user_1
+          : friendship.user_2;
+
+      props.userData?.updateUser({
+        friends: [
+          ...props.userData.user.friends,
+          {
+            id: friendship.id,
+            userId: props.userData.user.id,
+            user_1: friendship.user_1,
+            user_2: friendship.user_2,
+            friend,
+            requested_by: friendship.requested_by,
+            requested_to: friendship.requested_to,
+            accepted: friendship.accepted,
+          },
+        ],
+      });
+      client.emit('friendship_update');
+    }
+
+    if (unFriend.done) {
+      const friendship = unFriend.data.data;
+      unFriend.reset();
+      props.userData?.updateUser({
+        friends: props.userData.user.friends.filter(
+          (v: any) => v.id !== friendship.id,
+        ),
+      });
+      client.emit('friendship_update');
+    }
+    if (acceptFriend.done) {
+      const friendship = acceptFriend.data.data;
+      acceptFriend.reset();
+      props.userData?.updateUser({
+        friends: props.userData.user.friends.filter((v: any) => {
+          if (v.id === friendship.id) v.accepted = true;
+          return v;
+        }),
+      });
+      client.emit('friendship_update');
+    }
+  }, [friendUser.done, unFriend.done, props.userData, acceptFriend.done]);
+
+  if (props.userData?.user?.id === props.friendId) {
+    return null;
+  }
+
+  const friendship = props.userData?.user?.friends?.find(
+    (v: any) => v.friend?.id === props.friendId,
+  );
+
+  let method: any;
+  let buttonText;
+  let buttonType;
+  let twoButtons = false;
+
+  if (!friendship) {
+    method = friendUser;
+    buttonText = 'Send Friend Request';
+    buttonType = 'secondary';
+  } else {
+    if (friendship.accepted) {
+      method = unFriend;
+      buttonText = 'Unfriend User';
+      buttonType = 'danger';
+    } else {
+      if (friendship.requested_by === props.friendId) {
+        method = acceptFriend;
+        buttonText = <Icon type="accept" />;
+        buttonType = 'accept';
+        twoButtons = true;
+      } else {
+        method = unFriend;
+        buttonText = 'Cancel Friend Request';
+        buttonType = 'danger';
+      }
+    }
+  }
+
+  return (
+    <>
+      <Button
+        loading={method.loading}
+        type={
+          buttonType === 'danger'
+            ? 'danger'
+            : buttonType === 'secondary'
+            ? 'secondary'
+            : 'accept'
+        }
+        onclick={() => method.run()}
+        margin_right={true}
+      >
+        {buttonText}
+      </Button>
+      {twoButtons ? (
+        <Button
+          loading={unFriend.loading}
+          type={'decline'}
+          onclick={() => unFriend.run()}
+        >
+          <Icon type="decline" />
+        </Button>
+      ) : null}
+    </>
+  );
+}

@@ -15,7 +15,6 @@ import { UserEntity } from '@/user.entity';
 import { UserService } from '$/users/user.service';
 import { FriendsService } from './friends.service';
 import { FriendsEntity } from '@/friends.entity';
-import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('friends')
 @UseGuards(AuthenticatedGuard)
@@ -30,7 +29,7 @@ export class FriendsController {
   async friendRequest(
     @Param('friend_id') friendId: string,
     @User() user: UserEntity,
-  ): Promise<UpdateResult> {
+  ): Promise<FriendsEntity> {
     // checking if friend is in general user table
     const friend = await this.userService.findUser(friendId);
     if (!friend) throw new NotFoundException();
@@ -49,30 +48,30 @@ export class FriendsController {
   // Find all pending friend requests
   @Get('requests')
   findRequests(@User() user: UserEntity): Promise<FriendsEntity[]> {
-    return this.friendsService.findAllFriendRequests(user.id);
+    return this.friendsService.findFriendRequests(user.id);
   }
 
   // Accept pending friend request
-  @Patch('accept/:friendrequest_id')
+  @Patch('accept/:friend_id')
   async acceptRequest(
-    @Param('friendrequest_id') friendRequestId: string,
+    @Param('friend_id') friendId: string,
     @User() user: UserEntity,
-  ): Promise<UpdateResult> {
-    return this.friendsService.acceptFriendRequest(user.id, friendRequestId);
+  ): Promise<FriendsEntity> {
+    return this.friendsService.acceptFriendRequest(user.id, friendId);
   }
 
   // Unfriend existing friend
-  @Delete('unfriend/:friendrequest_id')
+  @Delete('unfriend/:friend_id')
   async unfriend(
-    @Param('friendrequest_id') friendRequestId: string,
+    @Param('friend_id') friendId: string,
     @User() user: UserEntity,
-  ): Promise<DeleteResult> {
-    return this.friendsService.deleteFriendship(user.id, friendRequestId);
+  ): Promise<FriendsEntity> {
+    return this.friendsService.deleteFriendship(user.id, friendId);
   }
 
   // Get full friendlist
   @Get('friendlist')
   async getFriendlist(@User() user: UserEntity): Promise<UserEntity[]> {
-    return this.friendsService.getFriendList(user.id);
+    return await this.friendsService.getFriendList(user.id);
   }
 }

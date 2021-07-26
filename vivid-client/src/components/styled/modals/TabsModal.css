@@ -1,3 +1,8 @@
+.tabs-wrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .button-new {
   line-height: initial;
   position: relative;
@@ -13,6 +18,7 @@
   cursor: pointer;
 }
 
+/* 
 .button-new > .loader {
   height: 1.5rem;
   width: 1.5rem;
@@ -51,17 +57,6 @@
   background: linear-gradient(to right, #243a94, #8c40cf);
 }
 
-.button-new.button-secondary {
-  background: #30354d;
-  padding: 0.7rem 3.5rem;
-  color: #c7cddf;
-}
-
-.button-new.button-secondary:hover {
-  background: #424866;
-  color: white;
-}
-
 .button-new.button-duel {
   background: #252a40;
   color: #8892b2;
@@ -69,17 +64,6 @@
   margin-right: 0.5rem;
   width: 4rem;
   font-size: 1.4rem;
-}
-
-.button-new.button-small-box {
-  font-size: 1rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  background: #131524;
-}
-
-.button-new.button-small-box > *:first-child {
-  margin-right: 0;
 }
 
 .button-new.button-duel:hover {
@@ -92,23 +76,6 @@
   color: white;
 }
 
-.button-new.button-decline {
-  height: 1.3rem;
-  width: 1.3rem;
-  justify-content: center;
-  border-radius: 50%;
-  background: #9c3446;
-  color: white;
-}
-
-.button-new.button-accept {
-  height: 1.3rem;
-  width: 1.3rem;
-  border-radius: 50%;
-  background: #90ee90;
-  color: white;
-}
-
 .button-new.button-danger:hover {
   background: #e45655;
   color: white;
@@ -116,10 +83,6 @@
 
 .button-new.button-less-padding {
   padding: 0.5rem 1rem;
-}
-
-.button-new.button-more-padding {
-  padding: 0.5rem 1.5rem;
 }
 
 .button-new.button-margin-right {
@@ -171,4 +134,4 @@
 
 .button-new.small > *:first-child {
   margin-right: 0.2rem;
-}
+} */

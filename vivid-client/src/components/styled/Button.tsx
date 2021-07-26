@@ -18,6 +18,8 @@ export function Button(props: {
     | 'danger'
     | 'small-box'
     | 'secondary-small';
+    | 'accept'
+    | 'decline'
 }) {
   const type = props.type || 'primary';
   const button_props = {

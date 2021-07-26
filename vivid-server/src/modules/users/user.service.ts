@@ -62,6 +62,10 @@ export class UserService {
       'joined_channels',
       'joined_channels.channel',
       'blocks',
+      'friends',
+      'friends_inverse',
+      'friends.user_2',
+      'friends_inverse.user_1',
     ],
   ): Promise<UserEntity> {
     return await this.userRepository
@@ -75,6 +79,13 @@ export class UserService {
         if (error.code === '22P02') throw new NotFoundException();
         throw error;
       });
+  }
+
+  async findUsers(username: string): Promise<UserEntity[]> {
+    return await this.userRepository
+      .createQueryBuilder()
+      .where('name like :n', { n: `%${username}%` })
+      .getMany();
   }
 
   // delete user, invalidates sessions and disconnects from websocket

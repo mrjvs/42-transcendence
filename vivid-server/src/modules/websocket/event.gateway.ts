@@ -265,4 +265,11 @@ export class EventGateway implements OnGatewayConnection {
     if (!client || !client.auth) return;
     this.matchmakingService.leavePool(client);
   }
+
+  /* FRIENDSHIPS */
+  @SubscribeMessage('friendship_update')
+  updateFriendships(@ConnectedSocket() client: Socket) {
+    if (!client.auth) return;
+    client.emit('friendship_update');
+  }
 }
