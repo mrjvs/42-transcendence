@@ -14,6 +14,7 @@ import {
 } from '~/middleware/decorators/login.decorator';
 import { AccountNotSetupGuard } from '~/middleware/guards/auth.guards';
 import { FullDetailsUser, UserEntity, UsernameChangeDto } from '@/user.entity';
+
 import { formatObject } from '~/utils/format';
 import { UserService } from './user.service';
 

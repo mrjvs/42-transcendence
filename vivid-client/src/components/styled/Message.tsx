@@ -111,7 +111,7 @@ export function Message(props: {
   channelData: any;
   currentChannelUser: any;
 }) {
-  const { run } = useFetch({
+  const deleteMessage = useFetch({
     runOnLoad: false,
     url: '',
     method: 'DELETE',
@@ -130,7 +130,10 @@ export function Message(props: {
         <Button
           type="small-box"
           onclick={() => {
-            run(null, `/api/v1/channels/${props.channelId}/messages/${msgId}`);
+            deleteMessage.run(
+              null,
+              `/api/v1/channels/${props.channelId}/messages/${msgId}`,
+            );
           }}
         >
           <Icon className="red-icon" type="trashcan" />

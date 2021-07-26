@@ -16,9 +16,9 @@ export function SidebarLink(props: {
         {props.icon ? <Icon type={props.icon} /> : null}
       </div>
       <div>
-        <p className={`sidebar-name ${props.description ? 'bold' : ''}`}>
+        <div className={`sidebar-name ${props.description ? 'bold' : ''}`}>
           {props.children}
-        </p>
+        </div>
         {props.description ? (
           <span className="sidebar-description">{props.description}</span>
         ) : null}

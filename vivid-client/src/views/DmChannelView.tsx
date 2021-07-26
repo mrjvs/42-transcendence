@@ -1,11 +1,12 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useMessages } from '../hooks/useMessages';
 import { MainLayout } from './layouts/MainLayout';
 import './ChannelView.css';
 import { useFetch } from '../hooks/useFetch';
 import { LoadingView } from './LoadingView';
 import { MessageView } from './channel/MessageView';
+import { UserContext } from '../hooks/useUser';
 
 function ChannelViewLoading(props: { loading: boolean }) {
   if (props.loading)
@@ -26,8 +27,16 @@ export function DmChannelView() {
   });
   const channelId = dmChannelFetch.done ? dmChannelFetch.data.data.id : null;
   const messageData = useMessages(channelId);
+  const userData = React.useContext(UserContext);
+  const history = useHistory();
 
   const friendUser = messageData.getUser(id);
+
+  // if no longer friend, redirect to home
+  React.useEffect(() => {
+    const found = userData.user.friends.find((v: any) => v.friend.id === id);
+    if (!found) history.push('/');
+  }, [userData.user.friends]);
 
   if (
     messageData.messageState.error ||
@@ -40,8 +49,6 @@ export function DmChannelView() {
         loading={!messageData.messageState.error && !dmChannelFetch.error}
       />
     );
-
-  // TODO if no longer friend, redirect to home
 
   if (!messageData?.currentChannelUser?.user?.is_joined)
     return <ChannelViewLoading loading={false} />;

@@ -13,6 +13,8 @@ import { AccountSetupModal } from '../components/styled/modals/AccountSetup.moda
 import { PongView } from '../views/PongView';
 import { SettingsView } from '../views/SettingsView';
 import { GameView } from '../views/GameView';
+import { Friends } from '../components/styled/sidebar/Friends';
+import { FriendsModal } from '../components/styled/modals/Friends.modal';
 import { ChannelSettingsView } from '../views/ChannelSettingsView';
 import { ChannelsContext } from '../hooks/useChannels';
 import { LoadingView } from '../views/LoadingView';
@@ -24,6 +26,7 @@ import { StatisticsView } from '../views/StatisticsView';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
+  const [friendsOpen, setFriendsOpen] = React.useState(false);
   const channelsData = React.useContext(ChannelsContext);
 
   const joinedChannels = channelsData.channels
@@ -35,8 +38,17 @@ function SideBarRouter() {
     .filter((v: any) => !v?.data?.dmId)
     .map((v: any) => v?.data);
 
+  const friendRequestLen = userData.user.friends?.filter(
+    (v: any) => !v.accepted && v.requested_by !== userData.user.id,
+  ).length;
+
   return (
     <div className="wrapper">
+      <FriendsModal
+        open={friendsOpen}
+        userData={userData}
+        close={() => setFriendsOpen(false)}
+      />
       <nav className="sideNav">
         <div className="top">
           <Heading size="small">Vivid</Heading>
@@ -52,12 +64,7 @@ function SideBarRouter() {
           Statistics
         </SidebarLink>
         <ActionRow label="channel">
-          <Button
-            badge={1}
-            small={true}
-            type="secondary"
-            onclick={() => alert('hi')}
-          >
+          <Button small={true} type="secondary" onclick={() => alert('hi')}>
             <Icon type="plus" />
             New
           </Button>
@@ -85,6 +92,18 @@ function SideBarRouter() {
             {v.title}
           </SidebarLink>
         ))}
+        <ActionRow label="friends">
+          <Button
+            badge={friendRequestLen > 0 ? friendRequestLen : undefined}
+            small={true}
+            type="secondary"
+            onclick={() => setFriendsOpen(true)}
+          >
+            <Icon type="plus" />
+            Friends
+          </Button>
+        </ActionRow>
+        <Friends userData={userData} openModal={() => setFriendsOpen(true)} />
       </nav>
       <div className="content">
         <Switch>

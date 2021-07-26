@@ -17,7 +17,9 @@ export function Button(props: {
     | 'duel'
     | 'danger'
     | 'small-box'
-    | 'secondary-small';
+    | 'secondary-small'
+    | 'accept'
+    | 'decline';
 }) {
   const type = props.type || 'primary';
   const button_props = {
@@ -41,7 +43,9 @@ export function Button(props: {
   return (
     <button {...button_props}>
       {props.loading ? <div className="loader"></div> : null}
-      {props.children}
+      {props.loading && ['accept', 'decline'].includes(props.type || '')
+        ? null
+        : props.children}
       {props.badge !== undefined ? (
         <span className="badge">{props.badge}</span>
       ) : null}
