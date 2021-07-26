@@ -24,6 +24,7 @@ export function Avatar(props: {
   color?: string;
 }) {
   let background;
+  if (!props.user) return null;
   if (!props.user.avatar)
     background = `linear-gradient(to right, ${props.user?.avatar_colors?.[0]}, ${props.user?.avatar_colors?.[1]})`;
   else

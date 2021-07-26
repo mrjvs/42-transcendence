@@ -1,11 +1,13 @@
 import React from 'react';
 import { ChannelsContext } from './useChannels';
+import { UsersContext } from './useUsers';
 
 export const UserContext = React.createContext<any>(null);
 
 export function useUser() {
   const [user, setUserReal] = React.useState({});
   const { addChannel } = React.useContext(ChannelsContext);
+  const { addUser: setUserInContext } = React.useContext(UsersContext);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [done, setDone] = React.useState(false);
@@ -23,6 +25,10 @@ export function useUser() {
       join.channel = channel.id;
       channel.joined_users = [join];
       addChannel(channel);
+    });
+    obj?.friends?.forEach((f: any) => {
+      const friend = f.friend;
+      if (friend) setUserInContext(friend);
     });
     if (!merge) setUserReal(obj);
     else
@@ -63,9 +69,7 @@ export function useUser() {
               setLoading(false);
               setDone(true);
             })
-            .catch((err) => {
-              console.log(err);
-
+            .catch(() => {
               setLoading(false);
               setError(true);
             });
@@ -74,8 +78,7 @@ export function useUser() {
           setDone(true);
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
         setLoading(false);
         setError(true);
       });

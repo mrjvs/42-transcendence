@@ -36,6 +36,7 @@
   padding: 0;
   color: white;
   padding-bottom: 0.8rem;
+  word-wrap: anywhere;
 }
 
 .messageWrapper .messageContent .partyparrot {
