@@ -24,6 +24,7 @@ import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
 import { ChannelRoleAuth } from '~/middleware/decorators/channel.decorator';
 import { ChannelRoles } from '~/middleware/guards/channel.guards';
+import { IJoinedChannel } from '~/models/joined_channels.entity';
 
 @Controller('channels')
 @UseGuards(AuthenticatedGuard)
@@ -56,7 +57,7 @@ export class ChannelController {
   createChannel(
     @Body() requestBody: ChannelDto,
     @User() user: UserEntity,
-  ): Promise<IChannel> {
+  ): Promise<{ join: IJoinedChannel; channel: IChannel }> {
     return this.channelService.add(requestBody, user.id);
   }
 
