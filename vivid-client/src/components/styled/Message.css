@@ -27,28 +27,25 @@
 .messageWrapper {
   display: flex;
   margin-bottom: 1.5rem;
+  position: relative;
+  align-items: flex-start;
 }
 
 .messageWrapper p {
   margin: 0;
   padding: 0;
   color: white;
-  margin-bottom: 0.8rem;
+  padding-bottom: 0.8rem;
 }
 
-.messageWrapper p .tag {
-  background-color: #6b3aab;
-  color: white;
-  padding: 0.1rem 0.6rem;
-  border-radius: 4px;
-  margin-left: 0.5rem;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-  font-weight: 600;
+.messageWrapper .message-special {
+  color: #6c738b;
 }
 
-.messageWrapper p .tag.tag-owner {
-  background-color: #345fd5;
+.messageWrapper .message-special .messageUserNameSpecial {
+  color: #ffffff;
+  font-weight: bold;
+  padding-right: 0.5rem;
 }
 
 .messageWrapper .messageUsernameWrap {
@@ -57,10 +54,10 @@
 }
 
 .messageWrapper .messageUserName {
-  margin-top: 0.1rem;
-  margin-bottom: 0.5rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.5rem;
   color: #9da6c4;
-  margin-right: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 .messageWrapper.blocked .messageUserNamem,
@@ -72,6 +69,10 @@
   background: #272c43;
 }
 
+.messageInvite-wrapper-wrapper {
+  padding-bottom: 0.8rem;
+}
+
 .messageInvite-wrapper {
   background: #121727;
   max-width: 100%;
@@ -80,7 +81,6 @@
   overflow: hidden;
   border-radius: 5px;
   display: flex;
-  margin-bottom: 0.8rem;
 }
 
 .messageInvite-wrapper .userAvatar .status-bubble {
@@ -152,4 +152,62 @@
   width: 7rem;
   right: -2.5rem;
   top: 4rem;
+}
+
+.messageMessageContainer {
+  width: 100%;
+}
+
+.messageMessage {
+  position: relative;
+}
+
+.message-delete-button {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  margin-top: -1rem;
+}
+
+.message-delete-button .red-icon {
+  color: #d46074;
+}
+
+.messageWrapper .messageMessage:hover .bg-layers,
+.messageWrapper
+  .messageUserName:hover
+  + .messageMessageContainer
+  .messageMessage:first-child
+  .bg-layers,
+.messageWrapper .messageMessage:hover .bg-layers {
+  opacity: 1;
+}
+
+.messageWrapper .messageMessage:first-child .bg-layers {
+  margin-top: -1.8rem;
+}
+
+.messageWrapper .bg-layers {
+  position: absolute;
+  opacity: 0;
+  left: -5.5rem;
+  right: -1.5rem;
+  top: 0;
+  bottom: 0;
+  margin: -0.1rem 0 0.2rem 0;
+}
+
+.messageWrapper .bg-underlay {
+  background-color: #181b2c;
+  z-index: -6;
+}
+
+.messageMessage .bg-overlay {
+  pointer-events: none;
+}
+
+.messageMessage .bg-overlay > * {
+  pointer-events: all;
 }

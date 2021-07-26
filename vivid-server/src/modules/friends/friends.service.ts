@@ -76,6 +76,29 @@ export class FriendsService {
     return await this.findFriendship(user_1, user_2);
   }
 
+  async getFriend(user1: string, user2: string): Promise<FriendsEntity> {
+    const tmp = user1;
+    if (user1 > user2) {
+      user1 = user2;
+      user2 = tmp;
+    }
+
+    return await this.friendsRepository.findOne({
+      user_1: user1,
+      user_2: user2,
+    });
+  }
+
+  // Find user's pending friend requests (FriendsEntity's that aren't accepted)
+  async findAllFriendRequests(userId: string): Promise<FriendsEntity[]> {
+    return await this.friendsRepository
+      .createQueryBuilder()
+      .select()
+      .where('requested_to = :r', { r: userId })
+      .andWhere('accepted = :a', { a: false })
+      .execute();
+  }
+
   // find all friends of the user
   // TODO also filters when accepted = false
   // TODO Are we using this function?

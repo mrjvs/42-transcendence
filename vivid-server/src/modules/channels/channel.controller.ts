@@ -12,8 +12,14 @@ import {
   Body,
   Put,
 } from '@nestjs/common';
-import { ChannelService, ChannelTypes } from './channel.service';
-import { ChannelDto, IChannel } from '@/channel.entity';
+import { ChannelService } from './channel.service';
+import {
+  ChannelDto,
+  ChannelEntity,
+  ChannelOwnerDto,
+  ChannelVisibility,
+  IChannel,
+} from '@/channel.entity';
 import { AuthenticatedGuard } from '~/middleware/guards/auth.guards';
 import { User } from '~/middleware/decorators/login.decorator';
 import { UserEntity } from '@/user.entity';
@@ -45,8 +51,12 @@ export class ChannelController {
   }
 
   @Get('/:id')
-  getChannel(@Param('id') channelId: string): Promise<IChannel> {
-    return this.channelService.findChannel(channelId);
+  @ChannelRoleAuth({
+    channelParam: 'id',
+    role: ChannelRoles.USER,
+  })
+  getChannel(@Param('id') channelId: string): Promise<ChannelEntity> {
+    return this.channelService.findChannel(channelId, true, null);
   }
 
   @Get('/')
@@ -59,7 +69,7 @@ export class ChannelController {
       throw new BadRequestException('invalidType');
     if (['private', 'all'].includes(type) && !user.isSiteAdmin())
       throw new ForbiddenException();
-    return this.channelService.findAllOfType(<ChannelTypes>type);
+    return this.channelService.findAllOfType(<ChannelVisibility>type);
   }
 
   @Post('/')
@@ -90,5 +100,18 @@ export class ChannelController {
   })
   removeChannel(@Param('id') id: string): Promise<{ id: string }> {
     return this.channelService.remove(id);
+  }
+
+  @Patch('/:id/owner')
+  @ChannelRoleAuth({
+    channelParam: 'id',
+    role: ChannelRoles.OWNER,
+    canAdmin: true,
+  })
+  changeOwner(
+    @Param('id') id: string,
+    @Body() body: ChannelOwnerDto,
+  ): Promise<ChannelEntity> {
+    return this.channelService.makeOwner(id, body.owner);
   }
 }
