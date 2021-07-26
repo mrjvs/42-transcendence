@@ -38,7 +38,10 @@ export class ChannelService {
     private readonly channelMessageService: ChannelMessageService,
   ) {}
 
-  async add(channelInput: ChannelDto, userId: string): Promise<IChannel> {
+  async add(
+    channelInput: ChannelDto,
+    userId: string,
+  ): Promise<{ join: IJoinedChannel; channel: IChannel }> {
     const input: IChannelInput = {
       has_password: channelInput.hasPassword,
       is_public: channelInput.isPublic,
@@ -54,11 +57,19 @@ export class ChannelService {
       );
     }
     const saveResult = await this.ChannelRepository.save(input);
-    await this.JoinedChannelRepository.save({
+    const result = await this.JoinedChannelRepository.save({
       channel: saveResult.id,
       user: saveResult.owner,
     });
-    return saveResult;
+    return {
+      join: await this.JoinedChannelRepository.findOneOrFail({
+        where: {
+          id: result.id,
+        },
+        relations: ['channel'],
+      }),
+      channel: saveResult,
+    };
   }
 
   async addDmChannel(user1: string, user2: string): Promise<ChannelEntity> {
@@ -161,10 +172,15 @@ export class ChannelService {
     if (type !== null) query.type = type;
     const relations = ['joined_users'];
     if (resolveUsers) relations.push('joined_users.user');
-    return await this.ChannelRepository.findOne({
-      relations,
-      where: query,
-    });
+    try {
+      return await this.ChannelRepository.findOne({
+        relations,
+        where: query,
+      });
+    } catch (err) {
+      if (err.code == '22P02') return null;
+      throw err;
+    }
   }
 
   async findDmChannel(user1: string, user2: string): Promise<ChannelEntity> {
@@ -231,7 +247,12 @@ export class ChannelService {
         channel.joined_users,
         alreadyJoined,
       );
-      return alreadyJoined;
+      return await this.JoinedChannelRepository.findOneOrFail({
+        where: {
+          id: alreadyJoined.id,
+        },
+        relations: ['channel'],
+      });
     }
 
     // create new join
@@ -248,7 +269,12 @@ export class ChannelService {
       channel.joined_users,
       newUser,
     );
-    return newUser;
+    return await this.JoinedChannelRepository.findOneOrFail({
+      where: {
+        id: newUser.id,
+      },
+      relations: ['channel'],
+    });
   }
 
   async makeUserMod(
