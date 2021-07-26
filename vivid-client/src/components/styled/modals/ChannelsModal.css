@@ -1,0 +1,46 @@
+.channel-list .channel-list-item {
+  background-color: #252a40;
+  color: white;
+  border-radius: 5px;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  padding: 1rem;
+  border: 3px solid #252a40;
+  border-color: #252a40;
+  user-select: none;
+  transition: border-color 80ms ease-in-out, background-color 80ms ease-in-out;
+}
+
+.channel-list .channel-list-item:hover {
+  background-color: #313753;
+  border-color: #313753;
+}
+
+.channel-list .channel-list-item:active {
+  border-color: #6790e6;
+}
+
+.channel-list .channel-list-item .channel-title {
+  margin: 0;
+}
+
+.channel-text {
+  color: #9da6c4;
+  margin: 0.5rem 0;
+}
+
+.channel-error {
+  margin: 0.5rem 0;
+  color: #d46074;
+}
+
+.channel-form {
+  display: block;
+  margin: 2rem auto;
+  width: 25rem;
+  max-width: 100%;
+}
+
+.channel-form .channel-input {
+  margin-bottom: 1rem;
+}

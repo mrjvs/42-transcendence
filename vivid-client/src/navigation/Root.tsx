@@ -23,10 +23,12 @@ import { GameMatchView } from '../views/GameMatch';
 import { LadderMatchView } from '../views/LadderMatch';
 import { MatchHistoryView } from '../views/MatchHistoryView';
 import { StatisticsView } from '../views/StatisticsView';
+import { ChannelsModal } from '../components/styled/modals/Channels.modal';
 
 function SideBarRouter() {
   const userData = React.useContext(UserContext);
   const [friendsOpen, setFriendsOpen] = React.useState(false);
+  const [channelsOpen, setChannelsOpen] = React.useState(false);
   const channelsData = React.useContext(ChannelsContext);
 
   const joinedChannels = channelsData.channels
@@ -49,6 +51,7 @@ function SideBarRouter() {
         userData={userData}
         close={() => setFriendsOpen(false)}
       />
+      <ChannelsModal open={channelsOpen} close={() => setChannelsOpen(false)} />
       <nav className="sideNav">
         <div className="top">
           <Heading size="small">Vivid</Heading>
@@ -64,7 +67,11 @@ function SideBarRouter() {
           Statistics
         </SidebarLink>
         <ActionRow label="channel">
-          <Button small={true} type="secondary" onclick={() => alert('hi')}>
+          <Button
+            small={true}
+            type="secondary"
+            onclick={() => setChannelsOpen(true)}
+          >
             <Icon type="plus" />
             New
           </Button>
