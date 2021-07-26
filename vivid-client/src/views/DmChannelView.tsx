@@ -30,6 +30,11 @@ export function DmChannelView() {
   const userData = React.useContext(UserContext);
   const history = useHistory();
 
+  React.useEffect(() => {
+    dmChannelFetch.reset();
+    dmChannelFetch.run();
+  }, [id]);
+
   const friendUser = messageData.getUser(id);
 
   // if no longer friend, redirect to home

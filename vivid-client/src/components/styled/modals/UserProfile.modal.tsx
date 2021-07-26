@@ -8,6 +8,52 @@ import { Avatar } from '../Avatar';
 import { UsersContext } from '../../../hooks/useUsers';
 import { MatchList } from '../MatchList';
 import { Icon } from '../Icon';
+import { TabsModal } from '../Tabs';
+
+function UserProfile(props: {
+  userData: any;
+  profileData: any;
+  isBlocked: boolean;
+}) {
+  return (
+    <div className="user-profile-grid">
+      <BlockAction
+        userData={props.userData}
+        userId={props.profileData?.user?.id}
+      />
+      {props.isBlocked ? (
+        <div className="user-profile-section padded">
+          <h2 className="user-profile-section-heading center">
+            you&apos;ve blocked this user
+          </h2>
+        </div>
+      ) : (
+        <div className="user-profile-section padded">
+          <FriendAction
+            userData={props.userData}
+            friendId={props.profileData?.user?.id}
+          />
+          {props.userData?.user?.id === props.profileData?.user?.id ? (
+            <p style={{ color: '#9DA6C4', textAlign: 'center' }}>
+              Can&apos;t friend yourself :P
+            </p>
+          ) : null}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MatchHistory(props: { profileData: any }) {
+  return (
+    <div className="user-profile-matches">
+      <MatchList
+        currentUser={props.profileData?.user?.id}
+        matchList={props.profileData?.matches}
+      />
+    </div>
+  );
+}
 
 function ModalContent(props: {
   userData: any;
@@ -21,44 +67,23 @@ function ModalContent(props: {
 
   return (
     <div>
-      <p>
-        <span onClick={() => props.setTab('profile')}>profile</span>{' '}
-        <span onClick={() => props.setTab('matchhistory')}>history</span>
-      </p>
-      <div
-        className={`user-profile-grid ${
-          props.tab !== 'profile' ? 'hidden' : ''
-        }`}
-      >
-        <BlockAction
+      <TabsModal
+        set={props.setTab}
+        value={props.tab}
+        tabs={[
+          { name: 'User profile', value: 'profile' },
+          { name: 'Match history', value: 'history' },
+        ]}
+      />
+      {props.tab === 'profile' ? (
+        <UserProfile
+          profileData={props.profileData}
           userData={props.userData}
-          userId={props.profileData.user.id}
+          isBlocked={isBlocked}
         />
-        {isBlocked ? (
-          <div className="user-profile-section padded">
-            <h2 className="user-profile-section-heading center">
-              you&apos;ve blocked this user
-            </h2>
-          </div>
-        ) : (
-          <div className="user-profile-section padded">
-            <FriendAction
-              userData={props.userData}
-              friendId={props.profileData.user.id}
-            />
-          </div>
-        )}
-      </div>
-      <div
-        className={`user-profile-matches ${
-          props.tab !== 'matchhistory' ? 'hidden' : ''
-        }`}
-      >
-        <MatchList
-          currentUser={props.profileData.user.id}
-          matchList={props.profileData.matches}
-        />
-      </div>
+      ) : props.tab === 'history' ? (
+        <MatchHistory profileData={props.profileData} />
+      ) : null}
     </div>
   );
 }

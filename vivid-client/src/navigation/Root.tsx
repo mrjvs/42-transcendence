@@ -79,14 +79,14 @@ function SideBarRouter() {
         {joinedChannels.length === 0 ? (
           <>
             <SidebarLink
-              click={() => alert('join')}
+              click={() => setChannelsOpen(true)}
               icon="users"
               description="Make your life awesome by making a team"
             >
               Join a channel
             </SidebarLink>
             <SidebarLink
-              click={() => alert('create')}
+              click={() => setChannelsOpen(true)}
               icon="user_friends"
               description="Be the leader of the pack!"
             >
