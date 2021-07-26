@@ -4,79 +4,79 @@ import PropTypes from 'prop-types';
 import throttle from 'lodash.throttle';
 import shallowequal from 'shallowequal';
 
-export default class TrackVisibility extends PureComponent {
-  static propTypes = {
-    /**
-     * Define if the visibility need to be tracked once
-     */
-    once: PropTypes.bool,
+const propTypes = {
+  /**
+   * Define if the visibility need to be tracked once
+   */
+  once: PropTypes.bool,
 
-    /**
-     * Tweak the throttle interval
-     * Check https://css-tricks.com/debouncing-throttling-explained-examples/ for more details
-     */
-    throttleInterval(props, propName, component) {
-      const currentProp = props[propName];
-      if (!Number.isInteger(currentProp) || currentProp < 0) {
-        return new Error(
-          `The ${propName} prop you provided to ${component} is not a valid integer >= 0.`,
-        );
-      }
-      return null;
-    },
+  /**
+   * Tweak the throttle interval
+   * Check https://css-tricks.com/debouncing-throttling-explained-examples/ for more details
+   */
+  throttleInterval(props, propName, component) {
+    const currentProp = props[propName];
+    if (!Number.isInteger(currentProp) || currentProp < 0) {
+      return new Error(
+        `The ${propName} prop you provided to ${component} is not a valid integer >= 0.`,
+      );
+    }
+    return null;
+  },
 
-    /**
-     * Pass one or more children to track
-     */
-    children: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element),
-    ]),
+  /**
+   * Pass one or more children to track
+   */
+  children: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.element,
+    PropTypes.arrayOf(PropTypes.element),
+  ]),
 
-    /**
-     * Additional style to apply
-     */
-    style: PropTypes.object,
+  /**
+   * Additional style to apply
+   */
+  style: PropTypes.object,
 
-    /**
-     * Additional className to apply
-     */
-    className: PropTypes.string,
+  /**
+   * Additional className to apply
+   */
+  className: PropTypes.string,
 
-    /**
-     * Define an offset. Can be useful for lazy loading
-     */
-    offset: PropTypes.number,
+  /**
+   * Define an offset. Can be useful for lazy loading
+   */
+  offset: PropTypes.number,
 
-    /**
-     * Update the visibility state as soon as a part of the tracked component is visible
-     */
-    partialVisibility: PropTypes.bool,
+  /**
+   * Update the visibility state as soon as a part of the tracked component is visible
+   */
+  partialVisibility: PropTypes.bool,
 
-    /**
-     * Exposed for testing but allows node other than internal wrapping <div /> to be tracked
-     * for visibility
-     */
-    nodeRef: PropTypes.object,
+  /**
+   * Exposed for testing but allows node other than internal wrapping <div /> to be tracked
+   * for visibility
+   */
+  nodeRef: PropTypes.object,
 
-    /**
-     * Define a custom tag
-     */
-    tag: PropTypes.string,
-  };
+  /**
+   * Define a custom tag
+   */
+  tag: PropTypes.string,
+};
 
-  static defaultProps = {
-    once: false,
-    throttleInterval: 150,
-    offset: 0,
-    partialVisibility: false,
-    tag: 'div',
-  };
+const defaultProps = {
+  once: false,
+  throttleInterval: 150,
+  offset: 0,
+  partialVisibility: false,
+  tag: 'div',
+};
 
+class TrackVisibility extends PureComponent {
   constructor(props) {
     super(props);
-    this.ownProps = Object.keys(TrackVisibility.propTypes);
+    this.ownProps = Object.keys(propTypes);
     this.state = {
       isVisible: false,
     };
@@ -220,3 +220,8 @@ export default class TrackVisibility extends PureComponent {
     );
   }
 }
+
+TrackVisibility.propTypes = propTypes;
+TrackVisibility.defaultProps = defaultProps;
+
+export default TrackVisibility;
