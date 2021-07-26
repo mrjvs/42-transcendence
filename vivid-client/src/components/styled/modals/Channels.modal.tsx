@@ -109,7 +109,11 @@ function PublicChannelList() {
         <p className="channel-text">Joining channel...</p>
       ) : joinChannelFetch.error ? (
         joinChannelFetch.error?.res?.status == 403 ? (
-          <p className="channel-error">Incorrect password</p>
+          <p className="channel-error">
+            {joinChannelFetch.error?.data?.message === 'User is banned'
+              ? 'You are banned!'
+              : 'Incorrect password'}
+          </p>
         ) : (
           <p className="channel-error">
             Failed to join channel, try again later
@@ -202,7 +206,11 @@ function JoinPrivateChannel() {
         joinChannelFetch.error?.res?.status == 404 ? (
           <p className="channel-error">couldn&apos;t find that channel</p>
         ) : joinChannelFetch.error?.res?.status == 403 ? (
-          <p className="channel-error">Incorrect password</p>
+          <p className="channel-error">
+            {joinChannelFetch.error?.data?.message === 'User is banned'
+              ? 'You are banned!'
+              : 'Incorrect password'}
+          </p>
         ) : (
           <p className="channel-error">
             Failed to join channel, try again later
