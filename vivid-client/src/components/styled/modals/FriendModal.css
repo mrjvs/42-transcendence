@@ -1,0 +1,39 @@
+.friendlist-wrap .friendlist-profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.friendlist-wrap .friendlist-profile .friendlist-name {
+  flex: 1;
+  color: #9da6c4;
+}
+
+.friendlist-wrap .friendlist-profile .friendlist-avatar {
+  transform: scale(0.8);
+  margin: 0 -0.2rem 0 -0.4rem;
+}
+.friendlist-wrap .friendlist-empty {
+  color: #9da6c4;
+  text-align: center;
+}
+
+.send-friend-request-wrap .button-wrap {
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0 0 0;
+}
+
+.send-friend-request-wrap .text-success {
+  color: #5eb975;
+}
+
+.send-friend-request-wrap .text-error {
+  color: #d66175;
+}
+
+.send-friend-request-wrap .text-input {
+  margin-top: 1rem;
+}

@@ -45,6 +45,27 @@ export class FriendsController {
     );
   }
 
+  // Send friend request on username
+  @Post('add-username/:friend_name')
+  async friendRequestName(
+    @Param('friend_name') friendName: string,
+    @User() user: UserEntity,
+  ): Promise<FriendsEntity> {
+    // checking if friend is in general user table
+    const friend = await this.userService.findUserName(friendName);
+    if (!friend) throw new NotFoundException();
+
+    // checking if friend is the logged in user
+    if (user.id === friend.id) throw new BadRequestException();
+
+    return this.friendsService.sendFriendRequest(
+      user.id,
+      friend.id,
+      user.id,
+      friend.id,
+    );
+  }
+
   // Find all pending friend requests
   @Get('requests')
   findRequests(@User() user: UserEntity): Promise<FriendsEntity[]> {

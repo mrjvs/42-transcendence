@@ -5,17 +5,19 @@ import { Avatar } from '../../../components/styled/Avatar';
 
 export function Friends(props: { userData: any }) {
   return (
-    <>
+    <div>
       {props.userData.user.friends
         ?.filter((v: any) => v.accepted)
         .map((v: any) => (
           <div key={v.id}>
-            <SidebarLink link="">
-              <Avatar isClickable user={v.friend} small={true} />
-              <span>{v.friend.name}</span>
+            <SidebarLink link={`/dm/${v.friend.id}`}>
+              <div className="friend-list-sidebar">
+                <Avatar user={v.friend} small={true} />
+                <span>{v.friend.name}</span>
+              </div>
             </SidebarLink>
           </div>
         ))}
-    </>
+    </div>
   );
 }

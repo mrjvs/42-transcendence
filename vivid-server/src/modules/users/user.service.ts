@@ -81,11 +81,11 @@ export class UserService {
       });
   }
 
-  async findUsers(username: string): Promise<UserEntity[]> {
+  async findUserName(username: string): Promise<UserEntity> {
     return await this.userRepository
       .createQueryBuilder()
-      .where('name like :n', { n: `%${username}%` })
-      .getMany();
+      .where('name = :n', { n: username })
+      .getOne();
   }
 
   // delete user, invalidates sessions and disconnects from websocket

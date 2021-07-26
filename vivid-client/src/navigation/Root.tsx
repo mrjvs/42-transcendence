@@ -38,8 +38,17 @@ function SideBarRouter() {
     .filter((v: any) => !v?.data?.dmId)
     .map((v: any) => v?.data);
 
+  const friendRequestLen = userData.user.friends?.filter(
+    (v: any) => !v.accepted && v.requested_by !== userData.user.id,
+  ).length;
+
   return (
     <div className="wrapper">
+      <FriendsModal
+        open={friendsOpen}
+        userData={userData}
+        close={() => setFriendsOpen(false)}
+      />
       <nav className="sideNav">
         <div className="top">
           <Heading size="small">Vivid</Heading>
@@ -55,12 +64,7 @@ function SideBarRouter() {
           Statistics
         </SidebarLink>
         <ActionRow label="channel">
-          <Button
-            badge={1}
-            small={true}
-            type="secondary"
-            onclick={() => alert('hi')}
-          >
+          <Button small={true} type="secondary" onclick={() => alert('hi')}>
             <Icon type="plus" />
             New
           </Button>
@@ -90,18 +94,14 @@ function SideBarRouter() {
         ))}
         <ActionRow label="friends">
           <Button
+            badge={friendRequestLen > 0 ? friendRequestLen : undefined}
             small={true}
             type="secondary"
             onclick={() => setFriendsOpen(true)}
           >
+            <Icon type="plus" />
             Friends
           </Button>
-          <FriendsModal
-            open={friendsOpen}
-            userData={userData}
-            close={() => setFriendsOpen(false)}
-          />
-          <Icon type="plus" />
         </ActionRow>
         <Friends userData={userData} />
       </nav>

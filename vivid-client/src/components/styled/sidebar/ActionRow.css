@@ -11,3 +11,14 @@
   font-weight: bold;
   color: #4a567a;
 }
+
+.friend-list-sidebar {
+  display: flex;
+  align-items: center;
+  height: 1.5rem;
+}
+
+.friend-list-sidebar .userAvatar {
+  transform: scale(0.6);
+  margin: 0 0.2rem 0 -1rem;
+}

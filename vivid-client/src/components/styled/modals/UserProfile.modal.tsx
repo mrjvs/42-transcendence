@@ -10,6 +10,9 @@ import { MatchList } from '../MatchList';
 import { SocketContext } from '../../../hooks/useWebsocket';
 import { Icon } from '../Icon';
 
+// TODO friends modal check
+// TODO events for friend updates
+
 function ModalContent(props: {
   userData: any;
   profileData: any;
@@ -43,13 +46,10 @@ function ModalContent(props: {
           </div>
         ) : (
           <div className="user-profile-section padded">
-            <h2 className="user-profile-section-heading">
-              They sent you a friend request
-            </h2>
-            <Button less_padding type="primary">
-              Accept friend
-            </Button>
-            <FriendAction userData={userData} friendId={props.user.id} />
+            <FriendAction
+              userData={props.userData}
+              friendId={props.profileData.user.id}
+            />
           </div>
         )}
       </div>
@@ -181,7 +181,7 @@ function BlockAction(props: { userData: any; userId: string }) {
   );
 }
 
-export function FriendAction(props: { userData: any; friendId: string }) {
+export function FriendButton(props: { userData: any; friendId: string }) {
   const { client } = React.useContext(SocketContext);
 
   const friendUser = useFetch({
@@ -224,7 +224,6 @@ export function FriendAction(props: { userData: any; friendId: string }) {
           },
         ],
       });
-      client.emit('friendship_update');
     }
 
     if (unFriend.done) {
@@ -235,7 +234,6 @@ export function FriendAction(props: { userData: any; friendId: string }) {
           (v: any) => v.id !== friendship.id,
         ),
       });
-      client.emit('friendship_update');
     }
     if (acceptFriend.done) {
       const friendship = acceptFriend.data.data;
@@ -246,7 +244,6 @@ export function FriendAction(props: { userData: any; friendId: string }) {
           return v;
         }),
       });
-      client.emit('friendship_update');
     }
   }, [friendUser.done, unFriend.done, props.userData, acceptFriend.done]);
 
@@ -266,7 +263,7 @@ export function FriendAction(props: { userData: any; friendId: string }) {
   if (!friendship) {
     method = friendUser;
     buttonText = 'Send Friend Request';
-    buttonType = 'secondary';
+    buttonType = 'primary';
   } else {
     if (friendship.accepted) {
       method = unFriend;
@@ -281,36 +278,64 @@ export function FriendAction(props: { userData: any; friendId: string }) {
       } else {
         method = unFriend;
         buttonText = 'Cancel Friend Request';
-        buttonType = 'danger';
+        buttonType = 'secondary';
       }
     }
   }
 
   return (
-    <>
+    <div>
       <Button
+        less_padding
+        margin_right
+        type={buttonType as any}
         loading={method.loading}
-        type={
-          buttonType === 'danger'
-            ? 'danger'
-            : buttonType === 'secondary'
-            ? 'secondary'
-            : 'accept'
-        }
         onclick={() => method.run()}
-        margin_right={true}
       >
         {buttonText}
       </Button>
       {twoButtons ? (
         <Button
           loading={unFriend.loading}
-          type={'decline'}
+          type="decline"
           onclick={() => unFriend.run()}
         >
           <Icon type="decline" />
         </Button>
       ) : null}
-    </>
+    </div>
+  );
+}
+
+export function FriendAction(props: { userData: any; friendId: string }) {
+  if (props.userData?.user?.id === props.friendId) {
+    return null;
+  }
+
+  const friendship = props.userData?.user?.friends?.find(
+    (v: any) => v.friend?.id === props.friendId,
+  );
+
+  let text;
+
+  if (!friendship) {
+    text = 'Like the guy and want to be friends?';
+  } else {
+    if (friendship.accepted) {
+      text = 'Did they do something stupid?';
+    } else {
+      if (friendship.requested_by === props.friendId) {
+        text = 'They sent you a friend request';
+      } else {
+        text = "You've sent a friend request";
+      }
+    }
+  }
+
+  return (
+    <div>
+      <h2 className="user-profile-section-heading">{text}</h2>
+      <FriendButton {...props} />
+    </div>
   );
 }

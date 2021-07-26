@@ -29,12 +29,6 @@ import { UserService } from './user.service';
 export class UserSetupController {
   constructor(private userService: UserService) {}
 
-  @Get('/find/:username')
-  async findUsers(@Param('username') username: string): Promise<any> {
-    const userRet = await this.userService.findUsers(username);
-    return formatObject(UnrelatedUser, userRet);
-  }
-
   @Get(':id')
   async findUser(
     @UserParam('id') usr: IUserParam,

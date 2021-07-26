@@ -1,79 +1,93 @@
 import React from 'react';
-import '../sidebar/ActionRow.css';
-import { SidebarLink } from '../sidebar/SidebarLink';
 import { Avatar } from '../Avatar';
 import { ModalBase } from './ModalBase';
 import { Button } from '../Button';
 import { TextInput } from '../TextInput';
 import { useFetch } from '../../../hooks/useFetch';
-import { FriendAction } from './UserProfile.modal';
+import { FriendButton } from './UserProfile.modal';
 import { SocketContext } from '../../../hooks/useWebsocket';
-import { TabsModal } from './Tabs.modal';
-import { Icon } from '../Icon';
+import { TabsModal } from '../Tabs';
 
-import './UserProfileModal.css';
+import './FriendModal.css';
 
 export function FindUsers(props: { userData: any }) {
   const [userName, setUserName] = React.useState('');
-  const [foundUsers, setFoundUsers] = React.useState<any>(null);
 
   const findUser = useFetch({
-    url: `/api/v1/users/find/${userName}`,
-    method: 'GET',
+    url: '',
+    method: 'POST',
   });
 
-  React.useEffect(() => {
-    if (findUser.error) setFoundUsers(null);
-    if (findUser.done) setFoundUsers(findUser.data.data);
+  function run() {
     findUser.reset();
+    findUser.run(undefined, `/api/v1/friends/add-username/${userName}`);
+  }
+
+  React.useEffect(() => {
+    if (findUser.done) {
+      setUserName('');
+    }
   }, [findUser.done]);
 
   return (
     <div>
-      <div className="search-friend">
+      <div className="send-friend-request-wrap">
         <div className="text-input">
           <TextInput
             value={userName}
             set={setUserName}
             placeholder="John Doe"
-            label="User Name"
+            label="Friends username"
           />
         </div>
-        <div className="search-button">
-          <Button small={false} type="secondary" onclick={() => findUser.run()}>
-            <Icon type="search" />
+        <div className="button-wrap">
+          <Button
+            type="primary"
+            loading={findUser.loading}
+            onclick={() => run()}
+          >
+            Send request
           </Button>
+          {findUser.error ? (
+            findUser.error?.res?.status == 404 ? (
+              <p className="text-error">that user doesn&apos;t exist!</p>
+            ) : (
+              <p className="text-error">Failed to send friend request</p>
+            )
+          ) : null}
+          {findUser.done ? (
+            <p className="text-success">Successfully sent friend request</p>
+          ) : null}
         </div>
       </div>
-      {foundUsers
-        ? foundUsers.map((v: any) => (
-            <div className="user-profile" key={v.id}>
-              <div className="user-profile avatar">
-                <Avatar isClickable user={v} small={true} />
-              </div>
-              <span className="user-profile user-name">{v.name}</span>
-              <FriendAction userData={props.userData} friendId={v.id} />
-            </div>
-          ))
-        : null}
     </div>
   );
 }
 
 function FriendRequests(props: { requests: any; userData: any }) {
-  return props.requests.map((v: any) => {
-    const potentialFriend =
-      v.user_1.id === props.userData.user.id ? v.user_2 : v.user_1;
-    return (
-      <div className="user-profile" key={v.id}>
-        <div className="user-profile avatar">
-          <Avatar isClickable user={potentialFriend} small={true} />
+  const friendRequests = props.requests.map((v: any) => ({
+    id: v.id,
+    theFriend: v.user_1.id === props.userData.user.id ? v.user_2 : v.user_1,
+  }));
+
+  return (
+    <div className="friendlist-wrap">
+      {friendRequests.map((v: any) => (
+        <div className="friendlist-profile" key={v.id}>
+          <div className="friendlist-avatar">
+            <Avatar user={v.theFriend} small noStatus />
+          </div>
+          <span className="friendlist-name">{v.theFriend.name}</span>
+          <FriendButton userData={props.userData} friendId={v.theFriend.id} />
         </div>
-        <span className="user-profile user-name">{potentialFriend.name}</span>
-        <FriendAction userData={props.userData} friendId={potentialFriend.id} />
-      </div>
-    );
-  });
+      ))}
+      {friendRequests.length == 0 ? (
+        <p className="friendlist-empty">
+          You don&apos;t have any friend requests :(
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 export function FriendsModal(props: {
@@ -144,12 +158,10 @@ export function FriendsModal(props: {
           {
             name: 'Friend requests',
             value: 'requests',
-            badge: friendRequests.length,
           },
           { name: 'Add friend', value: 'add' },
         ]}
       />
-      <hr className="solid"></hr>
       {modalTab === 'requests' ? (
         <FriendRequests requests={friendRequests} userData={props.userData} />
       ) : (
