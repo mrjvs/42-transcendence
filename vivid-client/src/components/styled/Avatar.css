@@ -1,0 +1,75 @@
+.userAvatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 100%;
+  background-image: linear-gradient(to bottom right, #29419f, #a34fec);
+  margin-right: 1rem;
+  background-position: center;
+  background-size: cover;
+}
+
+.userAvatar.clickable {
+  cursor: pointer;
+}
+
+.userAvatar.clickable:hover {
+  transform: scale(1.05);
+}
+
+.userAvatar.blocked {
+  background-color: #272c43 !important;
+  background-image: initial !important;
+  position: relative;
+}
+
+.userAvatar.blocked::after,
+.userAvatar.blocked::before {
+  background-color: #1b1f31;
+  content: '';
+  height: 2rem;
+  width: 3px;
+  border-radius: 10px;
+  position: absolute;
+  top: calc(50% - 1rem);
+  left: calc(50% - 1.5px);
+  transform-origin: center;
+  transform: rotate(-45deg);
+}
+.userAvatar.blocked::before {
+  transform: rotate(45deg);
+}
+
+.userAvatar.blocked .status-bubble {
+  display: none;
+}
+
+.userAvatar .status-bubble {
+  background-color: #353b57; /* offline defaults */
+  position: absolute;
+  bottom: -0.25em;
+  right: -0.25em;
+  border: 0.25em #1b1f31 solid;
+  height: 0.75em;
+  width: 0.75em;
+  border-radius: 1em;
+}
+
+.userAvatar.small .status-bubble {
+  bottom: -0.25em;
+  right: -0.25em;
+  border: 0.25em #1b1f31 solid;
+  height: 0.5em;
+  width: 0.5em;
+}
+
+.userAvatar .status-bubble.status-ONLINE {
+  background-color: #55b86f;
+}
+
+.userAvatar .status-bubble.status-INGAME {
+  background-color: #f59c37;
+}
+
+.userAvatar {
+  position: relative;
+}

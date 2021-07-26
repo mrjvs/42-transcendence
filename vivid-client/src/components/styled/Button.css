@@ -1,0 +1,201 @@
+.button-new {
+  line-height: initial;
+  position: relative;
+  background-color: #2a3453;
+  color: white;
+  font-size: 1rem;
+  border: 0;
+  display: inline-flex;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.button-new > .loader {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 4px;
+  animation: button-loader 2s infinite ease-in-out;
+  margin-right: 1rem !important;
+  background: white;
+}
+
+.button-new.small > .loader {
+  height: 0.7rem;
+  width: 0.7rem;
+  border-radius: 2px;
+  margin-right: 0.4rem !important;
+}
+
+@keyframes button-loader {
+  0% {
+    transform: rotate(45deg);
+  }
+  100% {
+    transform: rotate(405deg);
+  }
+}
+
+.button-new:active {
+  transform: scale(1.05);
+}
+
+.button-new.button-primary {
+  background: linear-gradient(to right, #29419f, #a34fec);
+  padding: 0.7rem 3.5rem;
+}
+
+.button-new.button-primary:hover {
+  background: linear-gradient(to right, #243a94, #8c40cf);
+}
+
+.button-new.button-secondary {
+  background: #30354d;
+  padding: 0.7rem 3.5rem;
+  color: #c7cddf;
+}
+
+.button-new.button-secondary:hover {
+  background: #424866;
+  color: white;
+}
+
+.button-new.button-duel {
+  background: #252a40;
+  color: #8892b2;
+  display: flex;
+  margin-right: 0.5rem;
+  width: 4rem;
+  font-size: 1.4rem;
+}
+
+.button-new.button-small-box {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #131524;
+}
+
+.button-new.button-small-box > *:first-child {
+  margin-right: 0;
+}
+
+.button-new.button-duel:hover {
+  background: #2a3453;
+  color: white;
+}
+
+.button-new.button-danger {
+  background: #9c3446;
+  color: white;
+}
+
+.button-new.button-decline,
+.button-new.button-accept {
+  height: 1.8rem;
+  width: 1.8rem;
+  padding: 0 !important;
+  overflow: hidden;
+  justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 50%;
+  background: rgba(51, 49, 49, 0.6);
+  color: #e45655;
+  box-sizing: border-box;
+}
+
+.button-new.button-decline > .loader,
+.button-new.button-accept > .loader {
+  width: 1rem;
+  height: 1rem;
+}
+
+.button-new.button-decline:hover {
+  background: rgba(83, 63, 63, 0.9);
+}
+
+.button-new.button-accept:hover {
+  background: rgba(160, 229, 126, 0.3);
+}
+
+.button-new.button-decline > *,
+.button-new.button-accept > * {
+  margin: 0 !important;
+}
+
+.button-new.button-decline svg,
+.button-new.button-accept svg {
+  stroke-width: 0.25em;
+}
+
+.button-new.button-accept {
+  background: rgba(160, 229, 126, 0.15);
+  color: #57b953;
+}
+
+.button-new.button-danger:hover {
+  background: #e45655;
+  color: white;
+}
+
+.button-new.button-less-padding {
+  padding: 0.5rem 1rem;
+}
+
+.button-new.button-more-padding {
+  padding: 0.5rem 1.5rem;
+}
+
+.button-new.button-margin-right {
+  margin-right: 0.5rem;
+}
+
+.button-new > *:first-child {
+  margin-right: 0.4rem;
+}
+
+.button-new.button-duel > *:first-child {
+  margin-right: 0;
+}
+
+.button-new:hover {
+  background-color: #354161;
+}
+
+.button-new .badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #e45655;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(50%, -50%);
+  pointer-events: none;
+}
+
+.button-new.small {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.button-new.small .badge {
+  width: 16px;
+  height: 16px;
+  font-size: 0.7rem;
+}
+
+.button-new.small > *:first-child {
+  margin-right: 0.2rem;
+}

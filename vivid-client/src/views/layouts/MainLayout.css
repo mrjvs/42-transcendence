@@ -1,0 +1,36 @@
+.contentContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.contentHeader {
+  background-color: #121727;
+  padding: 0 1.5rem;
+  color: white;
+  height: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.contentHeader.nobg {
+  background-color: transparent;
+}
+
+.contentHeader .heading {
+  margin: 0;
+}
+
+.contentHeader > .items {
+  align-items: flex-end;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.channelWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}

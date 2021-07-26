@@ -1,0 +1,22 @@
+.user-tag {
+  background-color: #6b3aab;
+  color: white;
+  padding: 0.1rem 0.6rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.user-tag.tag-owner {
+  background-color: #345fd5;
+}
+
+.user-tag.tag-muted {
+  background-color: #9c3446;
+}
+
+.user-tag.tag-banned {
+  background-color: #9c3446;
+}

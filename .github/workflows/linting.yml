@@ -1,0 +1,44 @@
+name: Linting
+
+on: [push, pull_request]
+
+jobs:
+  client_linting:
+    runs-on: ubuntu-latest
+
+    env:
+      working-directory: ./vivid-client
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+      - name: Installing dependencies
+        working-directory: ${{env.working-directory}}
+        run: npm ci
+      - name: Linting
+        working-directory: ${{env.working-directory}}
+        run: npm run lint
+
+  server_linting:
+    runs-on: ubuntu-latest
+
+    env:
+      working-directory: ./vivid-server
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+      - name: Setting up npm
+        run: npm install -g npm@6
+      - name: Installing dependencies
+        working-directory: ${{env.working-directory}}
+        run: npm ci
+      - name: Linting
+        working-directory: ${{env.working-directory}}
+        run: npm run lint

@@ -1,0 +1,188 @@
+.loading-screen {
+  min-height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  background-color: #1b1f31;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-screen .overlay {
+  background-color: #15192a;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+}
+
+.loading-screen .login-card {
+  position: relative;
+  z-index: 5;
+  background-color: #252a40;
+  border-radius: 10px;
+  width: 25rem;
+  padding: 2rem;
+  max-width: 100%;
+  margin: 2rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+}
+
+.loading-screen .login-buttons {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+}
+
+.loading-screen .login-buttons p {
+  line-height: 1.25;
+}
+
+.loading-screen .login-buttons .button-new {
+  margin-bottom: 0.5rem;
+  flex: 1;
+}
+
+.loading-screen .login-card .icon {
+  margin-bottom: 3rem;
+  margin-top: 1.5rem;
+  background: linear-gradient(to bottom right, #29419f, #a34fec);
+  transform: rotate(45deg);
+  border-radius: 5px;
+  height: 3rem;
+  width: 3rem;
+}
+
+.loading-screen .login-card .title {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: white;
+  text-align: center;
+  margin: 0 0 0.5rem 0;
+}
+
+.loading-screen .login-card .text {
+  color: #8892b2;
+  text-align: center;
+  max-width: 15rem;
+  margin-bottom: 5rem;
+  line-height: 1.4;
+}
+
+.loading-screen .icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-screen .icon-wrapper .icon,
+.loading-icon-rotate {
+  background: linear-gradient(to bottom right, #29419f, #a34fec);
+  transform: rotate(45deg);
+  height: 5rem;
+  width: 5rem;
+  border-radius: 10px;
+  animation: loading-rotate 2.2s cubic-bezier(0.57, 0.01, 0.35, 1) 0.2s infinite;
+  margin-bottom: 3rem;
+  margin-top: 6.5rem;
+}
+
+.loading-screen .icon-wrapper .icon.bigload {
+  margin-top: 18.5rem;
+}
+
+.loading-screen .icon-wrapper .icon.hidden {
+  opacity: 0;
+}
+
+.loading-icon-rotate.small {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  margin-top: 0;
+}
+
+.loading-screen .icon-wrapper .text {
+  color: #c7cddf;
+  height: 3.5rem;
+  margin: 0;
+  font-size: 1.1rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+@keyframes loading-rotate {
+  0% {
+    transform: rotate(45deg);
+  }
+  90% {
+    transform: rotate(765deg);
+  }
+  100% {
+    transform: rotate(765deg);
+  }
+}
+
+/* loading matches */
+.loading-screen .loading-match {
+  display: flex;
+  height: 5rem;
+  text-align: center;
+  line-height: 1.5;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  margin-top: 2rem;
+  height: 15rem;
+}
+
+.loading-screen .loading-match-rank {
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-height: 1.5rem;
+}
+
+.loading-screen .loading-match-rank .loading-match-icon {
+  font-size: 1.1rem;
+  margin-right: 0.3rem;
+}
+
+.loading-screen .loading-match .loading-match-heading {
+  font-size: 1.3rem;
+  margin: 0.7rem 0 0.5rem 0;
+  color: white;
+}
+
+.loading-screen .loading-match .loading-match-text {
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  color: #9da6c4;
+}
+
+.loading-screen .loading-match .loading-match-text.bigmargin {
+  margin: 0 0 2rem 0;
+}
+
+.loading-screen .loading-match .loading-match-status {
+  font-size: 0.7rem;
+  margin: 0 0 3rem 0;
+  color: #424d72;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.loading-screen .loading-match .loading-match-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

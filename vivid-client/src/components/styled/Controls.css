@@ -1,0 +1,45 @@
+.waiting-keys {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-gap: 5px;
+}
+
+.waiting-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: white;
+  background-color: #4a526b;
+  border-radius: 5px;
+  height: 3rem;
+  width: 3rem;
+  user-select: none;
+}
+
+.waiting-key.hide {
+  opacity: 0;
+}
+
+.waiting-key.wide {
+  margin-top: 1.5rem;
+  width: calc((5 * 3rem) + 10px);
+}
+
+.waiting-key.fade {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #4c5164;
+  background: rgba(54, 60, 82, 0.425);
+}
+
+.waiting-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}

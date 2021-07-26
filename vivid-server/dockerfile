@@ -1,0 +1,21 @@
+FROM node:16-alpine 
+WORKDIR /app
+
+# install build dependencies and python (for bcrypt)
+RUN apk --no-cache add build-base python3
+# downgrade npm v6 (for bcrypt)
+RUN npm install -g npm@6
+
+# install dependencies
+COPY package* ./
+RUN npm install
+
+# copy rest
+COPY . .
+
+# compile
+RUN npm run build
+
+# run server
+EXPOSE 3000
+CMD export PORT=3000 && cd dist && node main.js
