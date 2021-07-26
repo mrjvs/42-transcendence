@@ -7,11 +7,7 @@ import { UserContext } from '../../../hooks/useUser';
 import { Avatar } from '../Avatar';
 import { UsersContext } from '../../../hooks/useUsers';
 import { MatchList } from '../MatchList';
-import { SocketContext } from '../../../hooks/useWebsocket';
 import { Icon } from '../Icon';
-
-// TODO friends modal check
-// TODO events for friend updates
 
 function ModalContent(props: {
   userData: any;
@@ -182,8 +178,6 @@ function BlockAction(props: { userData: any; userId: string }) {
 }
 
 export function FriendButton(props: { userData: any; friendId: string }) {
-  const { client } = React.useContext(SocketContext);
-
   const friendUser = useFetch({
     url: `/api/v1/friends/add/${props.friendId}`,
     method: 'POST',

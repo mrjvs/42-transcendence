@@ -4,7 +4,6 @@ import {
   Delete,
   ForbiddenException,
   Get,
-  Param,
   Patch,
   UseGuards,
 } from '@nestjs/common';
@@ -14,12 +13,7 @@ import {
   UserParam,
 } from '~/middleware/decorators/login.decorator';
 import { AccountNotSetupGuard } from '~/middleware/guards/auth.guards';
-import {
-  FullDetailsUser,
-  UnrelatedUser,
-  UserEntity,
-  UsernameChangeDto,
-} from '@/user.entity';
+import { FullDetailsUser, UserEntity, UsernameChangeDto } from '@/user.entity';
 
 import { formatObject } from '~/utils/format';
 import { UserService } from './user.service';

@@ -9,7 +9,7 @@ import { TabsModal } from '../Tabs';
 
 import './FriendModal.css';
 
-export function FindUsers(props: { userData: any }) {
+export function SendRequest() {
   const [userName, setUserName] = React.useState('');
 
   const findUser = useFetch({
@@ -155,7 +155,7 @@ export function FriendsModal(props: {
       {modalTab === 'requests' ? (
         <FriendRequests requests={friendRequests} userData={props.userData} />
       ) : (
-        <FindUsers userData={props.userData} />
+        <SendRequest />
       )}
     </ModalBase>
   );
