@@ -6,6 +6,7 @@ import {
   ChannelsContext,
   useChannelsContext,
 } from './hooks/useChannels';
+import { FriendProvider } from './hooks/useFriends';
 import { GameEventContext, useGameEvents } from './hooks/useGameEvents';
 import { useMessageContext, MessageContext } from './hooks/useMessages';
 import { StatusContext, useStatusContext } from './hooks/useStatuses';
@@ -20,7 +21,7 @@ function MessageStoreInit(props: { children: any }) {
   return (
     <ChannelClientListener>
       <MessageContext.Provider value={messageData}>
-        {props.children}
+        <FriendProvider>{props.children}</FriendProvider>
       </MessageContext.Provider>
     </ChannelClientListener>
   );

@@ -103,7 +103,7 @@ function SideBarRouter() {
             Friends
           </Button>
         </ActionRow>
-        <Friends userData={userData} />
+        <Friends userData={userData} openModal={() => setFriendsOpen(true)} />
       </nav>
       <div className="content">
         <Switch>

@@ -7,12 +7,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { getConnection, Repository } from 'typeorm';
 import { FriendsEntity } from '@/friends.entity';
 import { UserEntity } from '@/user.entity';
+import { EventGateway } from '../websocket/event.gateway';
 
 @Injectable()
 export class FriendsService {
   constructor(
     @InjectRepository(FriendsEntity)
     private friendsRepository: Repository<FriendsEntity>,
+    private eventGateway: EventGateway,
   ) {}
 
   async findFriendship(user_1: string, user_2: string): Promise<FriendsEntity> {
@@ -68,7 +70,9 @@ export class FriendsService {
         if (error.code === '23505') throw new BadRequestException();
         throw error;
       });
-    return await this.findFriendship(user_1, user_2);
+    const friendship = await this.findFriendship(user_1, user_2);
+    this.eventGateway.updateFriendships(friendship);
+    return friendship;
   }
 
   async getFriend(user1: string, user2: string): Promise<FriendsEntity> {
@@ -134,6 +138,8 @@ export class FriendsService {
         if (error.code === '22P02') throw new NotFoundException();
         throw error;
       });
+    friendship.accepted = true;
+    this.eventGateway.updateFriendships(friendship);
     return friendship;
   }
 
@@ -153,6 +159,7 @@ export class FriendsService {
         if (error.code === '22P02') throw new NotFoundException();
         throw error;
       });
+    this.eventGateway.removeFriendships(friendship);
     return friendship;
   }
 }

@@ -22,6 +22,7 @@ import {
 import { ChannelEntity } from '@/channel.entity';
 import { MatchMakingService } from '$/ladder/matchmaking.service';
 import { forwardRef, Inject } from '@nestjs/common';
+import { FriendsEntity } from '~/models/friends.entity';
 
 @WebSocketGateway({ path: '/api/v1/events' })
 export class EventGateway implements OnGatewayConnection {
@@ -267,9 +268,26 @@ export class EventGateway implements OnGatewayConnection {
   }
 
   /* FRIENDSHIPS */
-  @SubscribeMessage('friendship_update')
-  updateFriendships(@ConnectedSocket() client: Socket) {
-    if (!client.auth) return;
-    client.emit('friendship_update');
+  updateFriendships(friend: FriendsEntity) {
+    if (!this.server) return;
+    const ids = [(friend.user_1 as any).id, (friend.user_2 as any).id];
+    const sockets = this.server.sockets.connected;
+    for (const socketId in sockets) {
+      const client = sockets[socketId];
+      if (!client.auth) continue; // skip user if not authed
+      if (!ids.includes(client.auth)) continue; // skip if user not related
+      client.emit('friendship_update', friend);
+    }
+  }
+  removeFriendships(friend: FriendsEntity) {
+    if (!this.server) return;
+    const ids = [(friend.user_1 as any).id, (friend.user_2 as any).id];
+    const sockets = this.server.sockets.connected;
+    for (const socketId in sockets) {
+      const client = sockets[socketId];
+      if (!client.auth) continue; // skip user if not authed
+      if (!ids.includes(client.auth)) continue; // skip if user not related
+      client.emit('friendship_remove', friend.id);
+    }
   }
 }

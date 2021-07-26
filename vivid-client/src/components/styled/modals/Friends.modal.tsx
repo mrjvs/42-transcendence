@@ -5,7 +5,6 @@ import { Button } from '../Button';
 import { TextInput } from '../TextInput';
 import { useFetch } from '../../../hooks/useFetch';
 import { FriendButton } from './UserProfile.modal';
-import { SocketContext } from '../../../hooks/useWebsocket';
 import { TabsModal } from '../Tabs';
 
 import './FriendModal.css';
@@ -97,7 +96,6 @@ export function FriendsModal(props: {
 }) {
   const [modalTab, setModalTab] = React.useState('requests');
   const [friendRequests, setFriendRequests] = React.useState([]);
-  const { client } = React.useContext(SocketContext);
 
   const findFriendRequests = useFetch({
     url: `/api/v1/friends/requests`,
@@ -136,14 +134,6 @@ export function FriendsModal(props: {
       );
     });
   }, [props.userData]);
-
-  React.useEffect(() => {
-    if (client) client.on('friendship_update', findFriendRequests.run);
-
-    return () => {
-      if (client) client.off('friendship_update', findFriendRequests.run);
-    };
-  }, [client]);
 
   return (
     <ModalBase

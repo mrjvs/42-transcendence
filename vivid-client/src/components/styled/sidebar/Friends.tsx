@@ -3,7 +3,7 @@ import './ActionRow.css';
 import { SidebarLink } from '../../../components/styled/sidebar/SidebarLink';
 import { Avatar } from '../../../components/styled/Avatar';
 
-export function Friends(props: { userData: any }) {
+export function Friends(props: { userData: any; openModal: () => void }) {
   return (
     <div>
       {props.userData.user.friends
@@ -18,6 +18,16 @@ export function Friends(props: { userData: any }) {
             </SidebarLink>
           </div>
         ))}
+      {props.userData.user.friends?.filter((v: any) => v.accepted).length ==
+      0 ? (
+        <SidebarLink
+          click={() => props.openModal()}
+          description="Click here to add a few"
+          icon="user_friends"
+        >
+          No friends?
+        </SidebarLink>
+      ) : null}
     </div>
   );
 }
